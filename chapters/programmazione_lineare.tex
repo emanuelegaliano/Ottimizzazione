@@ -1,0 +1,228 @@
+\chapter{Programmazione lineare}\label{ch:pl}
+La programmazione lineare (PL) è una delle classi più semplici di problemi vincolati da studiare: sia la funzione obiettivo sia i vincoli sono lineari. A differenza del capitolo precedente, che ha introdotto il linguaggio generale dell'ottimizzazione, qui si parte da un problema concreto, quello dei mattoncini lego, per costruirne il modello e ricavarne la forma generale di un problema di PL. Vedremo poi come, quando le variabili sono due, il problema si possa risolvere semplicemente disegnandolo sul piano.
+
+\section{Formulazione del problema dei mattoncini lego}\label{sec:lego-form}
+Riprendiamo il problema della sezione~\ref{sec:lego-intro}. Date le materie prime:
+\begin{itemize}
+    \item Mattoncini piccoli: 8.
+    \item Mattoncini grandi: 6.
+\end{itemize}
+si possono produrre sedie, con 1 mattoncino grande e 2 piccoli, vendute a 15 euro, e tavoli, con 2 mattoncini grandi e 2 piccoli, venduti a 20 euro. Si tratta di un problema di \textbf{ottimizzazione lineare}, e per formularlo si procede definendo uno per volta gli elementi del modello.
+
+\paragraph{Obiettivo.}
+Massimizzare il profitto totale ottenuto dalla vendita di sedie e tavoli.
+
+\paragraph{Variabili.}
+Le scelte da compiere sono le quantità da produrre:
+\begin{itemize}
+    \item $x_1$: numero di sedie.
+    \item $x_2$: numero di tavoli.
+\end{itemize}
+
+\paragraph{Funzione obiettivo.}
+Il profitto totale si ottiene moltiplicando il profitto di ogni prodotto per la rispettiva variabile e sommando i contributi:
+\[
+f(x) = 15x_1 + 20x_2.
+\]
+
+\paragraph{Vincoli.}
+Le quantità di mattoncini necessarie a ciascun prodotto sono riassunte nella seguente tabella:
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Mattoncini & Sedie & Tavoli & Disponibili \\
+\midrule
+Piccoli & 2 & 2 & 8 \\
+Grandi  & 1 & 2 & 6 \\
+\bottomrule
+\end{tabular}
+\end{center}
+da cui seguono due vincoli, uno per ogni risorsa:
+\begin{itemize}
+    \item \textbf{Vincolo 1}: non possiamo usare più di 8 mattoncini piccoli.
+    \item \textbf{Vincolo 2}: non possiamo usare più di 6 mattoncini grandi.
+\end{itemize}
+Per il vincolo 1, ogni sedia e ogni tavolo richiedono 2 mattoncini piccoli, quindi
+\[
+2x_1 + 2x_2 \le 8,
+\]
+mentre per il vincolo 2, ogni sedia richiede 1 mattoncino grande e ogni tavolo ne richiede 2, quindi
+\[
+x_1 + 2x_2 \le 6.
+\]
+Infine, è ovvio che le quantità prodotte non possano essere negative, per cui $x_1, x_2 \ge 0$.
+
+\paragraph{Problema finale.}
+Il problema consiste nel trovare
+\begin{equation}\label{eq:lego}
+\max\, (15x_1 + 20x_2)
+\end{equation}
+dove i vincoli sono:
+\[
+\begin{aligned}
+2x_1 + 2x_2 &\le 8 \\
+x_1 + 2x_2 &\le 6 \\
+x_1,\, x_2 &\ge 0.
+\end{aligned}
+\]
+
+\section{Programmazione lineare}
+In generale, un problema di programmazione lineare si presenta nella forma
+\[
+\min\, (c_1 x_1 + \dots + c_n x_n)
+\]
+con i vincoli
+\[
+\begin{aligned}
+a_{11} x_1 + \dots + a_{1n} x_n &\ge b_1 \\
+&\ \,\vdots \\
+a_{m1} x_1 + \dots + a_{mn} x_n &\ge b_m
+\end{aligned}
+\]
+dove $x_1, \dots, x_n \in \mathbb{R}$ sono le \textbf{variabili decisionali}, $c_j$ sono i \textbf{coefficienti di costo} (o di profitto), $a_{ij}$ sono i coefficienti del sistema dei vincoli e $b_i$ sono i \textbf{termini noti}. I vincoli possono anche essere di tipo $\le$ oppure di uguaglianza.
+
+\begin{osservazione}
+Nella programmazione lineare non esistono mai vincoli stretti ($<$ oppure $>$). Il motivo è che una regione ammissibile definita da disuguaglianze strette non include i punti del suo bordo, e di conseguenza un problema anche limitato potrebbe non avere alcun punto di minimo.
+\end{osservazione}
+
+\subsection{Caratteristiche di un problema lineare}
+Un problema è lineare quando soddisfa tre caratteristiche:
+\begin{itemize}
+    \item \textbf{Proporzionalità}: ogni variabile è accompagnata da un coefficiente e compare in modo lineare, quindi dà un contributo proporzionale a se stessa. Nel problema dei mattoncini, ad esempio, raddoppiare il numero di sedie raddoppia anche il profitto che ne deriva.
+    \item \textbf{Additività}: i contributi di tutte le variabili si possono sommare, sia nella funzione obiettivo sia nei vincoli.
+    \item \textbf{Continuità}: ogni variabile può assumere un qualsiasi valore continuo, ovvero è una variabile reale.\footnote{Quando questa ipotesi non è realistica, ad esempio perché le variabili rappresentano numeri di oggetti, si parla di programmazione lineare intera.}
+\end{itemize}
+
+\section{Problemi di pianificazione della produzione}
+Il problema dei mattoncini è un esempio di \textbf{problema di pianificazione della produzione}, o di allocazione ottima delle risorse. In questo tipo di problemi si hanno:
+\begin{itemize}
+    \item $P_1, \dots, P_n$: i prodotti che si possono realizzare.
+    \item $c_1, \dots, c_n$: i profitti, dove $c_j$ è il profitto ottenuto dalla vendita di una unità del prodotto $P_j$.
+    \item $R_1, \dots, R_m$: le risorse (materie prime) a disposizione, di cui $b_i$ è la quantità disponibile della risorsa $R_i$.
+    \item $a_{ij}$: la quantità di risorsa $R_i$ necessaria a fabbricare una unità del prodotto $P_j$.
+\end{itemize}
+
+L'obiettivo è sempre massimizzare il profitto. Indicando con $x_j$ la quantità prodotta del prodotto $P_j$ (detta anche \textbf{livello di attività}), il problema si scrive come:
+\begin{equation}\label{eq:produzione}
+\max \sum_{j=1}^{n} c_j x_j
+\end{equation}
+con i vincoli
+\[
+\begin{aligned}
+\sum_{j=1}^{n} a_{ij} x_j &\le b_i, \quad i = 1, \dots, m \\
+x_j &\ge 0, \quad j = 1, \dots, n.
+\end{aligned}
+\]
+Il primo gruppo di vincoli impone che la quantità totale utilizzata di ciascuna risorsa non superi quella disponibile. Nel problema dei mattoncini si ha $n = m = 2$, con $c_1 = 15$, $c_2 = 20$, $b_1 = 8$, $b_2 = 6$ e coefficienti $a_{ij}$ dati dalla tabella della sezione~\ref{sec:lego-form}.
+
+\section{Risoluzione grafica}\label{sec:graf}
+Quando un problema di PL ha due sole variabili, i suoi elementi si possono rappresentare sul piano cartesiano $Ox_1x_2$, e la soluzione si individua direttamente sul disegno.
+
+\paragraph{Rappresentazione dei vincoli.}
+L'equazione $a x_1 + b x_2 = c$ rappresenta una retta che divide il piano in due semipiani, ciascuno dei quali è formato dai punti che soddisfano rispettivamente la disequazione $a x_1 + b x_2 \ge c$ oppure $a x_1 + b x_2 \le c$. Ogni vincolo del problema individua quindi un semipiano, e la regione ammissibile è data dall'intersezione di tali semipiani. Il vettore $(a, b)^T$ è ortogonale alla famiglia di rette parallele $a x_1 + b x_2 = c$ al variare di $c$ ed è orientato verso il semipiano in cui $a x_1 + b x_2 \ge c$.
+
+\paragraph{Rappresentazione della funzione obiettivo.}
+La funzione obiettivo $c_1 x_1 + c_2 x_2$ si rappresenta tracciando il fascio di rette
+\[
+c_1 x_1 + c_2 x_2 = k
+\]
+al variare di $k$, ovvero le \textbf{curve di livello} della funzione. Queste rette sono tutte parallele tra loro e ortogonali al vettore $c = (c_1, c_2)^T$, che è il gradiente della funzione obiettivo, e il valore $k$ cresce nel verso indicato da $c$. Di conseguenza, in un problema di massimizzazione si trasla il fascio nella direzione di crescita $c$, mentre in un problema di minimizzazione lo si trasla nella direzione opposta.
+
+\paragraph{Procedura.}
+La risoluzione grafica si svolge in tre passi:
+\begin{enumerate}
+    \item Si disegna la regione ammissibile, intersecando i semipiani individuati dai vincoli.
+    \item Si disegnano le curve di livello della funzione obiettivo, indicando la direzione in cui $k$ cresce.
+    \item Tra tutte le curve di livello che intersecano la regione ammissibile si cerca quella con il valore di $k$ massimo (o minimo, a seconda del problema): una soluzione ottima è data dall'intersezione di tale curva con la regione ammissibile.
+\end{enumerate}
+
+\paragraph{Esempio.}
+Applichiamo la procedura al problema dei mattoncini~\eqref{eq:lego}, rappresentato in figura~\ref{fig:lego-grafico}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.15, >=Stealth]
+  \useasboundingbox (-2.2,-1.1) rectangle (8.0,4.8);
+
+  % regione ammissibile OABC
+  \fill[Accent!12] (0,0) -- (4,0) -- (2,2) -- (0,3) -- cycle;
+
+  % assi
+  \draw[->] (-0.3,0) -- (6.7,0) node[right] {$x_1$};
+  \draw[->] (0,-0.3) -- (0,4.6) node[above] {$x_2$};
+  \foreach \x in {1,...,6} \draw (\x,0.06) -- (\x,-0.06) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,4} \draw (0.06,\y) -- (-0.06,\y) node[left,font=\scriptsize] {\y};
+
+  % curve di livello
+  \draw[dashed, TextGray] (0,1.5) -- (2,0);
+  \draw[dashed, TextGray] (0,3) -- (4,0);
+  \draw[red!70!black, thick] (0,3.5) -- (14/3,0);
+
+  % vincoli
+  \draw[blue!65!black, very thick] (0,4) -- (4,0)
+    node[pos=0.16, above, sloped, font=\small] {$2x_1+2x_2=8$};
+  \draw[orange!85!black, very thick] (0,3) -- (6,0)
+    node[pos=0.86, above, sloped, font=\small] {$x_1+2x_2=6$};
+
+  % direzione di crescita
+  \draw[->, red!70!black, very thick] (4.2,3.0) -- (5.1,4.2)
+    node[right, font=\small] {$c=(15,20)^T$};
+
+  % legenda delle curve di livello
+  \draw[RuleGray, fill=white] (4.8,1.45) rectangle (7.95,2.55);
+  \draw[dashed, TextGray] (4.95,2.2) -- (5.5,2.2);
+  \node[font=\small, anchor=west] at (5.6,2.2) {$k=30,\ k=60$};
+  \draw[red!70!black, thick] (4.95,1.8) -- (5.5,1.8);
+  \node[font=\small, anchor=west, red!70!black] at (5.6,1.8) {$k=70$};
+
+  % vertici
+  \node[circle, fill=black, inner sep=1.5pt] at (0,0) {};
+  \node[circle, fill=black, inner sep=1.5pt] at (4,0) {};
+  \node[circle, fill=black, inner sep=1.5pt] at (0,3) {};
+  \node[circle, fill=red!70!black, inner sep=2pt] at (2,2) {};
+  \node[font=\small, anchor=north east] at (-0.1,-0.12) {$O=(0,0)$};
+  \node[font=\small, anchor=north] at (4,-0.5) {$A=(4,0)$};
+  \node[font=\small, anchor=east] at (-0.4,3) {$C=(0,3)$};
+  \node[red!70!black, font=\small, anchor=south west] at (2.1,2.2) {$B=x^*=(2,2)$};
+\end{tikzpicture}
+\caption{Risoluzione grafica del problema dei mattoncini lego: la regione ammissibile (zona colorata) è il quadrilatero $OABC$ di vertici $O=(0,0)$, $A=(4,0)$, $B=(2,2)$ e $C=(0,3)$, delimitato dagli assi e dalle rette dei due vincoli (in blu quella dei mattoncini piccoli, in arancione quella dei grandi). Le rette tratteggiate grigie sono curve di livello della funzione obiettivo $15x_1+20x_2=k$ per $k=30$ e $k=60$, la retta rossa è quella per $k=70$, ovvero l'ultima che interseca la regione ammissibile, nel vertice $B$, e la freccia rossa indica la direzione di crescita $c=(15,20)^T$.}
+\label{fig:lego-grafico}
+\end{figure}
+
+\paragraph{Soluzione.}
+La regione ammissibile è il quadrilatero $OABC$ di vertici $O=(0,0)$, $A=(4,0)$, $B=(2,2)$ e $C=(0,3)$. Il vertice $B$ è l'intersezione delle rette dei due vincoli, ottenuta risolvendo il sistema
+\[
+\begin{cases}
+x_1 + x_2 = 4 \\
+x_1 + 2x_2 = 6
+\end{cases}
+\]
+dove la prima equazione è il vincolo 1 diviso per 2: sottraendola alla seconda si ricava $x_2 = 2$ e quindi $x_1 = 2$.
+
+Le curve di livello $15x_1 + 20x_2 = k$ sono rette di pendenza $-3/4$, ortogonali a $c = (15, 20)^T$. Poiché stiamo massimizzando, le trasliamo nella direzione di $c$ finché hanno ancora punti in comune con il poligono: l'ultima curva di livello che lo interseca è quella che passa per il vertice $B$, con
+\[
+k = 15 \cdot 2 + 20 \cdot 2 = 70.
+\]
+Gli altri vertici hanno infatti valori inferiori della funzione obiettivo: $f(O) = 0$, $f(A) = 60$ e $f(C) = 60$. La soluzione ottima è dunque $x^* = B = (2,2)$, con profitto pari a 70 euro: conviene costruire 2 sedie e 2 tavoli. In questo caso entrambi i vincoli sono verificati con uguaglianza, perché si usano esattamente $2 \cdot 2 + 2 \cdot 2 = 8$ mattoncini piccoli e $2 + 2 \cdot 2 = 6$ mattoncini grandi.
+
+\paragraph{Esiti possibili.}
+In generale, un problema di PL può:
+\begin{itemize}
+    \item \textbf{Ammettere soluzione ottima}: non necessariamente unica, ma situata in un vertice della regione ammissibile (un poligono).
+    \item \textbf{Non ammettere soluzione ottima}: ciò accade quando la regione ammissibile è vuota, oppure quando è illimitata e la funzione obiettivo è illimitata superiormente (problema di massimo) o inferiormente (problema di minimo).
+\end{itemize}
+
+Inoltre, se $c \neq 0$ nessuna soluzione ottima è interna alla regione ammissibile, e gli ottimi locali sono anche ottimi globali, come anticipato nella sezione~\ref{sec:definizioni}.
+
+\paragraph{Problemi a tre variabili.}
+Con questo metodo si possono risolvere anche problemi a tre variabili, scrivendone una in funzione delle altre due (ad esempio tramite un vincolo di uguaglianza) e riconducendo così il problema a due variabili.
+
+In sintesi, la risoluzione grafica è immediata e permette di vedere direttamente perché una soluzione ottima si trova in un vertice della regione ammissibile; tuttavia è applicabile solo a problemi con due variabili, o riconducibili a due, al prezzo di non essere uno strumento generale.
+
+\section*{Riferimenti}
+Il materiale visto in questo capitolo comprende:
+\begin{itemize}
+    \item Materiale visto a lezione (2 ottobre 2026).
+    \item Dispensa del corso \emph{Introduzione all'ottimizzazione}, sezione 4 (modelli di produzione).
+    \item Dispensa del corso \emph{Risoluzione grafica dei problemi di PL}.
+\end{itemize}

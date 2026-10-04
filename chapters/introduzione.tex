@@ -1,0 +1,337 @@
+\chapter{Introduzione all'ottimizzazione}
+Ogni volta che si hanno a disposizione risorse limitate e più modi di utilizzarle, ci si trova davanti a un problema di scelta: tra tutte le alternative possibili, qual è la migliore? L'ottimizzazione matematica nasce per rispondere a questa domanda in modo rigoroso, ovvero traducendo il problema reale in un modello matematico che possa essere analizzato e risolto con metodi numerici. In questo capitolo introduciamo il linguaggio di base che useremo per tutto il corso: cosa si intende per problema di ottimizzazione, come è fatto e in quali casi ammette (o non ammette) una soluzione.
+
+\section{Un primo esempio: i mattoncini lego}\label{sec:lego-intro}
+Per fissare le idee, partiamo da un problema concreto. Supponiamo di avere a disposizione 8 mattoncini piccoli e 6 mattoncini grandi, e di poter costruire due tipi di oggetti:
+\begin{itemize}
+    \item \textbf{Tavolo}: richiede 2 mattoncini piccoli e 2 grandi, e permette di guadagnare 20 euro.
+    \item \textbf{Sedia}: richiede 2 mattoncini piccoli e 1 grande, e permette di guadagnare 15 euro.
+\end{itemize}
+
+Il problema è decidere quanti tavoli e quante sedie costruire in modo da massimizzare il profitto. Prima di poterlo risolvere servono però gli strumenti per formularlo: la formulazione matematica verrà costruita nel capitolo~\ref{ch:pl}.
+
+\section{Cos'è l'ottimizzazione}\label{sec:cos-e}
+L'\textbf{ottimizzazione matematica}, detta anche \textbf{programmazione matematica}, è una branca della \textbf{Ricerca Operativa}, ovvero la disciplina che si occupa di formulare e risolvere modelli matematici per processi decisionali complessi (per questo motivo la Ricerca Operativa è detta anche la \emph{scienza delle decisioni}). In particolare, l'ottimizzazione si occupa di problemi decisionali che sono:
+\begin{itemize}
+    \item \textbf{Con un solo decisore}: la scelta è compiuta da un unico soggetto.
+    \item \textbf{Con un solo obiettivo}: esiste un unico criterio che permette di confrontare le diverse alternative.
+    \item \textbf{Deterministici}: i dati si considerano certi, senza alcuna componente probabilistica.
+\end{itemize}
+
+È importante precisare che i problemi con più decisori, ognuno con i propri obiettivi, non rientrano in questo ambito: la loro risoluzione è studiata dalla \textbf{teoria dei giochi}.
+
+% TODO: problema di Dantzig, da leggere nelle slide del corso.
+
+\section{Approccio modellistico}
+Il passaggio da un problema reale alla sua soluzione segue, in generale, cinque fasi:
+\begin{enumerate}
+    \item \textbf{Formulazione del problema}: si individuano gli obiettivi, si determinano le restrizioni e si raccolgono i dati.
+    \item \textbf{Costruzione del modello}: si cerca un compromesso tra precisione e trattabilità matematica, individuando le variabili, la funzione obiettivo e i vincoli.
+    \item \textbf{Analisi del modello}: si individuano i metodi numerici adatti e si costruisce l'algoritmo risolutivo.
+    \item \textbf{Soluzione numerica}: si esegue l'algoritmo e si calcola la soluzione.
+    \item \textbf{Validazione del modello}: si verifica la soluzione ottenuta (collaudo) e, se necessario, si migliora il modello.
+\end{enumerate}
+
+Un modello troppo dettagliato rischia di essere impossibile da risolvere, mentre un modello troppo semplice potrebbe non descrivere abbastanza bene il problema reale: per questo motivo l'ultima fase può riportare indietro alle prime, e il processo viene spesso ripetuto più volte.
+
+\section{Com'è fatto un problema di ottimizzazione}
+La forma più generale di un problema di ottimizzazione è:
+\begin{equation}\label{eq:opt-generale}
+\min f(x), \quad x \in X, \quad f: \mathbb{R}^n \to \mathbb{R}
+\end{equation}
+dove:
+\begin{itemize}
+    \item $f(x)$ è la \textbf{funzione obiettivo}, ovvero il criterio di scelta tra le diverse alternative.
+    \item $X \subseteq \mathbb{R}^n$ è la \textbf{regione ammissibile}, ovvero l'insieme dei punti che rispettano i vincoli del problema; un punto $x \in X$ è detto \textbf{punto ammissibile}.
+    \item $x = (x_1, \dots, x_n)^T$ è il vettore delle \textbf{variabili}.
+\end{itemize}
+
+Un problema di ottimizzazione consiste quindi nel determinare, se esiste, un punto di minimo della funzione $f$ tra i punti dell'insieme $X$.
+
+\begin{osservazione}[Problemi di massimo e di minimo]
+Nel seguito parleremo principalmente di problemi di minimo, perché un problema di massimo può sempre essere ricondotto a uno di minimo cambiando di segno la funzione obiettivo. Infatti i punti di massimo di $f$ su $X$ coincidono con i punti di minimo di $-f$, e di conseguenza:
+\[
+\max_{x \in X} f(x) = -\min_{x \in X} \big(-f(x)\big).
+\]
+\end{osservazione}
+
+\paragraph{Esempio.}
+Consideriamo la funzione
+\[
+f(x) = -x^2 + 10x
+\]
+ovvero una parabola con vertice $V_0 = (5, 25)$, rappresentata nella figura~\ref{fig:parabole} a sinistra. Il massimo di $f(x)$ è l'ordinata del vertice, cioè $25$. Se consideriamo invece $-f(x) = x^2 - 10x$, la parabola si ribalta (figura~\ref{fig:parabole}, a destra) e il suo minimo è $-25$, ovvero l'ordinata del nuovo vertice $V_1 = (5, -25)$. Cambiando di segno si ottiene allora il massimo di partenza: $\max f(x) = -(-25) = 25$.
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[xscale=0.45, yscale=0.085, >=Stealth]
+  \useasboundingbox (-2,-33) rectangle (14,34);
+  % parabola speculare (traccia)
+  \draw[RuleGray, dashed, domain=-0.6:10.6, samples=60, smooth] plot (\x, {\x*\x-10*\x});
+  % assi
+  \draw[->] (-1.5,0) -- (11.8,0) node[right] {$x$};
+  \draw[->] (0,-30) -- (0,31) node[above] {$y$};
+  % curva
+  \draw[Accent, thick, domain=-0.6:10.6, samples=60, smooth] plot (\x, {-\x*\x+10*\x});
+  \node[Accent, font=\small, anchor=west] at (9.6,-9) {$f(x)$};
+  % massimo
+  \draw[dashed, TextGray] (0,25) -- (5,25) -- (5,0);
+  \node[font=\scriptsize, left] at (0,25) {$25$};
+  \node[font=\scriptsize, below] at (5,0) {$5$};
+  \node[circle, fill=Accent, inner sep=1.8pt] at (5,25) {};
+  \node[Accent, font=\small, anchor=south west] at (5.3,25.5) {$V_0$: massimo};
+\end{tikzpicture}
+\end{subfigure}
+\hfill
+\begin{subfigure}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[xscale=0.45, yscale=0.085, >=Stealth]
+  \useasboundingbox (-2,-33) rectangle (14,34);
+  % parabola speculare (traccia)
+  \draw[RuleGray, dashed, domain=-0.6:10.6, samples=60, smooth] plot (\x, {-\x*\x+10*\x});
+  % assi
+  \draw[->] (-1.5,0) -- (11.8,0) node[right] {$x$};
+  \draw[->] (0,-30) -- (0,31) node[above] {$y$};
+  % curva
+  \draw[red!70!black, thick, domain=-0.6:10.6, samples=60, smooth] plot (\x, {\x*\x-10*\x});
+  \node[red!70!black, font=\small, anchor=west] at (9.6,9) {$-f(x)$};
+  % minimo
+  \draw[dashed, TextGray] (0,-25) -- (5,-25) -- (5,0);
+  \node[font=\scriptsize, left] at (0,-25) {$-25$};
+  \node[font=\scriptsize, above] at (5,0) {$5$};
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (5,-25) {};
+  \node[red!70!black, font=\small, anchor=north west] at (5.3,-25.5) {$V_1$: minimo};
+\end{tikzpicture}
+\end{subfigure}
+\caption{Una parabola e la sua opposta: a sinistra $f(x) = -x^2+10x$ (in verde petrolio) con il massimo nel vertice $V_0 = (5,25)$, a destra $-f(x) = x^2-10x$ (in rosso) con il minimo nel vertice $V_1 = (5,-25)$. In entrambi i grafici la curva tratteggiata grigia è l'altra parabola: cambiare di segno la funzione equivale a ribaltarla rispetto all'asse $x$, e trasforma il massimo in un minimo di valore opposto.}
+\label{fig:parabole}
+\end{figure}
+
+\section{Classificazione dei problemi}
+I problemi di ottimizzazione si distinguono in due grandi classi, a seconda di come è fatta la regione ammissibile $X$.
+
+\begin{definizione}[Problema non vincolato]
+Un problema di ottimizzazione è \textbf{non vincolato} se la regione ammissibile coincide con tutto lo spazio, ovvero $X = \mathbb{R}^n$:
+\[
+\min_{x \in \mathbb{R}^n} f(x).
+\]
+\end{definizione}
+
+In questo caso non ci sono vincoli sulle variabili. Questi problemi sono sempre e solo non lineari: una funzione lineare non nulla, infatti, è illimitata inferiormente su tutto $\mathbb{R}^n$ e quindi non ammette un punto di minimo.
+
+\paragraph{Esempio.}
+Cerchiamo il minimo di
+\[
+\min_{x \in \mathbb{R}} \, x^2 - 10x.
+\]
+\textbf{Soluzione.} Si tratta della funzione $-f(x)$ dell'esempio precedente, ovvero di una parabola con vertice $V_1 = (5, -25)$. Non essendoci vincoli, l'ottimo coincide con il vertice: $x^* = 5$, con valore della funzione obiettivo pari a $-25$.
+
+\begin{definizione}[Problema vincolato]
+Un problema di ottimizzazione è \textbf{vincolato} se la regione ammissibile è descritta da vincoli di disuguaglianza e/o di uguaglianza sulle variabili:
+\[
+X = \{x \in \mathbb{R}^n : g_i(x) \le 0,\ i = 1, \dots, m;\ h_j(x) = 0,\ j = 1, \dots, p\},
+\]
+ovvero il problema si scrive come
+\[
+\begin{aligned}
+&\min f(x) \\
+&g_i(x) \le 0, \quad i = 1, \dots, m \\
+&h_j(x) = 0, \quad j = 1, \dots, p
+\end{aligned}
+\]
+dove $g_i : \mathbb{R}^n \to \mathbb{R}$ sono i $m$ vincoli di disuguaglianza e $h_j : \mathbb{R}^n \to \mathbb{R}$ sono i $p$ vincoli di uguaglianza. Un punto è quindi ammissibile solo se li rispetta tutti\footnote{Da notare che la $i$ e la $j$ indicano rispettivamente il numero di vincoli di disuguaglianza e di uguaglianza.} contemporaneamente.
+\end{definizione}
+
+\paragraph{Esempio.}
+Aggiungiamo al problema precedente un vincolo:
+\[
+\begin{aligned}
+&\min \, x^2 - 10x \\
+&x - 3 \le 0
+\end{aligned}
+\]
+ovvero $g_1(x) = x - 3$, con $m = 1$ e $p = 0$ (c'è un solo vincolo, di disuguaglianza). Il vincolo si legge come una restrizione sulla scelta di $x$: $x - 3 \le 0$ equivale a $x \le 3$, per cui la regione ammissibile è $X = (-\infty, 3]$. La funzione obiettivo è la stessa di prima, ma ora si può scegliere $x$ solo in $X$, come mostrato nella figura~\ref{fig:vincolato}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[xscale=0.6, yscale=0.11, >=Stealth]
+  \useasboundingbox (-3.6,-36) rectangle (12.6,17);
+  % regione ammissibile x <= 3
+  \fill[Accent!10] (-3,-34) rectangle (3,14);
+  \node[Accent, font=\small, anchor=south] at (0,-34) {$X=(-\infty,3]$};
+  % assi
+  \draw[->] (-3,0) -- (12,0) node[right] {$x$};
+  \draw[->] (0,-13) -- (0,15) node[above] {$y$};
+  \draw[Accent, very thick] (-3,0) -- (3,0);
+  % bordo del vincolo
+  \draw[Accent, thick] (3,-34) -- (3,14);
+  \node[Accent, font=\small, anchor=west] at (3.2,10) {$x = 3$};
+  % parabola: tratto ammissibile e tratto escluso dal vincolo
+  \draw[red!70!black, thick, domain=-1:3, samples=50, smooth] plot (\x, {\x*\x-10*\x});
+  \draw[TextGray, dashed, domain=3:11, samples=50, smooth] plot (\x, {\x*\x-10*\x});
+  \node[red!70!black, font=\small, anchor=east] at (-1.1,11) {$f(x)$};
+  % tacche
+  \draw (3,0.8) -- (3,-0.8);
+  \draw (5,0.8) -- (5,-0.8);
+  \node[font=\scriptsize, above left] at (3,0.8) {$3$};
+  \node[font=\scriptsize, above] at (5,0.8) {$5$};
+  % minimo non vincolato (non ammissibile)
+  \node[circle, draw=TextGray, fill=white, inner sep=1.6pt] at (5,-25) {};
+  \node[TextGray, font=\small, anchor=north] at (5,-26.5) {$V=(5,-25)$};
+  % minimo vincolato
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (3,-21) {};
+  \node[red!70!black, font=\small, anchor=east] at (2.7,-24) {$x^*=3,\ f(x^*)=-21$};
+\end{tikzpicture}
+\caption{Problema $\min x^2-10x$ con vincolo $x \le 3$: la zona colorata è la regione ammissibile $X = (-\infty, 3]$, la curva rossa è la funzione obiettivo sui punti ammissibili e il tratto grigio tratteggiato è la parte esclusa dal vincolo. Il vertice $V = (5,-25)$, minimo del problema non vincolato, non è ammissibile; l'ottimo del problema vincolato è il punto pieno $x^*=3$, sul bordo di $X$, con valore $-21$.}
+\label{fig:vincolato}
+\end{figure}
+
+\subparagraph{Soluzione.} Procediamo in tre passi:
+\begin{enumerate}
+    \item Senza il vincolo il minimo sarebbe nel vertice $x = 5$, con valore $-25$.
+    \item Questo punto però non è ammissibile, perché $5 > 3$ e quindi non rispetta il vincolo.
+    \item Poiché la parabola è decrescente per $x < 5$, all'interno di $X$ la funzione obiettivo diminuisce man mano che $x$ si avvicina a $3$: il valore più basso si ottiene quindi nel punto ammissibile più vicino al vertice, cioè $x^* = 3$, con $f(3) = 9 - 30 = -21$.
+\end{enumerate}
+Il vincolo ha quindi spostato l'ottimo e ne ha peggiorato il valore, che passa da $-25$ a $-21$. Si noti che $x^*$ si trova sul bordo della regione ammissibile, dove il vincolo è verificato con uguaglianza.
+
+Tra i problemi vincolati ritroviamo la \textbf{programmazione lineare} (PL), cioè il caso in cui $f$ e tutte le funzioni dei vincoli sono lineari, la \textbf{programmazione lineare intera} (PLI), in cui le variabili devono inoltre essere intere, e la \textbf{programmazione non lineare}, in cui almeno una tra $f$, $g_i$ e $h_j$ non è lineare.
+
+\section{Definizioni}\label{sec:definizioni}
+Dato il problema $\min_{x \in X} f(x)$, valgono le seguenti definizioni.
+
+\begin{definizione}[Problema inammissibile]
+Un problema di ottimizzazione è \textbf{inammissibile} se $X = \emptyset$, ovvero se nessun punto rispetta tutti i vincoli.
+\end{definizione}
+
+\begin{esempiofig}
+Consideriamo ancora la funzione $x^2 - 10x$, ma con due vincoli: $x \le 3$ e $x \ge 5$. Un punto ammissibile dovrebbe rispettarli entrambi, ma nessun numero è contemporaneamente minore o uguale a $3$ e maggiore o uguale a $5$: come mostra il grafico a destra, le due zone colorate non hanno punti in comune. Quindi $X = \emptyset$ e il problema è inammissibile. In questo caso non ha senso cercare un minimo, perché non esiste alcuna scelta possibile.
+\tcblower
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[xscale=0.5, yscale=0.09, >=Stealth]
+  \useasboundingbox (-1.8,-30) rectangle (12.6,16);
+  \fill[Accent!14] (-1,-28) rectangle (3,12);
+  \fill[red!14] (5,-28) rectangle (11,12);
+  \draw[->] (-1,0) -- (11.8,0) node[right, font=\scriptsize] {$x$};
+  \draw[->] (0,-28) -- (0,14) node[above, font=\scriptsize] {$y$};
+  \draw[TextGray, dashed, domain=-1:11, samples=50, smooth] plot (\x, {\x*\x-10*\x});
+  \draw[Accent, thick] (3,-28) -- (3,12);
+  \draw[red!70!black, thick] (5,-28) -- (5,12);
+  \node[Accent, font=\scriptsize] at (1,8) {$x\le 3$};
+  \node[red!70!black, font=\scriptsize] at (8,8) {$x\ge 5$};
+  \node[font=\scriptsize, fill=white, inner sep=1.5pt] at (4,-10) {$X=\emptyset$};
+\end{tikzpicture}
+}
+\end{esempiofig}
+
+\begin{definizione}[Problema illimitato]
+Un problema di ottimizzazione è \textbf{illimitato} se, comunque si scelga $k > 0$, esiste un punto $x \in X$ tale che $f(x) < -k$, ovvero se $f$ non è limitata inferiormente su $X$.
+\end{definizione}
+
+\begin{esempiofig}
+Consideriamo il problema
+\[
+\min_{x \in \mathbb{R}} \, -x^2 + 10x.
+\]
+Per qualsiasi $k > 0$ vale $f(x) < -k$ quando $x^2 - 10x - k > 0$, e questa disuguaglianza è verificata da tutti gli $x$ abbastanza grandi in valore assoluto. Ad esempio, per $k = 20$ si ha $f(13) = -169 + 130 = -39 < -20$. La funzione obiettivo scende quindi sotto qualsiasi valore fissato, come si vede dal grafico a destra: il problema è illimitato e non ammette un minimo.
+\tcblower
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[xscale=0.36, yscale=0.06, >=Stealth]
+  \useasboundingbox (-4.2,-52) rectangle (15.5,32);
+  \draw[->] (-4,0) -- (14.8,0) node[right, font=\scriptsize] {$x$};
+  \draw[->] (0,-50) -- (0,30) node[above, font=\scriptsize] {$y$};
+  \draw[Accent, thick, domain=-3.4:13.4, samples=60, smooth] plot (\x, {-\x*\x+10*\x});
+  \node[Accent, font=\scriptsize, anchor=west] at (9,22) {$f(x)$};
+  \draw[dashed, TextGray] (-4,-20) -- (14.5,-20);
+  \node[TextGray, font=\scriptsize, anchor=south west] at (0.2,-19) {$y=-k$};
+  \node[circle, fill=red!70!black, inner sep=1.5pt] at (13,-39) {};
+  \node[red!70!black, font=\scriptsize, anchor=east] at (12.3,-42) {$f(x)<-k$};
+\end{tikzpicture}
+}
+\end{esempiofig}
+
+\begin{definizione}[Ottimo globale]
+Un punto $x^* \in X$ è un \textbf{ottimo globale} se $f(x^*) \le f(x)$ per ogni $x \in X$.
+\end{definizione}
+
+\begin{esempiofig}
+Riprendiamo il problema non vincolato $\min_{x \in \mathbb{R}} \, x^2 - 10x$. Il punto $x^* = 5$ è un ottimo globale, perché per ogni $x \in \mathbb{R}$ si ha
+\[
+f(x) - f(5) = x^2 - 10x + 25 = (x - 5)^2 \ge 0
+\]
+ovvero $f(x) \ge -25 = f(5)$: nessun punto può avere un valore della funzione obiettivo inferiore a quello di $x^*$, come si vede nel grafico a destra dove la curva non scende mai sotto la retta tratteggiata.
+\tcblower
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[xscale=0.5, yscale=0.09, >=Stealth]
+  \useasboundingbox (-1.8,-33) rectangle (12.6,16);
+  \draw[->] (-1,0) -- (11.8,0) node[right, font=\scriptsize] {$x$};
+  \draw[->] (0,-28) -- (0,14) node[above, font=\scriptsize] {$y$};
+  \draw[Accent, thick, domain=-0.9:10.9, samples=50, smooth] plot (\x, {\x*\x-10*\x});
+  \node[Accent, font=\scriptsize, anchor=west] at (9.2,9) {$f(x)$};
+  \draw[dashed, TextGray] (-1,-25) -- (11,-25);
+  \draw[dashed, TextGray] (5,0) -- (5,-25);
+  \node[font=\scriptsize, above] at (5,0.5) {$5$};
+  \node[circle, fill=red!70!black, inner sep=1.6pt] at (5,-25) {};
+  \node[red!70!black, font=\scriptsize, anchor=north] at (5,-27) {$x^*=5$};
+  \node[TextGray, font=\scriptsize, anchor=north west] at (6.2,-26.5) {$f(x^*)=-25$};
+\end{tikzpicture}
+}
+\end{esempiofig}
+
+\begin{definizione}[Ottimo locale]
+Un punto $x^* \in X$ è un \textbf{ottimo locale} se esiste $\varepsilon > 0$ tale che $f(x^*) \le f(x)$ per ogni $x \in X$ con $\|x - x^*\| < \varepsilon$, ovvero se è un minimo all'interno di un intorno di $x^*$. L'ottimo locale è \textbf{stretto} se $f(x^*) < f(x)$ per ogni $x \neq x^*$ dell'intorno, cioè se $x^*$ è l'unico punto di minimo in quell'intorno.
+\end{definizione}
+
+\begin{esempiofig}
+Consideriamo il problema $\min f(x) = x^3 - 3x$ con $X = [-3, 3]$. Nel punto $x = 1$ vale
+\[
+f(x) - f(1) = x^3 - 3x + 2 = (x - 1)^2 (x + 2)
+\]
+e per ogni $x$ nell'intorno $|x - 1| < 1$, ovvero in $(0, 2)$, il fattore $x + 2$ è positivo. Di conseguenza $f(x) > f(1) = -2$ per ogni $x \neq 1$ dell'intorno: $x^* = 1$ è un ottimo locale stretto. Non è però un ottimo globale, perché $f(-3) = -18 < -2$. L'ottimo globale del problema è infatti $x = -3$, estremo della regione ammissibile. Come si vede dal grafico a destra, il minimo locale è il punto più basso solo nei dintorni di $x = 1$, mentre altrove su $X$ la funzione scende ancora di più.
+\tcblower
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[xscale=0.85, yscale=0.14, >=Stealth]
+  \useasboundingbox (-3.6,-22) rectangle (4.3,22);
+  \draw[->] (-3.3,0) -- (3.9,0) node[right, font=\scriptsize] {$x$};
+  \draw[->] (0,-21) -- (0,21) node[above, font=\scriptsize] {$y$};
+  \draw[Accent, thick, domain=-3:3, samples=60, smooth] plot (\x, {\x*\x*\x-3*\x});
+  \draw[red!70!black, very thick, domain=0:2, samples=30, smooth] plot (\x, {\x*\x*\x-3*\x});
+  \draw[red!70!black, very thick] (0,0) -- (2,0);
+  \node[red!70!black, font=\scriptsize, anchor=south] at (1,0.8) {$\varepsilon=1$};
+  \node[circle, fill=red!70!black, inner sep=1.6pt] at (1,-2) {};
+  \node[red!70!black, font=\scriptsize, anchor=north] at (1.2,-4) {min locale};
+  \node[circle, fill=Accent, inner sep=1.6pt] at (-3,-18) {};
+  \node[Accent, font=\scriptsize, anchor=west] at (-2.75,-19) {min globale};
+\end{tikzpicture}
+}
+\end{esempiofig}
+
+Un ottimo locale non stretto è invece un punto che appartiene a una regione confinata di punti con lo stesso valore minimo di $f$. Naturalmente ogni ottimo globale è anche un ottimo locale, ma non è detto il contrario.
+
+\begin{osservazione}
+Nella programmazione lineare la distinzione tra ottimo globale e ottimo locale non esiste: ogni ottimo locale è anche un ottimo globale (si veda la sezione~\ref{sec:graf}).
+\end{osservazione}
+
+\section{Esistenza della soluzione}
+Assegnati $X$ ed $f$, potrebbero anche non esistere soluzioni ottime. Quando si cerca $\min_{x \in X} f(x)$ possono verificarsi quattro casi:
+\begin{enumerate}
+    \item La regione ammissibile è vuota: il problema è inammissibile e non c'è alcuna scelta possibile.
+    \item La regione ammissibile non è vuota, ma $f$ non è limitata inferiormente: il problema è illimitato e non esiste un minimo.
+    \item La regione ammissibile non è vuota e $f$ è limitata inferiormente, ma non esistono punti di minimo globale.
+    \item La regione ammissibile non è vuota ed esiste un punto di minimo globale; in questo caso $f$ è ovviamente limitata inferiormente.
+\end{enumerate}
+
+Risolvere un problema di ottimizzazione significa quindi, in pratica:
+\begin{itemize}
+    \item Stabilire se l'insieme ammissibile è non vuoto, oppure concludere che non esistono soluzioni ammissibili.
+    \item Stabilire se esistono soluzioni ottime, oppure dimostrare che il problema non ammette soluzioni ottime.
+    \item Determinare, eventualmente in modo approssimato, una soluzione ottima.
+\end{itemize}
+
+\section*{Riferimenti}
+Il materiale visto in questo capitolo comprende:
+\begin{itemize}
+    \item Materiale visto a lezione (2 ottobre 2026).
+    \item Dispensa del corso \emph{Introduzione all'ottimizzazione}, capitoli 1--3.
+\end{itemize}
