@@ -119,14 +119,29 @@ Il primo gruppo di vincoli impone che la quantità totale utilizzata di ciascuna
 Quando un problema di PL ha due sole variabili, i suoi elementi si possono rappresentare sul piano cartesiano $Ox_1x_2$, e la soluzione si individua direttamente sul disegno.
 
 \paragraph{Rappresentazione dei vincoli.}
-L'equazione $a x_1 + b x_2 = c$ rappresenta una retta che divide il piano in due semipiani, ciascuno dei quali è formato dai punti che soddisfano rispettivamente la disequazione $a x_1 + b x_2 \ge c$ oppure $a x_1 + b x_2 \le c$. Ogni vincolo del problema individua quindi un semipiano, e la regione ammissibile è data dall'intersezione di tali semipiani. Il vettore $(a, b)^T$ è ortogonale alla famiglia di rette parallele $a x_1 + b x_2 = c$ al variare di $c$ ed è orientato verso il semipiano in cui $a x_1 + b x_2 \ge c$.
+L'equazione $a x_1 + b x_2 = d$ rappresenta una retta che divide il piano in due semipiani, ciascuno dei quali è formato dai punti che soddisfano rispettivamente la disequazione $a x_1 + b x_2 \ge d$ oppure $a x_1 + b x_2 \le d$. Ogni vincolo del problema individua quindi un semipiano, e la regione ammissibile è data dall'intersezione di tali semipiani. Per capire da quale parte della retta si trovi ciascun semipiano è utile il seguente lemma.
+
+\begin{lemma}\label{lem:ortogonale}
+Si consideri la famiglia di rette parallele $a x_1 + b x_2 = d$ al variare di $d \in \mathbb{R}$, con $(a, b) \neq (0, 0)$. Il vettore $(a, b)^T$ individua una direzione ortogonale alle rette della famiglia ed è orientato verso il semipiano in cui $a x_1 + b x_2 \ge d$.
+\end{lemma}
+
+\paragraph{Dimostrazione.}
+Siano $x$ e $y$ due punti della stessa retta, ovvero $a x_1 + b x_2 = d = a y_1 + b y_2$. Sottraendo membro a membro si ottiene
+\[
+a(x_1 - y_1) + b(x_2 - y_2) = 0
+\]
+ovvero $(a, b) \cdot (x - y) = 0$, quindi $(a,b)^T$ è ortogonale a ogni vettore parallelo alla retta. Inoltre, partendo da un punto $x$ della retta e spostandosi di $t\,(a, b)^T$ con $t > 0$, si ha
+\[
+a(x_1 + t a) + b(x_2 + t b) = d + t(a^2 + b^2) > d
+\]
+dove $a^2 + b^2 > 0$ perché $(a,b) \neq (0,0)$: ci si sposta dunque nel semipiano in cui $a x_1 + b x_2 \ge d$. \hfill $\square$
 
 \paragraph{Rappresentazione della funzione obiettivo.}
 La funzione obiettivo $c_1 x_1 + c_2 x_2$ si rappresenta tracciando il fascio di rette
 \[
 c_1 x_1 + c_2 x_2 = k
 \]
-al variare di $k$, ovvero le \textbf{curve di livello} della funzione. Queste rette sono tutte parallele tra loro e ortogonali al vettore $c = (c_1, c_2)^T$, che è il gradiente della funzione obiettivo, e il valore $k$ cresce nel verso indicato da $c$. Di conseguenza, in un problema di massimizzazione si trasla il fascio nella direzione di crescita $c$, mentre in un problema di minimizzazione lo si trasla nella direzione opposta.
+al variare di $k$, ovvero le \textbf{curve di livello} della funzione. Per il lemma~\ref{lem:ortogonale}, queste rette sono tutte parallele tra loro e ortogonali al vettore $c = (c_1, c_2)^T$, che è il gradiente della funzione obiettivo, e il valore $k$ cresce nel verso indicato da $c$. Di conseguenza, in un problema di massimizzazione si trasla il fascio nella direzione di crescita $c$, mentre in un problema di minimizzazione lo si trasla nella direzione opposta.
 
 \paragraph{Procedura.}
 La risoluzione grafica si svolge in tre passi:
@@ -135,6 +150,8 @@ La risoluzione grafica si svolge in tre passi:
     \item Si disegnano le curve di livello della funzione obiettivo, indicando la direzione in cui $k$ cresce.
     \item Tra tutte le curve di livello che intersecano la regione ammissibile si cerca quella con il valore di $k$ massimo (o minimo, a seconda del problema): una soluzione ottima è data dall'intersezione di tale curva con la regione ammissibile.
 \end{enumerate}
+
+Alcuni esercizi svolti con questa procedura sono riportati nella sezione~\ref{sec:es-grafica}.
 
 \paragraph{Esempio.}
 Applichiamo la procedura al problema dei mattoncini~\eqref{eq:lego}, rappresentato in figura~\ref{fig:lego-grafico}.

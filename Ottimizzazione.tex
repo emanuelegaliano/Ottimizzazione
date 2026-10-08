@@ -23,6 +23,8 @@
 \definecolor{RuleGray}{gray}{0.75}
 \definecolor{ObsColor}{HTML}{9C5A12}  % ocra scuro, per le osservazioni
 \definecolor{FigColor}{HTML}{6B3F73}  % prugna, per le didascalie
+\definecolor{LemmaColor}{HTML}{4E7A3A}  % verde foglia, per lemmi e teoremi
+\definecolor{ExColor}{HTML}{4A5560}  % grigio ardesia, per gli esercizi
 
 % =====================================================
 % GRAPHICS
@@ -106,6 +108,7 @@
 %   esempio con il testo a sinistra e una figura a destra
 % \begin{osservazione}[Titolo opzionale] ... \end{osservazione}
 %   non numerata, per note, precisazioni e risultati da ricordare
+% \begin{lemma}, \begin{esercizio}: si veda più sotto
 \usepackage[skins,breakable]{tcolorbox}
 
 \tcbset{
@@ -119,11 +122,38 @@
   }
 }
 
+% \label dentro i box numerati: usa il numero del box e non quello della sezione
+\makeatletter
+\newcommand{\tcblabelfix}{\def\@currentlabel{\thetcbcounter}}
+\makeatother
+
 \newtcolorbox[auto counter, number within=chapter]{definizione}[1][]{
   boxbase,
   colback=Accent!6, coltitle=Accent,
   borderline west={2.5pt}{0pt}{Accent},
+  attach title to upper={\tcblabelfix\ },
   title={Definizione~\thetcbcounter\ifblank{#1}{}{\ (#1)}.},
+}
+
+% \begin{lemma}[Titolo opzionale] ... \end{lemma}
+%   numerato per capitolo; la dimostrazione si scrive con \paragraph{Dimostrazione.}
+\newtcolorbox[auto counter, number within=chapter]{lemma}[1][]{
+  boxbase,
+  colback=LemmaColor!7, coltitle=LemmaColor,
+  borderline west={2.5pt}{0pt}{LemmaColor},
+  attach title to upper={\tcblabelfix\ },
+  title={Lemma~\thetcbcounter\ifblank{#1}{}{\ (#1)}.},
+}
+
+% \begin{esercizio}[Titolo opzionale] testo \end{esercizio}
+%   numerato per capitolo (nelle appendici: Esercizio A.1, A.2, ...);
+%   la soluzione segue come \paragraph{Soluzione.}
+\newtcolorbox[auto counter, number within=chapter]{esercizio}[1][]{
+  boxbase,
+  colback=ExColor!8, coltitle=ExColor,
+  borderline west={2.5pt}{0pt}{ExColor},
+  attach title to upper={\tcblabelfix\ },
+  title={Esercizio~\thetcbcounter\ifblank{#1}{}{\ (#1)}.},
 }
 
 % =====================================================
@@ -294,6 +324,12 @@ Versione: \today
 
 \input{chapters/introduzione}
 \input{chapters/programmazione_lineare}
+
+% =====================================================
+% APPENDICI
+% =====================================================
+\appendix
+\input{chapters/esercizi}
 
 % =====================================================
 % BIBLIOGRAPHY

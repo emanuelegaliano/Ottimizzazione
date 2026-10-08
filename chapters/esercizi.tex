@@ -1,0 +1,345 @@
+\chapter{Esercizi svolti}\label{app:esercizi}
+Questa appendice raccoglie gli esercizi svolti nelle esercitazioni, con l'obiettivo di mostrare come i concetti visti nei capitoli precedenti vengano applicati nella pratica. Gli esercizi sono organizzati per argomento, con una sezione per ciascuno, e ognuno riporta il testo, la soluzione e, quando serve, una figura che ne illustra i passaggi.
+
+\section{Risoluzione grafica dei problemi di Programmazione lineare}\label{sec:es-grafica}
+Come visto nel Capitolo \ref{ch:pl}, la risoluzione grafica è un metodo \emph{naif} per risolvere i problemi di PL con due variabili ($n = 2$), e con qualche accorgimento anche con tre, rappresentando le variabili sul piano (o nello spazio). Dato il problema
+\[
+\begin{aligned}
+&\min\, (c_1 x_1 + c_2 x_2) \\
+&a_{11} x_1 + a_{12} x_2 \le b_1 \\
+&a_{21} x_1 + a_{22} x_2 \le b_2 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+si procede in tre passi:
+\begin{enumerate}
+    \item \textbf{Costruzione della regione ammissibile}: la regione ammissibile è l'intersezione dei semipiani individuati dai vincoli. Per disegnare ogni retta bastano due punti, ad esempio le intersezioni con gli assi, mentre per capire quale dei due semipiani sia quello ammissibile si controlla la disuguaglianza in un punto di prova, come l'origine.
+    \item \textbf{Costruzione delle curve di livello}: si tracciano le rette $c_1 x_1 + c_2 x_2 = K$ al variare di $K$. Se si vuole massimizzare, si segue la direzione di crescita rappresentata dal vettore $c = (c_1, c_2)^T$, mentre se si vuole minimizzare si segue la direzione di decrescita, ovvero quella opposta (l'antigradiente) $d = (-c_1, -c_2)^T$.
+    \item \textbf{Individuazione della soluzione}: la soluzione ottima è l'ultimo punto in comune tra le curve di livello e la regione ammissibile.
+\end{enumerate}
+
+\begin{esercizio}
+Risolvere graficamente il problema
+\[
+\begin{aligned}
+&\min\, (x_1 - x_2) \\
+&x_1 + x_2 \le 4 \\
+&-x_1 + x_2 \le 2 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+che ha quattro vincoli: due disuguaglianze e due condizioni di positività.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Tracciamo le due rette dei vincoli cercando due punti per ciascuna:
+\begin{itemize}
+    \item $x_1 + x_2 = 4$ passa per $(0, 4)$ e $(4, 0)$.
+    \item $-x_1 + x_2 = 2$ passa per $(0, 2)$ e $(-2, 0)$.
+\end{itemize}
+Intersecando i semipiani con il primo quadrante si ottiene la regione ammissibile in figura~\ref{fig:es-infinite}. Le curve di livello sono le rette $x_1 - x_2 = K$ e cerchiamo il punto $(x_1, x_2)$ che rende $K$ minimo. Il vettore $c = (1, -1)^T$ indica la direzione di crescita, mentre $d = (-1, 1)^T$ è la direzione di decrescita, che è quella da seguire.
+
+Spostando le curve di livello nella direzione di $d$, l'ultima che interseca la regione ammissibile si sovrappone al lato di estremi $A = (0, 2)$ e $B = (1, 3)$, dove $B$ è l'intersezione delle due rette ($x_2 = 3$ e $x_1 = 1$). Questo succede perché la curva di livello $x_1 - x_2 = -2$ coincide con la retta $-x_1 + x_2 = 2$. Il problema ha quindi \textbf{infinite soluzioni}: il vertice $A$, il vertice $B$ e tutti i punti del segmento $AB$, nei quali la funzione obiettivo vale $K = -2$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \useasboundingbox (-2.9,-1.0) rectangle (7.0,5.9);
+  % regione ammissibile
+  \fill[Accent!12] (0,0) -- (4,0) -- (1,3) -- (0,2) -- cycle;
+  % assi
+  \draw[->] (-2.6,0) -- (5.4,0) node[right] {$x_1$};
+  \draw[->] (0,-0.5) -- (0,5.2) node[above] {$x_2$};
+  \foreach \x in {1,...,5} \draw (\x,0.06) -- (\x,-0.06) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,5} \draw (0.06,\y) -- (-0.06,\y) node[left,font=\scriptsize] {\y};
+  \draw (-2,0.06) -- (-2,-0.06) node[below,font=\scriptsize] {$-2$};
+  % curva di livello K=0
+  \draw[dashed, TextGray] (-0.5,-0.5) -- (4.2,4.2) node[right, font=\scriptsize] {$K=0$};
+  % vincoli
+  \draw[blue!65!black, very thick] (-0.3,4.3) -- (4.4,-0.4)
+    node[below right, font=\small] {$x_1+x_2=4$};
+  \draw[orange!85!black, very thick] (-2.4,-0.4) -- (3.2,5.2)
+    node[above right, font=\small] {$-x_1+x_2=2$};
+  % soluzioni: segmento AB
+  \draw[red!70!black, very thick] (0,2) -- (1,3);
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (0,2) {};
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (1,3) {};
+  \node[font=\small, anchor=east, red!70!black] at (-0.4,2) {$A=(0,2)$};
+  \node[font=\small, anchor=west, red!70!black] at (1.3,3.0) {$B=(1,3)$};
+  \node[font=\small, anchor=east, red!70!black] at (-0.5,2.6) {$K=-2$};
+  % direzioni
+  \draw[->, TextGray, very thick] (4.6,1.5) -- (5.3,0.8) node[right, font=\small] {$c$};
+  \draw[->, red!70!black, very thick] (4.6,1.5) -- (3.9,2.2) node[above left, font=\small] {$d$};
+  % altri vertici
+  \node[circle, fill=black, inner sep=1.3pt] at (0,0) {};
+  \node[circle, fill=black, inner sep=1.3pt] at (4,0) {};
+\end{tikzpicture}
+\caption{Esercizio con infinite soluzioni: la regione ammissibile (zona colorata) è il quadrilatero di vertici $(0,0)$, $(4,0)$, $B=(1,3)$ e $A=(0,2)$. La curva di livello $x_1-x_2=0$ (grigia tratteggiata) viene spostata nella direzione di decrescita $d$ finché si sovrappone al lato $AB$ (in rosso), dove $K=-2$ è minimo: ogni punto del segmento è una soluzione ottima.}
+\label{fig:es-infinite}
+\end{figure}
+
+\begin{esercizio}
+Risolvere graficamente il problema
+\[
+\begin{aligned}
+&\max\, (4x_1 - 5x_2) \\
+&x_1 + 2x_2 \le -3 \\
+&-x_1 + x_2 \le 1 \\
+&x_2 \ge 0
+\end{aligned}
+\]
+che ha tre vincoli.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Tracciamo le due rette dei vincoli:
+\begin{itemize}
+    \item $x_1 + 2x_2 = -3$ passa per $(-3, 0)$ e $(0, -3/2)$.
+    \item $-x_1 + x_2 = 1$ passa per $(-1, 0)$ e $(0, 1)$.
+\end{itemize}
+Per capire da quale parte si trovi la regione ammissibile bisogna controllare le disuguaglianze: ad esempio l'origine non appartiene al primo semipiano, perché $0 \le -3$ è falso. Il terzo vincolo, $x_2 \ge 0$, individua invece il semipiano sopra l'asse $x_1$. Come si vede in figura~\ref{fig:es-inammissibile}, i tre semipiani non hanno alcun punto in comune: l'intersezione è vuota.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.95, >=Stealth]
+  \useasboundingbox (-4.6,-3.4) rectangle (7.2,3.5);
+  % assi
+  \draw[->] (-4.3,0) -- (3.0,0) node[right] {$x_1$};
+  \draw[->] (0,-3.1) -- (0,3.3) node[above] {$x_2$};
+  \draw (-3,0.06) -- (-3,-0.06) node[below,font=\scriptsize] {$-3$};
+  \draw (-1,0.06) -- (-1,-0.06) node[below,font=\scriptsize] {$-1$};
+  \draw (0.06,1) -- (-0.06,1) node[left,font=\scriptsize] {$1$};
+  \draw (0.06,-1.5) -- (-0.06,-1.5) node[left,font=\scriptsize] {$-\frac32$};
+  % vincoli
+  \draw[blue!65!black, very thick] (-4.3,0.65) -- (2.4,-2.7)
+    node[right, font=\small] {$x_1+2x_2=-3$};
+  \draw[orange!85!black, very thick] (-3.2,-2.2) -- (2.2,3.2)
+    node[right, font=\small] {$-x_1+x_2=1$};
+  % lati ammissibili di ciascun vincolo
+  \draw[->, blue!65!black, thick] (-1,-1) -- (-1.35,-1.7);
+  \draw[->, orange!85!black, thick] (1,2) -- (1.5,1.5);
+  \draw[->, black, thick] (1.8,0) -- (1.8,0.7);
+  \node[font=\small, anchor=east] at (3.0,-0.35) {$x_2\ge 0$};
+  \node[font=\large] at (-2.4,2.2) {$X=\emptyset$};
+\end{tikzpicture}
+\caption{Esercizio inammissibile: le frecce indicano per ciascun vincolo il semipiano ammissibile (sotto-sinistra della retta blu, sotto-destra della retta arancione, sopra l'asse $x_1$). I tre semipiani non hanno punti in comune, quindi la regione ammissibile è vuota.}
+\label{fig:es-inammissibile}
+\end{figure}
+
+Poiché $X = \emptyset$, il problema è \textbf{inammissibile}: non esiste alcun punto che rispetti tutti i vincoli, e di conseguenza non ha senso cercare un massimo. Lo si può verificare anche senza il grafico: da $x_2 \ge 0$ e dal primo vincolo segue $x_1 \le -3 - 2x_2 \le -3$, mentre dal secondo vincolo segue $x_1 \ge x_2 - 1 \ge -1$, e le due condizioni sono incompatibili.
+
+\begin{esercizio}
+Risolvere graficamente il problema
+\[
+\begin{aligned}
+&\min\, (-2x_1 + x_2) \\
+&2x_1 + x_2 \ge 2 \\
+&x_1 - x_2 \le 3 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Tracciamo le due rette dei vincoli:
+\begin{itemize}
+    \item $2x_1 + x_2 = 2$ passa per $(1, 0)$ e $(0, 2)$.
+    \item $x_1 - x_2 = 3$ passa per $(3, 0)$ e $(0, -3)$.
+\end{itemize}
+Intersecando i semipiani con il primo quadrante si ottiene la regione ammissibile in figura~\ref{fig:es-illimitato}. Notiamo che la regione ammissibile non è limitata: questa condizione, da sola, non è sufficiente per concludere che il problema non ammette soluzione, e bisogna sempre vedere cosa fa la funzione obiettivo rispetto alla regione ammissibile.
+
+Le curve di livello sono le rette $-2x_1 + x_2 = K$ e la direzione di decrescita è $d = (-c_1, -c_2)^T = (2, -1)^T$. Il grafico mostra che, seguendo $d$, esistono sempre punti ammissibili che abbassano il valore della funzione obiettivo: $-2x_1 + x_2 = K$ decresce sempre, senza mai trovare un ultimo punto in comune con la regione ammissibile. Il problema quindi non ha soluzione ed è \textbf{illimitato inferiormente}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \useasboundingbox (-3.5,-3.6) rectangle (9.4,6.0);
+  % regione ammissibile (illimitata)
+  \fill[Accent!12] (0,5.2) -- (0,2) -- (1,0) -- (3,0) -- (8.2,5.2) -- cycle;
+  % assi
+  \draw[->] (-0.8,0) -- (8.6,0) node[right] {$x_1$};
+  \draw[->] (0,-3.3) -- (0,5.7) node[above] {$x_2$};
+  \foreach \x in {1,...,8} \draw (\x,0.06) -- (\x,-0.06) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,5} \draw (0.06,\y) -- (-0.06,\y) node[left,font=\scriptsize] {\y};
+  \draw (0.06,-3) -- (-0.06,-3) node[left,font=\scriptsize] {$-3$};
+  % curve di livello
+  \draw[dashed, TextGray] (0,0) -- (2.6,5.2) node[above, font=\scriptsize] {$K=0$};
+  \draw[dashed, TextGray] (2,0) -- (4.6,5.2) node[above, font=\scriptsize] {$K=-4$};
+  \draw[dashed, TextGray] (4,0) -- (6.6,5.2) node[above, font=\scriptsize] {$K=-8$};
+  % vincoli
+  \draw[blue!65!black, very thick] (1.9,-1.8) -- (-0.5,3)
+    node[left, font=\small] {$2x_1+x_2=2$};
+  \draw[orange!85!black, very thick] (-0.3,-3.3) -- (8.2,5.2)
+    node[above right, font=\small] {$x_1-x_2=3$};
+  % direzione di decrescita
+  \draw[->, red!70!black, very thick] (5.2,-1.6) -- (6.8,-2.4) node[right, font=\small] {$d$};
+  \node[font=\small] at (0.55,4.4) {$X$};
+\end{tikzpicture}
+\caption{Esercizio illimitato: la regione ammissibile (zona colorata) non è limitata. Le curve di livello grigie tratteggiate $-2x_1+x_2=K$ si spostano nella direzione di decrescita $d=(2,-1)^T$ (freccia rossa) e continuano a intersecare la regione ammissibile per valori di $K$ sempre più negativi, quindi la funzione obiettivo non è limitata inferiormente.}
+\label{fig:es-illimitato}
+\end{figure}
+
+\begin{esercizio}
+Risolvere graficamente il problema
+\[
+\begin{aligned}
+&\max\, (10x_1 + 6x_2) \\
+&5x_1 + 3x_2 \le 15 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+La retta $5x_1 + 3x_2 = 15$ passa per $(3, 0)$ e $(0, 5)$, e la regione ammissibile è il triangolo in figura~\ref{fig:es-parallele}. La direzione di crescita è data da $c = (10, 6)^T$, che è proporzionale a $(5, 3)^T$: le curve di livello $10x_1 + 6x_2 = K$ sono quindi rette parallele alla retta del vincolo. Spostandole nella direzione di $c$, l'ultima che interseca la regione ammissibile è proprio quella che coincide con la retta del vincolo, con $K = 30$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.95, >=Stealth]
+  \useasboundingbox (-1.9,-1.6) rectangle (7.2,6.2);
+  % regione ammissibile
+  \fill[Accent!12] (0,0) -- (3,0) -- (0,5) -- cycle;
+  % assi
+  \draw[->] (-1.0,0) -- (6.2,0) node[right] {$x_1$};
+  \draw[->] (0,-1.0) -- (0,5.9) node[above] {$x_2$};
+  \foreach \x in {1,...,6} \draw (\x,0.06) -- (\x,-0.06) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,5} \draw (0.06,\y) -- (-0.06,\y) node[left,font=\scriptsize] {\y};
+  % curve di livello
+  \draw[dashed, TextGray] (-0.9,1.5) -- (0.9,-1.5)
+    node[pos=0.1, above, sloped, font=\scriptsize] {$K=0$};
+  \draw[dashed, TextGray] (1,0) -- (0,5/3)
+    node[pos=0.5, above, sloped, font=\scriptsize] {$K=10$};
+  \draw[dashed, TextGray] (2,0) -- (0,10/3)
+    node[pos=0.5, above, sloped, font=\scriptsize] {$K=20$};
+  % vincolo = curva K=30
+  \draw[blue!65!black, very thick] (-0.3,5.5) -- (3.5,-5/6*1.0+0.0)
+    node[below right, font=\small] {$5x_1+3x_2=15$};
+  \draw[red!70!black, very thick] (0,5) -- (3,0);
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (0,5) {};
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (3,0) {};
+  \node[font=\small, anchor=south west, red!70!black] at (0.2,5.1) {$A=(0,5)$};
+  \node[font=\small, anchor=south west, red!70!black] at (3.1,0.2) {$B=(3,0)$};
+  \node[font=\small, anchor=west, red!70!black] at (1.9,3.0) {$K=30$};
+  % direzione di crescita
+  \draw[->, TextGray, very thick] (4.2,2.2) -- (5.06,2.71) node[above, font=\small] {$c$};
+  \node[circle, fill=black, inner sep=1.3pt] at (0,0) {};
+\end{tikzpicture}
+\caption{Esercizio con infinite soluzioni per rette parallele: la regione ammissibile (zona colorata) è il triangolo di vertici $(0,0)$, $B=(3,0)$ e $A=(0,5)$. Le curve di livello $10x_1+6x_2=K$ (grigie tratteggiate) sono parallele alla retta del vincolo (in blu) e crescono nella direzione di $c=(10,6)^T$: l'ultima che interseca la regione ammissibile coincide con il lato $AB$ (in rosso), dove $K=30$.}
+\label{fig:es-parallele}
+\end{figure}
+
+Il problema ha dunque \textbf{infinite soluzioni}, più precisamente: il vertice $(0, 5)$, il vertice $(3, 0)$ e tutti i punti del segmento che unisce questi due vertici.
+
+\begin{osservazione}[Riepilogo]
+A seconda di come è fatta la regione ammissibile, un problema di PL si può trovare in uno dei seguenti casi:
+\begin{enumerate}
+    \item \textbf{La regione ammissibile è vuota} ($X = \emptyset$): non ci sono soluzioni e il problema è inammissibile.
+    \item \textbf{La regione ammissibile è chiusa e limitata}: il problema ha una sola soluzione oppure infinite soluzioni.
+    \item \textbf{La regione ammissibile è non limitata}: il problema ha una sola soluzione, infinite soluzioni oppure nessuna soluzione, nel qual caso il problema è illimitato.
+\end{enumerate}
+\end{osservazione}
+
+\section{Problemi di miscela}\label{sec:es-miscela}
+Nei \textbf{problemi di miscelazione} si hanno $n$ sostanze $S_1, \dots, S_n$ e $m$ componenti $C_1, \dots, C_m$, e si indica con $a_{ij}$ la quantità del componente $C_i$ contenuta nella sostanza $S_j$ e con $c_j$ il costo della sostanza $S_j$. Si richiede che la miscela contenga almeno una quantità $b_i$ del componente $C_i$, per ogni $i$, e l'obiettivo è creare la miscela di costo minimo. I dati del problema si riassumono in una tabella:
+\begin{center}
+\begin{tabular}{c|ccc|c}
+ & $S_1$ & $\cdots$ & $S_n$ & \\
+\hline
+$C_1$ & $a_{11}$ & $\cdots$ & $a_{1n}$ & $\ge b_1$ \\
+$\vdots$ & $\vdots$ & & $\vdots$ & $\vdots$ \\
+$C_m$ & $a_{m1}$ & $\cdots$ & $a_{mn}$ & $\ge b_m$ \\
+\end{tabular}
+\end{center}
+Indicando con $x_j$ la quantità utilizzata della sostanza $S_j$, la funzione obiettivo e i vincoli si scrivono come:
+\[
+\begin{aligned}
+&\min \sum_{j=1}^{n} c_j x_j \\
+&\sum_{j=1}^{n} a_{ij} x_j \ge b_i, \quad i = 1, \dots, m \\
+&x_j \ge 0, \quad j = 1, \dots, n.
+\end{aligned}
+\]
+
+\begin{esercizio}[Cibo per gatti]
+Un'azienda deve produrre cibo per gatti in confezioni da $500$ g. La composizione deve contenere almeno $120$ g di proteine, $115$ g di carboidrati e $210$ g di grassi. La miscela è composta da tre sostanze e, per $100$ g di sostanza, si ha la composizione (in grammi) e il prezzo (in euro) riportati nella tabella:
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & Sostanza 1 & Sostanza 2 & Sostanza 3 \\
+\midrule
+Proteine     & 14 & 15 & 40 \\
+Carboidrati  & 25 & 37 & 20 \\
+Grassi       & 57 & 40 & 25 \\
+Altro        & 4 & 8 & 15 \\
+Prezzo       & 0.8 & 0.55 & 0.4 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Determinare la miscela che minimizza il prezzo della confezione.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Le variabili sono le percentuali di ciascuna sostanza da miscelare: indichiamo con $x_1$, $x_2$ e $x_3$ la percentuale delle sostanze $S_1$, $S_2$ e $S_3$ in $100$ g di miscela, espressa come frazione. Poiché sono percentuali, devono sommare a uno:
+\[
+x_1 + x_2 + x_3 = 1.
+\]
+La funzione obiettivo è il prezzo della confezione. Il costo di $100$ g di miscela è $0.8x_1 + 0.55x_2 + 0.4x_3$, e una confezione da $500$ g equivale a cinque volte tanto:
+\[
+\min \; 5\,(0.8x_1 + 0.55x_2 + 0.4x_3).
+\]
+Per i vincoli ragioniamo sempre su $100$ g di miscela, dividendo i requisiti della confezione per $5$: le proteine in $100$ g di miscela sono $14x_1 + 15x_2 + 40x_3$, e devono essere almeno $120/5$; lo stesso vale per i carboidrati e per i grassi. La riga \emph{Altro} completa il contenuto di ogni sostanza a $100$ g e non compare nei vincoli, perché non si richiede alcuna quantità minima. Il problema si formula quindi come:
+\[
+\begin{aligned}
+&\min \; 5\,(0.8x_1 + 0.55x_2 + 0.4x_3) \\
+&14x_1 + 15x_2 + 40x_3 \ge \tfrac{120}{5} \\
+&25x_1 + 37x_2 + 20x_3 \ge \tfrac{115}{5} \\
+&57x_1 + 40x_2 + 25x_3 \ge \tfrac{210}{5} \\
+&x_1 + x_2 + x_3 = 1 \\
+&x_1,\, x_2,\, x_3 \ge 0.
+\end{aligned}
+\]
+Con tre variabili la risoluzione grafica non è praticabile in modo comodo, ma il problema si può risolvere con strumenti numerici come Excel.
+
+\subsection{Problema della dieta ottimale}
+Un caso particolare di problema di miscelazione è il \textbf{problema della dieta ottimale}. In questo caso si hanno $n$ alimenti $A_1, \dots, A_n$ e $m$ principi nutritivi $P_1, \dots, P_m$, con $a_{ij}$ la quantità del principio nutritivo $P_i$ nell'alimento $A_j$, $b_i$ il requisito minimo per il principio nutritivo $P_i$ e $c_j$ il costo dell'alimento $A_j$. L'obiettivo è determinare la dieta ottimale, ovvero quella di costo minimo. Indicando con $x_j$ la quantità utilizzata dell'alimento $A_j$, il problema ha la stessa forma di quello di miscelazione:
+\[
+\begin{aligned}
+&\min \sum_{j=1}^{n} c_j x_j \\
+&\sum_{j=1}^{n} a_{ij} x_j \ge b_i, \quad i = 1, \dots, m \\
+&x_j \ge 0, \quad j = 1, \dots, n.
+\end{aligned}
+\]
+
+\begin{esercizio}[Piano giornaliero di costo minimo]
+Si vuole determinare un piano giornaliero di costo minimo che soddisfi i seguenti requisiti: almeno $2000$ kcal, almeno $100$ g di proteine e almeno $40$ g di fibre. I valori nutrizionali (per porzione) e i costi degli alimenti $A$, $B$ e $C$ sono riportati nella tabella:
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & A & B & C \\
+\midrule
+Calorie   & 400 & 300 & 150 \\
+Proteine  & 20 & 30 & 5 \\
+Fibre     & 5 & 10 & 8 \\
+Costo     & 2 & 3 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Indichiamo con $x_1$, $x_2$ e $x_3$ il numero di porzioni degli alimenti $A$, $B$ e $C$. La funzione obiettivo è il costo del piano, mentre ciascun vincolo impone che la quantità di un principio nutritivo raggiunga il requisito minimo:
+\[
+\begin{aligned}
+&\min \; (2x_1 + 3x_2 + x_3) \\
+&400x_1 + 300x_2 + 150x_3 \ge 2000 \\
+&20x_1 + 30x_2 + 5x_3 \ge 100 \\
+&5x_1 + 10x_2 + 8x_3 \ge 40 \\
+&x_1,\, x_2,\, x_3 \ge 0.
+\end{aligned}
+\]
+
+\section*{Riferimenti}
+Il materiale visto in questa appendice comprende:
+\begin{itemize}
+    \item Materiale visto a lezione (esercitazione del 5 ottobre 2026).
+    \item Figure~\ref{fig:es-infinite}, \ref{fig:es-inammissibile}, \ref{fig:es-illimitato} e~\ref{fig:es-parallele}: realizzate dall'autore.
+\end{itemize}
