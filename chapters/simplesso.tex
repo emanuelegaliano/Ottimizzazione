@@ -1,0 +1,886 @@
+\chapter{Il metodo del simplesso}\label{ch:simplesso}
+Il \textbf{metodo del simplesso} è l'algoritmo che permette di risolvere un problema di PL con un numero qualsiasi di variabili. È stato introdotto da Dantzig nel 1947 e parte da un risultato che conosciamo già: se un problema di PL ammette un ottimo, allora c'è un ottimo in un vertice del poliedro (teorema~\ref{teo:fondamentale}). Visitare tutti i vertici non è però opportuno, perché il loro numero cresce esponenzialmente con le dimensioni del problema. Il simplesso parte quindi da un vertice e si sposta ogni volta su un vertice adiacente migliore.
+
+I passi principali sono:
+\begin{itemize}
+    \item Si visita un vertice.
+    \item Si verifica se il vertice è ottimo.
+    \item Si verifica se il problema è illimitato inferiormente.
+    \item Se nessuna delle due verifiche ha successo, si passa a un vertice adiacente.
+\end{itemize}
+
+Il metodo nasce da un'idea geometrica, ma lavora interamente con l'algebra lineare. Ricordando che i vertici sono le soluzioni ammissibili di base (teorema~\ref{teo:vertici-base}), spostarsi da un vertice all'altro significa infatti cambiare base. In questo capitolo costruiamo prima gli strumenti che servono (la forma canonica e la tabella del simplesso), poi vediamo con quali regole l'algoritmo decide quando fermarsi e come cambiare base.
+
+\section{Forma canonica}\label{sec:canonica}
+Partiamo da un problema in forma standard
+\[
+\min c^T x, \quad A x = b, \quad x \ge 0
+\]
+con $A \in \mathbb{R}^{m \times n}$ di rango $m$. Fissata una base $B$ (definizione~\ref{def:base}), il sistema dei vincoli si scrive $B x_B + N x_N = b$. Poiché $B$ è invertibile, possiamo moltiplicare per $B^{-1}$ e ricavare le variabili di base:
+\begin{equation}\label{eq:xb}
+x_B = B^{-1} b - B^{-1} N x_N
+\end{equation}
+ovvero le variabili di base scritte in funzione di quelle fuori base. Ponendo $x_N = 0$ si ritrova la soluzione di base $(B^{-1}b, 0)$.
+
+\begin{definizione}[Forma canonica]\label{def:canonica}
+Un problema di PL in forma standard è in \textbf{forma canonica} rispetto alla base $B$ quando le variabili di base sono espresse in funzione delle variabili fuori base. In altre parole, il sistema dei vincoli è scritto come
+\[
+x_B + B^{-1} N x_N = B^{-1} b.
+\]
+\end{definizione}
+
+Supponendo, per comodità, che le variabili di base siano le prime $m$, il sistema in forma canonica per esteso è:
+\[
+\begin{aligned}
+x_1 &+ \alpha_{1,m+1} x_{m+1} + \dots + \alpha_{1n} x_n = \beta_1 \\
+x_2 &+ \alpha_{2,m+1} x_{m+1} + \dots + \alpha_{2n} x_n = \beta_2 \\
+&\ \,\vdots \\
+x_m &+ \alpha_{m,m+1} x_{m+1} + \dots + \alpha_{mn} x_n = \beta_m
+\end{aligned}
+\]
+dove gli $\alpha_{ij}$ sono gli elementi della matrice $B^{-1}N$ e i $\beta_i$ quelli del vettore $B^{-1}b$. Nella matrice dei vincoli, le colonne delle variabili di base formano quindi la matrice identità.
+
+Il vantaggio della forma canonica è che la soluzione di base si legge direttamente: le variabili di base valgono $x_i = \beta_i$ e quelle fuori base valgono zero.
+
+\paragraph{Esempio.}
+Consideriamo i vincoli
+\[
+\begin{aligned}
+x_1 - x_2 &\le 2 \\
+2x_1 + x_2 &\le 4 \\
+-3x_1 + 2x_2 &\le 6 \\
+x_1,\, x_2 &\ge 0
+\end{aligned}
+\]
+e portiamoli in forma standard aggiungendo una variabile di scarto per ciascun vincolo:
+\[
+\begin{aligned}
+x_1 - x_2 + x_3 &= 2 \\
+2x_1 + x_2 + x_4 &= 4 \\
+-3x_1 + 2x_2 + x_5 &= 6
+\end{aligned}
+\qquad\Longrightarrow\qquad
+A = \begin{pmatrix} 1 & -1 & 1 & 0 & 0 \\ 2 & 1 & 0 & 1 & 0 \\ -3 & 2 & 0 & 0 & 1 \end{pmatrix}.
+\]
+Le colonne delle variabili di scarto $x_3$, $x_4$ e $x_5$ formano la matrice identità. Scegliendole come variabili di base, il sistema è già in forma canonica:
+\[
+x_3 = 2 - x_1 + x_2, \qquad x_4 = 4 - 2x_1 - x_2, \qquad x_5 = 6 + 3x_1 - 2x_2.
+\]
+Ponendo $x_1 = x_2 = 0$ si ottiene la soluzione di base $(0, 0, 2, 4, 6)$, che è ammissibile.
+
+\begin{osservazione}[Forma canonica gratis]
+Se tutti i vincoli sono di tipo $\le$ con termini noti non negativi, le variabili di scarto formano sempre una base ammissibile, e il problema è già in forma canonica. Quando invece compaiono vincoli $\ge$ o di uguaglianza, una base ammissibile di partenza non è immediata da trovare. Questo problema si risolve con il metodo delle due fasi (sezione~\ref{sec:due-fasi}).
+\end{osservazione}
+
+\section{La tabella del simplesso}\label{sec:tabella}
+Per applicare il simplesso è comodo raccogliere tutti i coefficienti del problema in una tabella. Introduciamo una nuova variabile $z = c^T x$, ovvero il valore della funzione obiettivo, da cui segue il vincolo $-z + c^T x = 0$. Il problema diventa:
+\[
+\begin{aligned}
+&\min z \\
+&A x = b \\
+&{-z} + c^T x = 0 \\
+&x \ge 0
+\end{aligned}
+\]
+e i coefficienti del sistema dei vincoli si dispongono nella tabella
+\[
+\begin{array}{c|c|c}
+z & x & \\
+\hline
+0 & A & b \\
+\hline
+-1 & c^T & 0
+\end{array}
+\]
+dove l'ultima riga corrisponde al vincolo $-z + c^T x = 0$.
+
+Scegliamo ora una base $B$ e riscriviamo i vincoli rispetto ad essa:
+\[
+\begin{aligned}
+&B x_B + N x_N = b \\
+&{-z} + c_B^T x_B + c_N^T x_N = 0
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{array}{c|c|c|c}
+z & x_B & x_N & \\
+\hline
+0 & B & N & b \\
+\hline
+-1 & c_B^T & c_N^T & 0
+\end{array}
+\]
+Sostituendo l'espressione~\eqref{eq:xb} di $x_B$ nella seconda equazione si ha:
+\[
+-z + c_B^T \big(B^{-1}b - B^{-1}N x_N\big) + c_N^T x_N = 0
+\]
+ovvero, raccogliendo $x_N$:
+\[
+-z + \big(c_N^T - c_B^T B^{-1} N\big) x_N = -c_B^T B^{-1} b.
+\]
+Il problema in forma canonica rispetto a $B$ ha quindi la tabella\footnote{La colonna di $z$ resta sempre uguale (tutti zeri e un $-1$ nell'ultima riga), quindi da qui in avanti la omettiamo.}
+\begin{equation}\label{eq:tabella}
+\begin{array}{c|c|c}
+x_B & x_N & \\
+\hline
+I & B^{-1} N & B^{-1} b \\
+\hline
+0 & c_N^T - c_B^T B^{-1} N & -c_B^T B^{-1} b
+\end{array}
+\end{equation}
+che prende il nome di \textbf{tabella del simplesso} (o tableau).
+
+\begin{definizione}[Costi ridotti]\label{def:costi-ridotti}
+I coefficienti delle variabili fuori base nell'ultima riga della tabella,
+\[
+\bar{c}_N^T = c_N^T - c_B^T B^{-1} N,
+\]
+si dicono \textbf{costi ridotti}.
+\end{definizione}
+
+Il vettore dei costi ridotti ha $n - m$ componenti, una per ogni variabile fuori base. Si possono definire anche per le variabili di base, ma valgono sempre zero: $\bar{c}_B^T = c_B^T - c_B^T B^{-1} B = 0$. Il costo ridotto $\bar{c}_j$ indica di quanto varia la funzione obiettivo per ogni unità di cui cresce la variabile fuori base $x_j$, che nella soluzione corrente vale zero.
+
+Indicando con $z_0 = c_B^T B^{-1} b$ il valore della funzione obiettivo nella soluzione di base corrente, la tabella si legge così:
+\begin{itemize}
+    \item \textbf{Ultima colonna}: i valori $\beta_i$ delle variabili di base, ovvero il vertice corrente.
+    \item \textbf{Ultima riga}: i costi ridotti, nulli sulle variabili di base.
+    \item \textbf{Elemento in basso a destra}: $-z_0$, ovvero l'\emph{opposto} del valore corrente della funzione obiettivo.
+\end{itemize}
+
+\paragraph{Esempio.}
+Consideriamo il problema
+\[
+\begin{aligned}
+&\max\, (x_1 + 2x_2) \\
+&x_1 + x_2 \le 4 \\
+&{-x_1} + x_2 \le 2 \\
+&x_2 \le 3 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+che useremo come esempio in tutto il capitolo. La sua regione ammissibile è il quadrilatero di vertici $(0,0)$, $(4,0)$, $(1,3)$ e $(0,2)$, rappresentato nella figura~\ref{fig:simplesso-percorso}. In forma standard diventa:
+\[
+\begin{aligned}
+&\min\, (-x_1 - 2x_2) \\
+&x_1 + x_2 + x_3 = 4 \\
+&{-x_1} + x_2 + x_4 = 2 \\
+&x_2 + x_5 = 3 \\
+&x_i \ge 0, \quad i = 1, \dots, 5.
+\end{aligned}
+\]
+I vincoli sono tutti di tipo $\le$, quindi le variabili di scarto $x_3$, $x_4$ e $x_5$ formano una base e la tabella iniziale è:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_3$ & 1 & 1 & 1 & 0 & 0 & 4 \\
+$x_4$ & $-1$ & 1 & 0 & 1 & 0 & 2 \\
+$x_5$ & 0 & 1 & 0 & 0 & 1 & 3 \\
+\hline
+ & $-1$ & $-2$ & 0 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+dove a sinistra di ogni riga indichiamo la variabile di base corrispondente. La soluzione di base è $(0, 0, 4, 2, 3)$, che corrisponde all'origine del piano $x_1 x_2$, e la funzione obiettivo vale $0$.
+
+\begin{osservazione}[Base di sole variabili di scarto]
+Se la base è formata solo da variabili di scarto si ha $B = I$ e $c_B = 0$. In questo caso i costi ridotti coincidono con i coefficienti della funzione obiettivo in forma standard, e l'elemento in basso a destra vale $0$, come nell'esempio precedente. In tutti gli altri casi i costi ridotti vanno calcolati con la formula.
+\end{osservazione}
+
+\paragraph{Esempio.}
+Consideriamo il problema
+\[
+\begin{aligned}
+&\min\, (-2x_1 - 5x_2 + 4x_3) \\
+&x_1 + 4x_2 + 4x_3 - x_4 = 4 \\
+&-3x_2 - 5x_3 + x_4 + x_5 = 2 \\
+&x_i \ge 0, \quad i = 1, \dots, 5
+\end{aligned}
+\qquad
+A = \begin{pmatrix} 1 & 4 & 4 & -1 & 0 \\ 0 & -3 & -5 & 1 & 1 \end{pmatrix}.
+\]
+Le colonne di $x_1$ e $x_5$ formano la matrice identità, quindi possiamo scegliere la base $B = I$, con $B^{-1}N = N$. Tuttavia $c_B = (c_1, c_5) = (-2, 0) \neq 0$, e i costi ridotti non coincidono con i coefficienti di $c$.
+
+In pratica, il costo ridotto di $x_j$ si calcola come il suo coefficiente nella funzione obiettivo meno il prodotto scalare tra $c_B$ e la colonna di $x_j$ nella tabella:
+\[
+\begin{aligned}
+\bar{c}_2 &= -5 - (-2, 0) \begin{pmatrix} 4 \\ -3 \end{pmatrix} = -5 + 8 = 3 \\
+\bar{c}_3 &= 4 - (-2, 0) \begin{pmatrix} 4 \\ -5 \end{pmatrix} = 4 + 8 = 12 \\
+\bar{c}_4 &= 0 - (-2, 0) \begin{pmatrix} -1 \\ 1 \end{pmatrix} = -2
+\end{aligned}
+\]
+mentre l'elemento in basso a destra vale $-c_B^T b = -(-2 \cdot 4 + 0 \cdot 2) = 8$. Infatti la soluzione di base è $(4, 0, 0, 0, 2)$, in cui la funzione obiettivo vale $-8$. La tabella è quindi:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_1$ & 1 & 4 & 4 & $-1$ & 0 & 4 \\
+$x_5$ & 0 & $-3$ & $-5$ & 1 & 1 & 2 \\
+\hline
+ & 0 & 3 & 12 & $-2$ & 0 & 8 \\
+\end{tabular}
+\end{center}
+Riprenderemo questo problema nella sezione~\ref{sec:algoritmo}.
+
+\section{Test di ottimalità e di illimitatezza}\label{sec:test}
+Data una soluzione ammissibile di base, il simplesso deve capire se fermarsi. Ci sono due casi in cui l'algoritmo termina: la soluzione corrente è ottima, oppure il problema è illimitato inferiormente. Entrambi si riconoscono guardando la riga dei costi ridotti.
+
+\begin{teorema}[Test di ottimalità]\label{teo:ottimalita}
+Sia $\bar{x} = (B^{-1}b, 0)$ una soluzione ammissibile di base. Se i costi ridotti delle variabili fuori base sono tutti non negativi, ovvero
+\[
+\bar{c}_N^T = c_N^T - c_B^T B^{-1} N \ge 0,
+\]
+allora $\bar{x}$ è una soluzione ottima.
+\end{teorema}
+
+\paragraph{Dimostrazione.}
+Sia $x$ una qualsiasi soluzione ammissibile. Per la~\eqref{eq:xb} vale $x_B = B^{-1}b - B^{-1}N x_N$, e sostituendo nella funzione obiettivo si ottiene:
+\[
+c^T x = c_B^T x_B + c_N^T x_N = c_B^T B^{-1} b + \big(c_N^T - c_B^T B^{-1} N\big) x_N.
+\]
+Il vettore dei costi ridotti è non negativo per ipotesi, e $x_N \ge 0$ perché $x$ è ammissibile. Il secondo addendo è quindi non negativo, e
+\[
+c^T x \ge c_B^T B^{-1} b = c^T \bar{x}.
+\]
+La funzione obiettivo in $\bar{x}$ non supera quindi il valore in nessun altro punto ammissibile: $\bar{x}$ è un punto di minimo. \hfill $\square$
+
+\vspace{0.5em}
+Il test è una condizione sufficiente\footnote{Una soluzione di base degenere può essere ottima anche se nella sua tabella compare qualche costo ridotto negativo.}: se un costo ridotto è negativo non possiamo concludere che $\bar{x}$ non sia ottima, ma solo che il test non ci permette di fermarci.
+
+\paragraph{Esempio.}
+Torniamo al nostro esempio. Nella tabella iniziale i costi ridotti di $x_1$ e $x_2$ sono $-1$ e $-2$, quindi il test di ottimalità non è verificato. In effetti, se facciamo crescere $x_2$ di una unità la funzione obiettivo $-x_1 - 2x_2$ diminuisce di $2$: l'origine non è il punto di minimo.
+
+\begin{teorema}[Test di illimitatezza]\label{teo:illimitatezza}
+Se esiste una variabile fuori base $x_k$ con costo ridotto $\bar{c}_k < 0$, e tutti gli elementi della colonna $k$ della tabella sono non positivi ($\alpha_{ik} \le 0$ per ogni $i = 1, \dots, m$), allora il problema è illimitato inferiormente.
+\end{teorema}
+
+Vediamo perché. Lasciamo a zero tutte le variabili fuori base tranne $x_k$, che facciamo crescere ponendo $x_k = t \ge 0$. Dalla forma canonica, le variabili di base diventano:
+\[
+x_i = \beta_i - \alpha_{ik} t, \quad i = 1, \dots, m.
+\]
+Poiché $\alpha_{ik} \le 0$, le variabili di base non diminuiscono al crescere di $t$, quindi restano non negative e il punto resta ammissibile comunque grande sia $t$. La funzione obiettivo vale invece
+\[
+z = c^T \bar{x} + \bar{c}_k t
+\]
+e tende a $-\infty$ per $t \to +\infty$, perché $\bar{c}_k < 0$. Il problema è quindi illimitato inferiormente.
+
+\section{Cambio di base}\label{sec:cambio-base}
+Se nessuno dei due test è verificato, la soluzione corrente non è ottima e non possiamo ancora dire che il problema sia illimitato. Bisogna quindi spostarsi su un altro vertice, migliore del precedente. Questo si fa cambiando base: una variabile fuori base entra in base, e una variabile di base esce.
+
+\begin{definizione}[Basi adiacenti]
+Due basi si dicono \textbf{adiacenti} se differiscono per una sola colonna. Due soluzioni di base si dicono adiacenti se sono associate a basi adiacenti.
+\end{definizione}
+
+Geometricamente, due soluzioni ammissibili di base adiacenti corrispondono, in generale, a due vertici collegati da uno spigolo del poliedro. Per cambiare base bisogna stabilire quale variabile entra, quale esce, e come aggiornare la tabella.
+
+\subsection{Criterio di entrata}
+Entra in base una variabile fuori base con costo ridotto negativo: come abbiamo visto, farla crescere fa diminuire la funzione obiettivo. Quando ci sono più costi ridotti negativi, quindi più variabili candidate ad entrare, si può scegliere in due modi:
+\begin{itemize}
+    \item \textbf{Regola di Dantzig} (o euristica): entra la variabile con il costo ridotto minimo, ovvero quella che localmente fa diminuire più rapidamente la funzione obiettivo.
+    \item \textbf{Regola di Bland}: entra la variabile con costo ridotto negativo di indice minimo, ovvero la prima che si incontra scorrendo la riga dei costi ridotti.
+\end{itemize}
+Nella pratica la regola di Dantzig richiede spesso una o due iterazioni in meno. La regola di Bland ha però una garanzia teorica, che vedremo nella sezione~\ref{sec:bland}.
+
+Nel nostro esempio i costi ridotti negativi sono $\bar{c}_1 = -1$ e $\bar{c}_2 = -2$. Con la regola di Dantzig entra $x_2$, mentre con la regola di Bland entrerebbe $x_1$.
+
+\subsection{Criterio del rapporto (o di uscita)}
+Scelta la variabile entrante $x_k$, bisogna decidere fino a quanto farla crescere. Come nel test di illimitatezza, lasciando a zero le altre variabili fuori base si ha $x_i = \beta_i - \alpha_{ik} x_k$.
+
+Se $\alpha_{ik} \le 0$ la variabile $x_i$ non diminuisce, quindi non pone alcun limite. Se invece $\alpha_{ik} > 0$, per restare nella regione ammissibile deve valere:
+\[
+\beta_i - \alpha_{ik} x_k \ge 0 \quad\Longleftrightarrow\quad x_k \le \frac{\beta_i}{\alpha_{ik}}.
+\]
+La variabile $x_k$ può quindi crescere fino al più piccolo di questi rapporti. Esce dalla base la variabile che si annulla per prima, ovvero quella della riga $s$ tale che:
+\begin{equation}\label{eq:rapporto}
+\frac{\beta_s}{\alpha_{sk}} = \min_{i} \left\{ \frac{\beta_i}{\alpha_{ik}} : \alpha_{ik} > 0 \right\}.
+\end{equation}
+
+\paragraph{Esempio.}
+Torniamo al nostro esempio, in cui entra $x_2$. La variabile $x_1$ resta fuori base e vale zero, quindi i vincoli diventano:
+\[
+\begin{aligned}
+x_3 &= 4 - x_2 \ge 0 \\
+x_4 &= 2 - x_2 \ge 0 \\
+x_5 &= 3 - x_2 \ge 0
+\end{aligned}
+\quad\Longrightarrow\quad
+\begin{cases}
+x_2 \le 4 \\
+x_2 \le 2 \\
+x_2 \le 3
+\end{cases}
+\]
+Il rapporto minimo è $\min\{4/1,\ 2/1,\ 3/1\} = 2$, nella riga di $x_4$: esce quindi $x_4$. Graficamente, partendo dall'origine ci muoviamo lungo l'asse $x_2$ finché non incontriamo la retta $-x_1 + x_2 = 2$, nel punto $(0, 2)$. Andando oltre, il vincolo non sarebbe più rispettato.
+
+\subsection{Operazione pivotale}
+Scelte la variabile entrante $x_k$ e la riga $s$ della variabile uscente, bisogna aggiornare la tabella in modo che sia in forma canonica rispetto alla nuova base. La colonna di $x_k$ deve quindi diventare una colonna dell'identità, con $1$ nella riga $s$ e $0$ altrove. L'elemento $\alpha_{sk}$ si dice \textbf{pivot} (o perno) della trasformazione, ed è sempre diverso da zero, perché il criterio del rapporto considera solo gli $\alpha_{ik} > 0$.
+
+Le trasformazioni sono operazioni di Gauss sulle righe della tabella:
+\begin{itemize}
+    \item \textbf{Riga del pivot}: si divide per il pivot,
+    \[
+    \alpha'_{sj} = \frac{\alpha_{sj}}{\alpha_{sk}} \quad \forall j.
+    \]
+    \item \textbf{Righe diverse da quella del pivot}: a ogni riga $r \neq s$ si somma la riga del pivot aggiornata, moltiplicata per $-\alpha_{rk}$,
+    \[
+    \alpha'_{rj} = \alpha_{rj} - \alpha_{rk} \frac{\alpha_{sj}}{\alpha_{sk}} \quad \forall j.
+    \]
+\end{itemize}
+Le stesse trasformazioni si applicano alla colonna dei termini noti e alla riga dei costi ridotti, che in questo modo resta nulla sulle variabili di base.
+
+\begin{osservazione}[Cosa succede con un pivot]
+Dopo il pivot, la variabile entrante $x_k$ vale $\beta_s / \alpha_{sk}$, ovvero il rapporto minimo calcolato con la~\eqref{eq:rapporto}. La funzione obiettivo diminuisce invece della quantità
+\[
+|\bar{c}_k| \cdot \frac{\beta_s}{\alpha_{sk}}
+\]
+che è nulla solo quando $\beta_s = 0$, cioè quando la soluzione di base è degenere.
+\end{osservazione}
+
+\paragraph{Esempio.}
+Torniamo al nostro esempio. Entra $x_2$ ed esce $x_4$, quindi il pivot è l'elemento nella riga di $x_4$ e nella colonna di $x_2$:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_3$ & 1 & 1 & 1 & 0 & 0 & 4 \\
+$x_4$ & $-1$ & $\boxed{1}$ & 0 & 1 & 0 & 2 \\
+$x_5$ & 0 & 1 & 0 & 0 & 1 & 3 \\
+\hline
+ & $-1$ & $-2$ & 0 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Vogliamo trasformare la colonna di $x_2$, ovvero $(1, 1, 1)^T$, nella colonna $(0, 1, 0)^T$, e azzerare il costo ridotto $-2$. Il pivot vale già $1$, quindi indicando con $R_i$ la riga $i$-esima (la quarta è quella dei costi ridotti) le operazioni sono:
+\[
+R_1 \to R_1 - R_2, \qquad R_3 \to R_3 - R_2, \qquad R_4 \to R_4 + 2R_2.
+\]
+Si ottiene la tabella
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_3$ & $\boxed{2}$ & 0 & 1 & $-1$ & 0 & 2 \\
+$x_2$ & $-1$ & 1 & 0 & 1 & 0 & 2 \\
+$x_5$ & 1 & 0 & 0 & $-1$ & 1 & 1 \\
+\hline
+ & $-3$ & 0 & 0 & 2 & 0 & 4 \\
+\end{tabular}
+\end{center}
+con soluzione di base $(0, 2, 2, 0, 1)$, ovvero il vertice $(0, 2)$ del piano. La funzione obiettivo vale $-4$ (in basso a destra c'è il suo opposto).
+
+Ripetiamo i test. Il costo ridotto di $x_1$ è $-3 < 0$, quindi la soluzione non è ottima, e la colonna di $x_1$ ha elementi positivi, quindi il test di illimitatezza non è verificato. Entra $x_1$, e il criterio del rapporto considera solo le righe con elemento positivo:
+\[
+\min \left\{ \frac{2}{2},\ \frac{1}{1} \right\} = 1.
+\]
+
+Il minimo è raggiunto da due righe: scegliamo di far uscire $x_3$ (vedremo nella sezione~\ref{sec:bland} perché). Il pivot vale $2$, quindi prima dividiamo la sua riga per $2$ e poi aggiorniamo le altre:
+\[
+R_1 \to \frac{R_1}{2}, \qquad R_2 \to R_2 + R_1, \qquad R_3 \to R_3 - R_1, \qquad R_4 \to R_4 + 3R_1
+\]
+dove $R_1$ indica la riga del pivot già aggiornata. La nuova tabella è
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_1$ & 1 & 0 & $\frac12$ & $-\frac12$ & 0 & 1 \\
+$x_2$ & 0 & 1 & $\frac12$ & $\frac12$ & 0 & 3 \\
+$x_5$ & 0 & 0 & $-\frac12$ & $-\frac12$ & 1 & 0 \\
+\hline
+ & 0 & 0 & $\frac32$ & $\frac12$ & 0 & 7 \\
+\end{tabular}
+\end{center}
+e tutti i costi ridotti sono non negativi: per il test di ottimalità la soluzione di base $(1, 3, 0, 0, 0)$ è ottima. Il minimo del problema in forma standard è $-7$, quindi il massimo del problema di partenza è $7$, nel punto $x^* = (1, 3)$. La figura~\ref{fig:simplesso-percorso} mostra il percorso seguito dall'algoritmo.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.05, >=Stealth]
+  \useasboundingbox (-2.8,-0.9) rectangle (7.6,4.7);
+
+  % regione ammissibile
+  \fill[Accent!12] (0,0) -- (4,0) -- (1,3) -- (0,2) -- cycle;
+
+  % assi
+  \draw[->] (-2.7,0) -- (5.8,0) node[right] {$x_1$};
+  \draw[->] (0,-0.4) -- (0,4.5) node[above] {$x_2$};
+  \foreach \x in {1,...,5} \draw (\x,0.06) -- (\x,-0.06) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,4} \draw (0.06,\y) -- (-0.06,\y) node[left,font=\scriptsize] {\y};
+
+  % vincoli
+  \draw[blue!65!black, very thick] (-0.3,4.3) -- (4.6,-0.6)
+    node[right, font=\small] {$x_1+x_2=4$};
+  \draw[orange!85!black, very thick] (-2.5,-0.5) -- (2.2,4.2)
+    node[above, font=\small] {$-x_1+x_2=2$};
+  \draw[TextGray, very thick] (-0.3,3) -- (5.6,3)
+    node[right, font=\small] {$x_2=3$};
+
+  % curva di livello ottima e gradiente
+  \draw[red!70!black, dashed] (-0.6,3.8) -- (6.2,0.4)
+    node[right, font=\small] {$x_1+2x_2=7$};
+  \draw[->, red!70!black, very thick] (4.4,1.6) -- (4.85,2.5)
+    node[right, font=\small] {$c=(1,2)^T$};
+
+  % percorso del simplesso
+  \draw[->, line width=1.6pt, red!70!black] (0,0.08) -- (0,1.9);
+  \draw[->, line width=1.6pt, red!70!black] (0.06,2.06) -- (0.93,2.93);
+  \node[circle, fill=black, inner sep=1.6pt] at (0,0) {};
+  \node[circle, fill=black, inner sep=1.6pt] at (4,0) {};
+  \node[circle, fill=red!70!black, inner sep=1.6pt] at (0,2) {};
+  \node[circle, fill=red!70!black, inner sep=2.2pt] at (1,3) {};
+  \node[font=\small, anchor=north east] at (-0.08,-0.05) {$(0,0)$};
+  \node[font=\small, anchor=east, red!70!black] at (-0.75,2.1) {$(0,2)$};
+  \draw[TextGray] (-0.08,2.05) -- (-0.72,2.1);
+  \node[font=\small, anchor=west, red!70!black] at (3.2,3.6) {$x^*=(1,3)$};
+  \draw[TextGray] (1.08,3.05) -- (3.15,3.55);
+\end{tikzpicture}
+\caption{Percorso del simplesso nell'esempio guida: la regione ammissibile (zona colorata) è il quadrilatero di vertici $(0,0)$, $(4,0)$, $(1,3)$ e $(0,2)$. L'algoritmo parte dall'origine, entra $x_2$ e si sposta lungo l'asse $x_2$ fino al vertice $(0,2)$. Poi entra $x_1$, e l'algoritmo si sposta lungo il lato sulla retta arancione fino al vertice ottimo $x^*=(1,3)$, dove la curva di livello tratteggiata $x_1+2x_2=7$ tocca la regione. Nel vertice ottimo passano tre rette dei vincoli: è il motivo per cui la soluzione di base finale è degenere.}
+\label{fig:simplesso-percorso}
+\end{figure}
+
+\section{L'algoritmo}\label{sec:algoritmo}
+Mettendo insieme tutti i pezzi, il metodo del simplesso si svolge nei seguenti passi:
+\begin{enumerate}
+    \item Scrivere il problema in forma standard.
+    \item Individuare una base $B \in \mathbb{R}^{m \times m}$ invertibile che dia una soluzione ammissibile di base, e scrivere la tabella in forma canonica rispetto a $B$. Se una base di questo tipo non è immediata, si usa il metodo delle due fasi (sezione~\ref{sec:due-fasi}).
+    \item Determinare la soluzione di base associata a $B$: è il primo vertice visitato.
+    \item \textbf{Test di ottimalità}: se tutti i costi ridotti sono $\ge 0$, la soluzione corrente è ottima e l'algoritmo termina.
+    \item \textbf{Test di illimitatezza}: se esiste un costo ridotto $< 0$ e tutti gli elementi della sua colonna sono $\le 0$, il problema è illimitato inferiormente e l'algoritmo termina.
+    \item \textbf{Cambio di base}: entra in base una variabile con costo ridotto negativo ed esce la variabile con il rapporto minimo tra termine noto ed elemento della colonna, considerando solo gli elementi positivi.
+    \item \textbf{Operazione pivotale}: si individua il pivot, si trasformano le righe della tabella e si torna al passo 4.
+\end{enumerate}
+
+\paragraph{Esempio.}
+Risolviamo il problema
+\[
+\begin{aligned}
+&\min\, (x_1 - 2x_2 - 6x_3) \\
+&x_1 \le 2 \\
+&x_2 \le 3 \\
+&x_3 \le 3 \\
+&x_1 + x_2 + x_3 \le 4 \\
+&x_i \ge 0, \quad i = 1, 2, 3.
+\end{aligned}
+\]
+Aggiungendo una variabile di scarto per ciascun vincolo otteniamo la forma standard
+\[
+x_1 + x_4 = 2, \qquad x_2 + x_5 = 3, \qquad x_3 + x_6 = 3, \qquad x_1 + x_2 + x_3 + x_7 = 4
+\]
+con $x_i \ge 0$ per ogni $i$. Le variabili di scarto formano una base, quindi il sistema è già in forma canonica e la tabella iniziale è:
+\begin{center}
+\begin{tabular}{c|ccccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $b$ \\
+\hline
+$x_4$ & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 2 \\
+$x_5$ & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 3 \\
+$x_6$ & 0 & 0 & $\boxed{1}$ & 0 & 0 & 1 & 0 & 3 \\
+$x_7$ & 1 & 1 & 1 & 0 & 0 & 0 & 1 & 4 \\
+\hline
+ & 1 & $-2$ & $-6$ & 0 & 0 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+La soluzione di base corrente è $(0, 0, 0, 2, 3, 3, 4)$. Il test di ottimalità non è verificato, e nemmeno quello di illimitatezza. I costi ridotti negativi sono due: con la regola di Dantzig entra $x_3$, che ha il costo ridotto minimo $-6$. Il rapporto minimo è $\min\{3/1,\ 4/1\} = 3$, quindi esce $x_6$. Con le operazioni $R_4 \to R_4 - R_3$ e $R_5 \to R_5 + 6R_3$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $b$ \\
+\hline
+$x_4$ & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 2 \\
+$x_5$ & 0 & 1 & 0 & 0 & 1 & 0 & 0 & 3 \\
+$x_3$ & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 3 \\
+$x_7$ & 1 & $\boxed{1}$ & 0 & 0 & 0 & $-1$ & 1 & 1 \\
+\hline
+ & 1 & $-2$ & 0 & 0 & 0 & 6 & 0 & 18 \\
+\end{tabular}
+\end{center}
+I test non sono ancora verificati. Entra $x_2$, e il rapporto minimo è $\min\{3/1,\ 1/1\} = 1$, quindi esce $x_7$. Con le operazioni $R_2 \to R_2 - R_4$ e $R_5 \to R_5 + 2R_4$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $b$ \\
+\hline
+$x_4$ & 1 & 0 & 0 & 1 & 0 & 0 & 0 & 2 \\
+$x_5$ & $-1$ & 0 & 0 & 0 & 1 & 1 & $-1$ & 2 \\
+$x_3$ & 0 & 0 & 1 & 0 & 0 & 1 & 0 & 3 \\
+$x_2$ & 1 & 1 & 0 & 0 & 0 & $-1$ & 1 & 1 \\
+\hline
+ & 3 & 0 & 0 & 0 & 0 & 4 & 2 & 20 \\
+\end{tabular}
+\end{center}
+Ora tutti i costi ridotti sono non negativi. La soluzione ottima è $(0, 1, 3, 2, 2, 0, 0)$, ovvero $x_1 = 0$, $x_2 = 1$, $x_3 = 3$ nel problema di partenza, con valore ottimo $-20$.
+
+Con la regola di Bland, nella prima iterazione sarebbe entrata $x_2$ (la prima variabile con costo ridotto negativo), e per arrivare allo stesso ottimo sarebbero servite tre iterazioni invece di due.
+
+\paragraph{Esempio.}
+Riprendiamo il problema della sezione~\ref{sec:tabella} con la base $\{x_1, x_5\}$, di cui abbiamo già calcolato la tabella:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_1$ & 1 & 4 & 4 & $-1$ & 0 & 4 \\
+$x_5$ & 0 & $-3$ & $-5$ & $\boxed{1}$ & 1 & 2 \\
+\hline
+ & 0 & 3 & 12 & $-2$ & 0 & 8 \\
+\end{tabular}
+\end{center}
+L'unico costo ridotto negativo è quello di $x_4$, la cui colonna contiene l'elemento positivo $1$: entra $x_4$ ed esce $x_5$, l'unica riga con elemento positivo. Con le operazioni $R_1 \to R_1 + R_2$ e $R_3 \to R_3 + 2R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_1$ & 1 & $\boxed{1}$ & $-1$ & 0 & 1 & 6 \\
+$x_4$ & 0 & $-3$ & $-5$ & 1 & 1 & 2 \\
+\hline
+ & 0 & $-3$ & 2 & 0 & 2 & 12 \\
+\end{tabular}
+\end{center}
+Ora è $x_2$ ad avere costo ridotto negativo. Nella sua colonna l'unico elemento positivo è quello della riga di $x_1$, quindi entra $x_2$ ed esce $x_1$. Con le operazioni $R_2 \to R_2 + 3R_1$ e $R_3 \to R_3 + 3R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_2$ & 1 & 1 & $-1$ & 0 & 1 & 6 \\
+$x_4$ & 3 & 0 & $-8$ & 1 & 4 & 20 \\
+\hline
+ & 3 & 0 & $-1$ & 0 & 5 & 30 \\
+\end{tabular}
+\end{center}
+Il costo ridotto di $x_3$ è $-1 < 0$, e tutti gli elementi della sua colonna, $-1$ e $-8$, sono negativi: per il test di illimitatezza il problema è \textbf{illimitato inferiormente}. Possiamo verificarlo direttamente: ponendo $x_3 = t$ e lasciando $x_1 = x_5 = 0$, si ha $x_2 = 6 + t$ e $x_4 = 20 + 8t$, che restano positive per ogni $t \ge 0$, mentre la funzione obiettivo vale $-30 - t$ e scende sotto qualsiasi valore.
+
+\section{Degenerazione e regola di Bland}\label{sec:bland}
+Quando il minimo nel criterio del rapporto è raggiunto da più righe, dopo il pivot tutte le variabili di base corrispondenti si annullano. Una di queste esce dalla base, mentre le altre restano in base con valore zero: la nuova soluzione di base è quindi \textbf{degenere}.
+
+È quello che è successo nel nostro esempio: nella seconda iterazione i rapporti $2/2$ e $1/1$ erano uguali, e infatti nella soluzione ottima $(1, 3, 0, 0, 0)$ la variabile $x_5$ è in base con valore nullo. Graficamente, nel vertice $(1, 3)$ passano tre rette dei vincoli, ovvero più delle $n = 2$ necessarie per individuare un punto del piano (figura~\ref{fig:simplesso-percorso}).
+
+Partendo da una soluzione degenere, può capitare che il rapporto minimo sia $\beta_s / \alpha_{sk} = 0$. In questo caso la variabile entrante entra in base con valore zero, la funzione obiettivo non cambia e l'algoritmo resta fermo nello stesso vertice, cambiando soltanto la base che lo rappresenta. Generalmente si rimane bloccati per qualche iterazione, ma nel caso peggiore si può tornare a una base già visitata: si genera un \textbf{ciclo} e l'algoritmo non termina.
+
+\begin{teorema}[Convergenza]\label{teo:convergenza}
+Se tutte le soluzioni ammissibili di base del problema sono non degeneri, il metodo del simplesso genera una sequenza di basi senza ripetizioni. Di conseguenza, in un numero finito di passi trova una soluzione ottima oppure stabilisce che il problema è illimitato inferiormente.
+\end{teorema}
+
+Il motivo è che, senza soluzioni degeneri, a ogni iterazione la funzione obiettivo diminuisce strettamente, quindi non si può tornare su una base già visitata. Poiché le basi sono in numero finito (al più $\binom{n}{m}$), l'algoritmo prima o poi si ferma. Per evitare i cicli anche in presenza di soluzioni degeneri si usa la regola di Bland.
+
+\begin{teorema}[Regola di Bland]\label{teo:bland}
+Supponiamo che a ogni iterazione:
+\begin{itemize}
+    \item entri in base la variabile con costo ridotto negativo di indice minimo,
+    \item tra le righe che realizzano il rapporto minimo, esca la variabile di base di indice minimo.
+\end{itemize}
+Allora il metodo del simplesso termina in un numero finito di passi.
+\end{teorema}
+
+L'indice considerato è quello della variabile\footnote{Ad esempio, se il minimo è raggiunto nelle righe di $x_5$ e di $x_3$, esce $x_3$ anche se la sua riga si trova più in basso nella tabella.}, non la posizione della riga nella tabella. Nel nostro esempio, tra $x_3$ e $x_5$ è uscita $x_3$ proprio per questa regola.
+
+Negli esercizi useremo spesso la regola di Dantzig per scegliere la variabile entrante, e l'indice minimo solo per risolvere i pareggi. Questo basta quasi sempre, ma la garanzia di terminazione vale solo applicando la regola di Bland per intero.
+
+\section{Unicità della soluzione}
+Il test di ottimalità ci dice quando una soluzione di base è ottima, ma non se è l'unica. Una condizione sufficiente si ottiene chiedendo che i costi ridotti siano \emph{strettamente} positivi.
+
+\begin{teorema}[Unicità]\label{teo:unicita}
+Se i costi ridotti di tutte le variabili fuori base sono strettamente positivi, ovvero
+\[
+\bar{c}_N^T = c_N^T - c_B^T B^{-1} N > 0,
+\]
+allora la soluzione di base $\bar{x} = (B^{-1}b, 0)$ è l'unica soluzione ottima del problema.
+\end{teorema}
+
+Il motivo segue dalla dimostrazione del test di ottimalità, dove abbiamo visto che $c^T x = c^T \bar{x} + \bar{c}_N^T x_N$ per ogni $x$ ammissibile. Se $x \neq \bar{x}$, allora $x_N \neq 0$ (altrimenti si avrebbe $x_B = B^{-1}b$, cioè $x = \bar{x}$), e con costi ridotti strettamente positivi si ha $c^T x > c^T \bar{x}$.
+
+Nel nostro esempio i costi ridotti finali delle variabili fuori base sono $\frac32$ e $\frac12$, quindi $x^* = (1, 3)$ è l'unico ottimo. Se invece all'ottimo una variabile fuori base ha costo ridotto nullo, farla entrare in base non cambia il valore della funzione obiettivo, e il problema può avere altre soluzioni ottime. È il caso, visto nella risoluzione grafica, in cui le curve di livello sono parallele a un lato della regione ammissibile.
+
+\section{Complessità}
+Per valutare la complessità del simplesso bisogna stimare il costo di una iterazione e il numero di iterazioni. Calcolando tutto da zero, le operazioni più costose sono l'inversione di $B$, il prodotto $B^{-1}N$ e il calcolo dei costi ridotti, che richiedono rispettivamente $O(m^3)$, $O(m^2(n-m))$ e $O(m(n-m))$ operazioni. Aggiornando invece la tabella con un pivot, ogni iterazione costa $O(mn)$, perché si modificano al più $(m+1)(n+1)$ elementi.
+
+Il numero di iterazioni coincide con il numero di vertici visitati, e nel caso peggiore cresce esponenzialmente con $m$ e $n$ (esempio di Klee e Minty). In teoria, quindi, il simplesso ha complessità esponenziale. In pratica però gli studi empirici mostrano che il numero di iterazioni cresce linearmente con il numero di vincoli $m$, ed è per questo che il simplesso è uno degli algoritmi più usati per risolvere i problemi di PL.
+
+\section{Il metodo delle due fasi}\label{sec:due-fasi}
+Il simplesso ha bisogno di partire da una soluzione ammissibile di base, ma non sempre ne abbiamo una a disposizione. Se i vincoli sono tutti di tipo $\le$ con termini noti non negativi, le variabili di scarto danno subito la base $B = I$, con $x_B = b$ e $x_N = 0$. Con vincoli misti, invece, il sistema in forma standard in generale non è in forma canonica.
+
+\paragraph{Esempio.}
+Consideriamo il problema
+\[
+\begin{aligned}
+&\min\, (-2x_1 + 3x_2 + 4x_3) \\
+&{-x_1} + x_2 + x_3 \le 8 \\
+&3x_1 + 5x_2 + x_3 \ge 4 \\
+&x_i \ge 0, \quad i = 1, 2, 3
+\end{aligned}
+\]
+che in forma standard diventa:
+\[
+\begin{aligned}
+&{-x_1} + x_2 + x_3 + x_4 = 8 \\
+&3x_1 + 5x_2 + x_3 - x_5 = 4 \\
+&x_i \ge 0, \quad i = 1, \dots, 5
+\end{aligned}
+\qquad
+A = \begin{pmatrix} -1 & 1 & 1 & 1 & 0 \\ 3 & 5 & 1 & 0 & -1 \end{pmatrix}.
+\]
+La colonna di $x_4$ è una colonna dell'identità, ma quella di $x_5$ no, a causa del segno meno della variabile di surplus. Si potrebbe pensare di moltiplicare il secondo vincolo per $-1$, ottenendo $-3x_1 - 5x_2 - x_3 + x_5 = -4$. Ora le colonne di $x_4$ e $x_5$ formano l'identità, ma la soluzione di base corrispondente è $(0, 0, 0, 8, -4)$, che non è ammissibile perché $x_5 < 0$. Abbiamo quindi una base, ma non una base ammissibile.
+
+Per risolvere il problema si usa il \textbf{metodo delle due fasi}, che applica due volte il simplesso:
+\begin{itemize}
+    \item \textbf{Fase 1}: si costruisce un problema ausiliario, detto \textbf{problema artificiale}, che è già in forma canonica. Risolvendolo con il simplesso si trova una soluzione ammissibile di base del problema di partenza, oppure si scopre che il problema è inammissibile.
+    \item \textbf{Fase 2}: si risolve il problema di partenza con il simplesso, a partire dalla soluzione ammissibile di base trovata nella fase 1.
+\end{itemize}
+
+\subsection{Fase 1: il problema artificiale}
+Partiamo dal problema in forma standard $\min c^T x$, $Ax = b$, $x \ge 0$, con $b \ge 0$. A ogni vincolo aggiungiamo una variabile $y_i \ge 0$, detta \textbf{variabile artificiale}:
+\[
+\sum_{j=1}^{n} a_{ij} x_j = b_i \quad\longrightarrow\quad \sum_{j=1}^{n} a_{ij} x_j + y_i = b_i, \qquad i = 1, \dots, m.
+\]
+Il sistema dei vincoli diventa $Ax + Iy = b$, che è in forma canonica rispetto alle variabili artificiali.
+
+\begin{definizione}[Problema artificiale]\label{def:artificiale}
+Dato un problema in forma standard con vincoli $Ax = b$, $x \ge 0$ e $b \ge 0$, il \textbf{problema artificiale} associato è
+\[
+\begin{aligned}
+&\min \sum_{i=1}^{m} y_i \\
+&Ax + y = b \\
+&x \ge 0, \quad y \ge 0
+\end{aligned}
+\]
+dove $y = (y_1, \dots, y_m)^T$ è il vettore delle variabili artificiali.
+\end{definizione}
+
+Le variabili artificiali misurano quanto un punto si allontana dal rispettare i vincoli di partenza. Sia $(x^*, y^*)$ una soluzione ottima del problema artificiale. Se $y^* = 0$, allora $Ax^* = b$ e $x^* \ge 0$, quindi $x^*$ è una soluzione ammissibile di base del problema di partenza.
+
+Viceversa, se il problema di partenza ha un punto ammissibile $x$, allora $(x, 0)$ è ammissibile per il problema artificiale e ha valore $0$, che è il minimo possibile perché $y \ge 0$. In altre parole:
+\[
+\min \sum_{i=1}^{m} y_i = 0 \quad\Longleftrightarrow\quad \text{il problema di partenza è ammissibile}.
+\]
+Inoltre il problema artificiale ammette sempre una soluzione ottima: è ammissibile, perché $(0, b)$ rispetta i vincoli, ed è limitato inferiormente da $0$.
+
+La base di partenza è quella delle variabili artificiali, quindi $B = I$ e $c_B = (1, \dots, 1)$, mentre le variabili $x_j$ hanno coefficiente nullo nella funzione obiettivo. Il costo ridotto di $x_j$ è allora
+\[
+\bar{c}_j = 0 - (1, \dots, 1) \begin{pmatrix} a_{1j} \\ \vdots \\ a_{mj} \end{pmatrix} = -\sum_{i=1}^{m} a_{ij}
+\]
+ovvero l'opposto della somma degli elementi della sua colonna. Allo stesso modo, l'elemento in basso a destra vale $-\sum_i b_i$. La tabella iniziale della fase 1 è quindi:
+\[
+\begin{array}{c|ccc|ccc|c}
+ & x_1 & \cdots & x_n & y_1 & \cdots & y_m & b \\
+\hline
+y_1 & a_{11} & \cdots & a_{1n} & 1 & \cdots & 0 & b_1 \\
+\vdots & \vdots & & \vdots & & \ddots & & \vdots \\
+y_m & a_{m1} & \cdots & a_{mn} & 0 & \cdots & 1 & b_m \\
+\hline
+ & -\sum_i a_{i1} & \cdots & -\sum_i a_{in} & 0 & \cdots & 0 & -\sum_i b_i
+\end{array}
+\]
+
+Risolto il problema artificiale con il simplesso, indichiamo con $z^* = \sum_i y_i^*$ il suo valore ottimo. Al termine della fase 1 si possono presentare tre casi:
+\begin{enumerate}
+    \item $z^* > 0$: il problema di partenza non ha soluzioni ammissibili, ovvero è \textbf{inammissibile}, e l'algoritmo termina.
+    \item $z^* = 0$ e tutte le variabili artificiali sono fuori base: la soluzione ottima della fase 1 è una soluzione ammissibile di base del problema di partenza, e si passa alla fase 2.
+    \item $z^* = 0$ e alcune variabili artificiali sono in base con valore nullo: si passa alla fase 2, ma prima bisogna far uscire dalla base le variabili artificiali.
+\end{enumerate}
+
+\begin{osservazione}[Meno variabili artificiali]
+Non serve aggiungere una variabile artificiale a ogni vincolo. Basta aggiungerla ai vincoli che non hanno già una colonna dell'identità, ad esempio a quelli che non hanno una variabile di scarto. In questo modo il problema artificiale ha meno variabili, e il simplesso richiede in genere meno iterazioni.
+\end{osservazione}
+
+\subsection{Fase 2}
+La fase 2 parte dalla tabella finale della fase 1, che è già in forma canonica rispetto a una base ammissibile. Si procede così:
+\begin{enumerate}
+    \item Si cancellano le colonne delle variabili artificiali fuori base.
+    \item Si ripristina la funzione obiettivo $c^T x$ del problema di partenza e si ricalcolano i costi ridotti con la formula $\bar{c}_j = c_j - c_B^T \alpha_j$, dove $\alpha_j$ è la colonna di $x_j$ nella tabella. La base infatti non è più formata da sole variabili di scarto.
+    \item Si applica il simplesso.
+\end{enumerate}
+
+Nel terzo caso, prima di applicare il simplesso, si fanno uscire dalla base le variabili artificiali rimaste, con operazioni pivotali in cui entrano solo le variabili di partenza $x_j$. Il pivot può essere un qualsiasi elemento non nullo della riga della variabile artificiale, anche negativo: il termine noto della riga è nullo, quindi il pivot non cambia il valore delle variabili e la soluzione resta ammissibile.
+
+Se invece la riga ha tutti zeri nelle colonne delle $x_j$, la variabile artificiale non può uscire. In questo caso il vincolo corrispondente è \textbf{ridondante}, ovvero è combinazione lineare degli altri, e si eliminano la sua riga e la colonna della variabile artificiale.
+
+\paragraph{Esempio.}
+Torniamo all'esempio iniziale. Il primo vincolo ha già la variabile di scarto $x_4$, quindi aggiungiamo una sola variabile artificiale $y$, nel secondo vincolo:
+\[
+\begin{aligned}
+&\min\, y \\
+&{-x_1} + x_2 + x_3 + x_4 = 8 \\
+&3x_1 + 5x_2 + x_3 - x_5 + y = 4 \\
+&x_i \ge 0, \quad i = 1, \dots, 5, \qquad y \ge 0.
+\end{aligned}
+\]
+La base iniziale è $\{x_4, y\}$, con $c_B = (0, 1)$: i costi ridotti delle $x_j$ sono quindi gli opposti degli elementi della seconda riga. Nella tabella iniziale della fase 1 entra $x_2$, con il costo ridotto minimo $-5$. Il rapporto minimo è $\min\{8/1,\ 4/5\} = 4/5$, quindi esce $y$:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $y$ & $b$ \\
+\hline
+$x_4$ & $-1$ & 1 & 1 & 1 & 0 & 0 & 8 \\
+$y$ & 3 & $\boxed{5}$ & 1 & 0 & $-1$ & 1 & 4 \\
+\hline
+ & $-3$ & $-5$ & $-1$ & 0 & 1 & 0 & $-4$ \\
+\end{tabular}
+\end{center}
+Con le operazioni $R_2 \to R_2/5$, $R_1 \to R_1 - R_2$ e $R_3 \to R_3 + 5R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $y$ & $b$ \\
+\hline
+$x_4$ & $-\frac85$ & 0 & $\frac45$ & 1 & $\frac15$ & $-\frac15$ & $\frac{36}{5}$ \\
+$x_2$ & $\frac35$ & 1 & $\frac15$ & 0 & $-\frac15$ & $\frac15$ & $\frac45$ \\
+\hline
+ & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
+\end{tabular}
+\end{center}
+La fase 1 termina con valore ottimo nullo e con $y$ fuori base (secondo caso): $(0, \frac45, 0, \frac{36}{5}, 0)$ è una soluzione ammissibile di base del problema di partenza.
+
+Nella fase 2 cancelliamo la colonna di $y$ e ripristiniamo la funzione obiettivo, con $c = (-2, 3, 4, 0, 0)$ e $c_B = (c_4, c_2) = (0, 3)$:
+\[
+\begin{aligned}
+\bar{c}_1 &= -2 - (0, 3) \begin{pmatrix} -8/5 \\ 3/5 \end{pmatrix} = -2 - \frac95 = -\frac{19}{5} \\
+\bar{c}_3 &= 4 - (0, 3) \begin{pmatrix} 4/5 \\ 1/5 \end{pmatrix} = 4 - \frac35 = \frac{17}{5} \\
+\bar{c}_5 &= 0 - (0, 3) \begin{pmatrix} 1/5 \\ -1/5 \end{pmatrix} = \frac35
+\end{aligned}
+\]
+mentre l'elemento in basso a destra vale $-c_B^T x_B = -3 \cdot \frac45 = -\frac{12}{5}$. Entra $x_1$, e l'unico elemento positivo della sua colonna è nella riga di $x_2$, che quindi esce:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_4$ & $-\frac85$ & 0 & $\frac45$ & 1 & $\frac15$ & $\frac{36}{5}$ \\
+$x_2$ & $\boxed{\tfrac35}$ & 1 & $\frac15$ & 0 & $-\frac15$ & $\frac45$ \\
+\hline
+ & $-\frac{19}{5}$ & 0 & $\frac{17}{5}$ & 0 & $\frac35$ & $-\frac{12}{5}$ \\
+\end{tabular}
+\end{center}
+Con le operazioni $R_2 \to \frac53 R_2$, $R_1 \to R_1 + \frac85 R_2$ e $R_3 \to R_3 + \frac{19}{5} R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_4$ & 0 & $\frac83$ & $\frac43$ & 1 & $-\frac13$ & $\frac{28}{3}$ \\
+$x_1$ & 1 & $\frac53$ & $\frac13$ & 0 & $-\frac13$ & $\frac43$ \\
+\hline
+ & 0 & $\frac{19}{3}$ & $\frac{14}{3}$ & 0 & $-\frac23$ & $\frac83$ \\
+\end{tabular}
+\end{center}
+Il costo ridotto di $x_5$ è negativo, e tutti gli elementi della sua colonna sono negativi: per il test di illimitatezza il problema è \textbf{illimitato inferiormente}. In effetti, facendo crescere $x_1$ i due vincoli di partenza restano sempre soddisfatti, mentre la funzione obiettivo $-2x_1$ scende senza limiti.
+
+\paragraph{Esempio (vincolo ridondante).}
+Risolviamo il problema
+\[
+\begin{aligned}
+&\min\, (4x_1 + x_2 + x_3) \\
+&2x_1 + x_2 + 2x_3 = 4 \\
+&3x_1 + 3x_2 + x_3 = 3 \\
+&{-x_1} + x_2 - 3x_3 = -5 \\
+&x_i \ge 0, \quad i = 1, 2, 3.
+\end{aligned}
+\]
+Il terzo termine noto è negativo, quindi moltiplichiamo il vincolo per $-1$, ottenendo $x_1 - x_2 + 3x_3 = 5$. Nessuna colonna di $A$ è una colonna dell'identità, quindi aggiungiamo tre variabili artificiali e il problema artificiale è:
+\[
+\begin{aligned}
+&\min\, (y_1 + y_2 + y_3) \\
+&2x_1 + x_2 + 2x_3 + y_1 = 4 \\
+&3x_1 + 3x_2 + x_3 + y_2 = 3 \\
+&x_1 - x_2 + 3x_3 + y_3 = 5 \\
+&x_i \ge 0, \quad y_i \ge 0, \quad i = 1, 2, 3.
+\end{aligned}
+\]
+Nella tabella iniziale i costi ridotti sono gli opposti delle somme delle colonne. Il costo ridotto minimo, $-6$, è condiviso da $x_1$ e $x_3$, ed entra $x_1$, che ha indice minore. I rapporti sono $4/2 = 2$, $3/3 = 1$ e $5/1 = 5$, quindi esce $y_2$:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $y_1$ & $y_2$ & $y_3$ & $b$ \\
+\hline
+$y_1$ & 2 & 1 & 2 & 1 & 0 & 0 & 4 \\
+$y_2$ & $\boxed{3}$ & 3 & 1 & 0 & 1 & 0 & 3 \\
+$y_3$ & 1 & $-1$ & 3 & 0 & 0 & 1 & 5 \\
+\hline
+ & $-6$ & $-3$ & $-6$ & 0 & 0 & 0 & $-12$ \\
+\end{tabular}
+\end{center}
+Con le operazioni $R_2 \to R_2/3$, $R_1 \to R_1 - 2R_2$, $R_3 \to R_3 - R_2$ e $R_4 \to R_4 + 6R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $y_1$ & $y_2$ & $y_3$ & $b$ \\
+\hline
+$y_1$ & 0 & $-1$ & $\boxed{\tfrac43}$ & 1 & $-\frac23$ & 0 & 2 \\
+$x_1$ & 1 & 1 & $\frac13$ & 0 & $\frac13$ & 0 & 1 \\
+$y_3$ & 0 & $-2$ & $\frac83$ & 0 & $-\frac13$ & 1 & 4 \\
+\hline
+ & 0 & 3 & $-4$ & 0 & 2 & 0 & $-6$ \\
+\end{tabular}
+\end{center}
+Entra $x_3$. I rapporti sono $2/\frac43 = \frac32$, $1/\frac13 = 3$ e $4/\frac83 = \frac32$: c'è un pareggio tra $y_1$ e $y_3$, ed esce $y_1$, che ha indice minore. Con le operazioni $R_1 \to \frac34 R_1$, $R_2 \to R_2 - \frac13 R_1$, $R_3 \to R_3 - \frac83 R_1$ e $R_4 \to R_4 + 4R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $y_1$ & $y_2$ & $y_3$ & $b$ \\
+\hline
+$x_3$ & 0 & $-\frac34$ & 1 & $\frac34$ & $-\frac12$ & 0 & $\frac32$ \\
+$x_1$ & 1 & $\frac54$ & 0 & $-\frac14$ & $\frac12$ & 0 & $\frac12$ \\
+$y_3$ & 0 & 0 & 0 & $-2$ & 1 & 1 & 0 \\
+\hline
+ & 0 & 0 & 0 & 3 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+I costi ridotti sono tutti non negativi e il valore ottimo è nullo, quindi il problema di partenza è ammissibile. Tuttavia $y_3$ è rimasta in base con valore nullo (terzo caso), e la sua riga ha tutti zeri nelle colonne di $x_1$, $x_2$ e $x_3$: non è possibile farla uscire. Il terzo vincolo è quindi ridondante, e infatti è uguale al doppio del primo meno il secondo:
+\[
+2\,(2, 1, 2 \mid 4) - (3, 3, 1 \mid 3) = (1, -1, 3 \mid 5).
+\]
+Eliminiamo la riga di $y_3$ e le colonne delle variabili artificiali. La soluzione ammissibile di base trovata è $(\frac12, 0, \frac32)$.
+
+Nella fase 2 ripristiniamo la funzione obiettivo, con $c = (4, 1, 1)$ e $c_B = (c_3, c_1) = (1, 4)$. Le variabili $x_1$ e $x_3$ sono in base, quindi hanno costo ridotto nullo, mentre per $x_2$ si ha
+\[
+\bar{c}_2 = 1 - (1, 4) \begin{pmatrix} -3/4 \\ 5/4 \end{pmatrix} = 1 - \frac{17}{4} = -\frac{13}{4}
+\]
+e l'elemento in basso a destra vale $-(1 \cdot \frac32 + 4 \cdot \frac12) = -\frac72$. Entra $x_2$, e l'unico elemento positivo della sua colonna è nella riga di $x_1$, che quindi esce:
+\begin{center}
+\begin{tabular}{c|ccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $b$ \\
+\hline
+$x_3$ & 0 & $-\frac34$ & 1 & $\frac32$ \\
+$x_1$ & 1 & $\boxed{\tfrac54}$ & 0 & $\frac12$ \\
+\hline
+ & 0 & $-\frac{13}{4}$ & 0 & $-\frac72$ \\
+\end{tabular}
+\qquad$\Longrightarrow$\qquad
+\begin{tabular}{c|ccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $b$ \\
+\hline
+$x_3$ & $\frac35$ & 0 & 1 & $\frac95$ \\
+$x_2$ & $\frac45$ & 1 & 0 & $\frac25$ \\
+\hline
+ & $\frac{13}{5}$ & 0 & 0 & $-\frac{11}{5}$ \\
+\end{tabular}
+\end{center}
+dove le operazioni sono $R_2 \to \frac45 R_2$, $R_1 \to R_1 + \frac34 R_2$ e $R_3 \to R_3 + \frac{13}{4} R_2$. Il costo ridotto di $x_1$ è positivo, quindi la soluzione $x^* = (0, \frac25, \frac95)$ è ottima (ed è l'unica), con valore ottimo $\frac{11}{5}$.
+
+\paragraph{Esempio (problema inammissibile).}
+Consideriamo il problema
+\[
+\begin{aligned}
+&\min\, (-x_1 + x_2) \\
+&x_1 + x_2 \ge 3 \\
+&x_1 + 2x_2 \le 2 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{aligned}
+&x_1 + x_2 - x_3 = 3 \\
+&x_1 + 2x_2 + x_4 = 2 \\
+&x_i \ge 0, \quad i = 1, \dots, 4.
+\end{aligned}
+\]
+Il secondo vincolo ha la variabile di scarto $x_4$, quindi basta una variabile artificiale $y$ nel primo, e il problema artificiale è $\min y$ con vincoli $x_1 + x_2 - x_3 + y = 3$ e $x_1 + 2x_2 + x_4 = 2$. Il costo ridotto minimo, $-1$, è condiviso da $x_1$ e $x_2$: entra $x_1$, e il rapporto minimo è $\min\{3/1,\ 2/1\} = 2$, quindi esce $x_4$. Con le operazioni $R_1 \to R_1 - R_2$ e $R_3 \to R_3 + R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $y$ & $b$ \\
+\hline
+$y$ & 1 & 1 & $-1$ & 0 & 1 & 3 \\
+$x_4$ & $\boxed{1}$ & 2 & 0 & 1 & 0 & 2 \\
+\hline
+ & $-1$ & $-1$ & 1 & 0 & 0 & $-3$ \\
+\end{tabular}
+\qquad$\Longrightarrow$\qquad
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $y$ & $b$ \\
+\hline
+$y$ & 0 & $-1$ & $-1$ & $-1$ & 1 & 1 \\
+$x_1$ & 1 & 2 & 0 & 1 & 0 & 2 \\
+\hline
+ & 0 & 1 & 1 & 1 & 0 & $-1$ \\
+\end{tabular}
+\end{center}
+I costi ridotti sono tutti non negativi, quindi la fase 1 è terminata, ma con valore ottimo $z^* = y^* = 1 \neq 0$ (primo caso): il problema di partenza è \textbf{inammissibile}. Lo si può verificare anche direttamente: poiché $x_2 \ge 0$, si ha $x_1 + x_2 \le x_1 + 2x_2 \le 2 < 3$, quindi i due vincoli non possono essere soddisfatti insieme.
+
+\section*{Riferimenti}
+Il materiale visto in questo capitolo comprende:
+\begin{itemize}
+    \item Materiale visto a lezione (16, 19, 23 e 30 ottobre 2026).
+    \item Dispensa del corso \emph{Il metodo del simplesso}, sezioni 2--9 (forma canonica, forma tabellare, condizioni di ottimalità e illimitatezza, operazione di pivot, regola di Bland, complessità e unicità).
+    \item Dispensa del corso \emph{Metodo delle due fasi}.
+\end{itemize}

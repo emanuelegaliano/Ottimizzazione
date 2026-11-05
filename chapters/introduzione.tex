@@ -20,7 +20,10 @@ L'\textbf{ottimizzazione matematica}, detta anche \textbf{programmazione matemat
 
 È importante precisare che i problemi con più decisori, ognuno con i propri obiettivi, non rientrano in questo ambito: la loro risoluzione è studiata dalla \textbf{teoria dei giochi}.
 
-% TODO: problema di Dantzig, da leggere nelle slide del corso.
+\paragraph{Il problema di Dantzig.}
+Un esempio che mostra perché servono metodi di ottimizzazione è il seguente: un'azienda deve assegnare i suoi 70 dipendenti a 70 mansioni diverse. Ogni dipendente va assegnato a un solo lavoro, e ogni lavoro deve essere svolto esattamente da un dipendente. L'assegnamento non è indifferente per l'azienda, perché i dipendenti hanno preferenze e capacità diverse rispetto alle mansioni.
+
+Si potrebbe pensare di provare tutti gli assegnamenti possibili e scegliere il migliore, ma sono $70!$, un numero dell'ordine di $10^{100}$. Tianhe-2, il supercomputer più potente fino al 2014, avrebbe impiegato circa $10^{76}$ anni per enumerarli tutti, mentre l'età dell'universo è di circa $13 \cdot 10^9$ anni. Serve quindi un modo per trovare la soluzione migliore senza esaminarle tutte, ed è proprio di questo che si occupa l'ottimizzazione.
 
 \section{Approccio modellistico}
 Il passaggio da un problema reale alla sua soluzione segue, in generale, cinque fasi:
@@ -334,4 +337,5 @@ Il materiale visto in questo capitolo comprende:
 \begin{itemize}
     \item Materiale visto a lezione (2 ottobre 2026).
     \item Dispensa del corso \emph{Introduzione all'ottimizzazione}, capitoli 1--3.
+    \item Slide del corso \emph{Introduzione alla Ricerca Operativa} (esempio di Dantzig).
 \end{itemize}

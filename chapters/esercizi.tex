@@ -230,6 +230,73 @@ La retta $5x_1 + 3x_2 = 15$ passa per $(3, 0)$ e $(0, 5)$, e la regione ammissib
 
 Il problema ha dunque \textbf{infinite soluzioni}, più precisamente: il vertice $(0, 5)$, il vertice $(3, 0)$ e tutti i punti del segmento che unisce questi due vertici.
 
+\begin{esercizio}
+Risolvere graficamente il problema
+\[
+\begin{aligned}
+&\min\, (x_1 + 6x_2) \\
+&x_1 - 2x_2 \le -1 \\
+&x_1 + 2x_2 \ge 7 \\
+&2x_1 + x_2 \ge 5 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+che abbiamo già portato in forma standard nel capitolo~\ref{ch:geoalg}.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Tracciamo le rette dei vincoli:
+\begin{itemize}
+    \item $x_1 - 2x_2 = -1$ passa per $(-1, 0)$ e $(0, 1/2)$.
+    \item $x_1 + 2x_2 = 7$ passa per $(7, 0)$ e $(0, 7/2)$.
+    \item $2x_1 + x_2 = 5$ passa per $(5/2, 0)$ e $(0, 5)$.
+\end{itemize}
+L'origine non soddisfa nessuno dei tre vincoli ($0 \le -1$, $0 \ge 7$ e $0 \ge 5$ sono falsi), quindi in tutti e tre i casi il semipiano ammissibile è quello che non contiene l'origine. Intersecando i semipiani con il primo quadrante si ottiene la regione in figura~\ref{fig:es-min-x1-6x2}, che non è limitata e ha tre vertici:
+\begin{itemize}
+    \item $A = (0, 5)$, dove la retta $2x_1 + x_2 = 5$ incontra l'asse $x_2$.
+    \item $B = (1, 3)$, intersezione delle rette $x_1 + 2x_2 = 7$ e $2x_1 + x_2 = 5$.
+    \item $C = (3, 2)$, intersezione delle rette $x_1 - 2x_2 = -1$ e $x_1 + 2x_2 = 7$ (sommandole si ottiene $2x_1 = 6$).
+\end{itemize}
+
+Le curve di livello sono le rette $x_1 + 6x_2 = K$. Stiamo minimizzando, quindi le spostiamo nella direzione dell'antigradiente $d = (-1, -6)^T$. L'ultimo punto in comune con la regione ammissibile è il vertice $C$, con $K = 3 + 6 \cdot 2 = 15$. Negli altri vertici la funzione obiettivo vale infatti $f(A) = 30$ e $f(B) = 19$.
+
+La regione ammissibile non è limitata, ma nelle direzioni in cui si estende (verso l'alto e lungo la retta $x_1 - 2x_2 = -1$) la funzione obiettivo cresce, quindi il problema non è illimitato. La soluzione ottima è $x^* = (3, 2)$, con valore $15$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.8, >=Stealth]
+  \useasboundingbox (-3.3,-1.0) rectangle (10.6,6.5);
+  % regione ammissibile (non limitata)
+  \fill[Accent!12] (0,6) -- (0,5) -- (1,3) -- (3,2) -- (8.4,4.7) -- (8.4,6) -- cycle;
+  % assi
+  \draw[->] (-1.6,0) -- (8.8,0) node[right] {$x_1$};
+  \draw[->] (0,-0.6) -- (0,6.3) node[above] {$x_2$};
+  \foreach \x in {1,...,8} \draw (\x,0.06) -- (\x,-0.06) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,5} \draw (0.06,\y) -- (-0.06,\y) node[left,font=\scriptsize] {\y};
+  % vincoli
+  \draw[blue!65!black, very thick] (-1.4,-0.2) -- (8.4,4.7)
+    node[right, font=\small] {$x_1-2x_2=-1$};
+  \draw[orange!85!black, very thick] (-0.4,3.7) -- (7.6,-0.3);
+  \node[orange!85!black, font=\small, anchor=east] at (-0.45,3.7) {$x_1+2x_2=7$};
+  \draw[green!45!black, very thick] (-0.3,5.6) -- (2.8,-0.6);
+  \node[green!45!black, font=\small, anchor=east] at (-0.35,5.6) {$2x_1+x_2=5$};
+  % curve di livello
+  \draw[dashed, TextGray] (0,5) -- (8.4,3.6) node[right, font=\scriptsize] {$K=30$};
+  \draw[dashed, red!70!black] (-0.6,2.6) -- (8.4,1.1) node[right, font=\scriptsize] {$K=15$};
+  % direzione di decrescita
+  \draw[->, red!70!black, very thick] (3.65,6.0) -- (3.5,5.1) node[right, font=\small] {$d$};
+  % vertici
+  \node[circle, fill=black, inner sep=1.5pt] at (0,5) {};
+  \node[circle, fill=black, inner sep=1.5pt] at (1,3) {};
+  \node[circle, fill=red!70!black, inner sep=2pt] at (3,2) {};
+  \node[font=\small, anchor=south west] at (0.08,5.05) {$A$};
+  \node[font=\small, anchor=north east] at (0.95,2.95) {$B$};
+  \node[font=\small, anchor=north, red!70!black] at (3,1.85) {$C$};
+\end{tikzpicture}
+\caption{Esercizio con regione ammissibile non limitata (zona colorata), delimitata dalle rette dei tre vincoli e dall'asse $x_2$, con vertici $A=(0,5)$, $B=(1,3)$ e $C=(3,2)$. La curva di livello grigia $x_1+6x_2=30$ passa per $A$. Spostando le curve di livello nella direzione di decrescita $d=(-1,-6)^T$, l'ultima che tocca la regione è quella rossa, $x_1+6x_2=15$, nel vertice ottimo $C$.}
+\label{fig:es-min-x1-6x2}
+\end{figure}
+
 \begin{osservazione}[Riepilogo]
 A seconda di come è fatta la regione ammissibile, un problema di PL si può trovare in uno dei seguenti casi:
 \begin{enumerate}
@@ -342,8 +409,397 @@ Indichiamo con $x_1$, $x_2$ e $x_3$ il numero di porzioni degli alimenti $A$, $B
 \end{aligned}
 \]
 
+\section{Problemi di trasporto}\label{sec:es-trasporto}
+Nei \textbf{problemi di trasporto} si hanno:
+\begin{itemize}
+    \item $m$ luoghi di origine $O_1, \dots, O_m$, con disponibilità $p_1, \dots, p_m$.
+    \item $n$ luoghi di destinazione $D_1, \dots, D_n$, con domande $d_1, \dots, d_n$.
+\end{itemize}
+Trasportare una unità di merce da $O_i$ a $D_j$ costa $c_{ij}$. Vogliamo trovare le quantità da trasportare che minimizzano il costo totale, rispettando le disponibilità delle origini e le domande delle destinazioni (figura~\ref{fig:trasporto}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[>=Stealth,
+  nodo/.style={circle, draw=Accent, fill=Accent!10, minimum size=9mm, font=\small}]
+  % origini e destinazioni
+  \node[nodo] (O1) at (0,2.4) {$O_1$};
+  \node[nodo] (Oi) at (0,0.6) {$O_i$};
+  \node[nodo] (Om) at (0,-1.2) {$O_m$};
+  \node[nodo] (D1) at (6,2.4) {$D_1$};
+  \node[nodo] (Dj) at (6,0.6) {$D_j$};
+  \node[nodo] (Dn) at (6,-1.2) {$D_n$};
+  \node at (0,1.55) {$\vdots$};
+  \node at (0,-0.25) {$\vdots$};
+  \node at (6,1.55) {$\vdots$};
+  \node at (6,-0.25) {$\vdots$};
+  % disponibilità e domande
+  \node[font=\small, anchor=east] at (O1.west) {$p_1$};
+  \node[font=\small, anchor=east] at (Oi.west) {$p_i$};
+  \node[font=\small, anchor=east] at (Om.west) {$p_m$};
+  \node[font=\small, anchor=west] at (D1.east) {$d_1$};
+  \node[font=\small, anchor=west] at (Dj.east) {$d_j$};
+  \node[font=\small, anchor=west] at (Dn.east) {$d_n$};
+  \node[font=\small\bfseries, Accent] at (0,3.4) {Origini};
+  \node[font=\small\bfseries, Accent] at (6,3.4) {Destinazioni};
+  % archi
+  \foreach \o in {O1,Oi,Om}
+    \foreach \d in {D1,Dj,Dn}
+      \draw[->, RuleGray] (\o) -- (\d);
+  \draw[->, red!70!black, thick] (Oi) -- (Dj)
+    node[midway, above, fill=white, inner sep=1.5pt, font=\small] {$c_{ij},\ x_{ij}$};
+\end{tikzpicture}
+\caption{Struttura di un problema di trasporto: ogni origine $O_i$ ha una disponibilità $p_i$, ogni destinazione $D_j$ ha una domanda $d_j$, e ogni arco da $O_i$ a $D_j$ ha un costo unitario $c_{ij}$. La variabile $x_{ij}$ è la quantità di merce trasportata lungo l'arco evidenziato in rosso.}
+\label{fig:trasporto}
+\end{figure}
+
+Gli elementi del modello sono:
+\begin{itemize}
+    \item \textbf{Variabili}: $x_{ij}$, la quantità da trasportare da $O_i$ a $D_j$.
+    \item \textbf{Funzione obiettivo}: il costo totale, ovvero $\sum_{i=1}^{m} \sum_{j=1}^{n} c_{ij} x_{ij}$.
+    \item \textbf{Vincoli di offerta}: quello che parte da $O_i$ non può superare $p_i$.
+    \item \textbf{Vincoli di domanda}: quello che arriva a $D_j$ deve essere almeno $d_j$.
+\end{itemize}
+Il problema si formula quindi come:
+\[
+\begin{aligned}
+&\min \sum_{i=1}^{m} \sum_{j=1}^{n} c_{ij} x_{ij} \\
+&\sum_{j=1}^{n} x_{ij} \le p_i, \quad i = 1, \dots, m \\
+&\sum_{i=1}^{m} x_{ij} \ge d_j, \quad j = 1, \dots, n \\
+&x_{ij} \ge 0, \quad i = 1, \dots, m,\ j = 1, \dots, n.
+\end{aligned}
+\]
+
+Se la domanda totale supera l'offerta totale, ovvero $\sum_j d_j > \sum_i p_i$, il problema non ammette soluzioni ammissibili. Se invece è minore, si aggiunge una destinazione fittizia, collegata a tutte le origini con costo nullo, che raccoglie l'eccesso di offerta. In questo modo ci si riconduce sempre alla \textbf{forma bilanciata}, in cui $\sum_i p_i = \sum_j d_j$ e i vincoli sono di uguaglianza\footnote{Se l'offerta totale coincide con la domanda totale, i vincoli $\le$ e $\ge$ sono necessariamente verificati con il segno di uguaglianza.}:
+\[
+\sum_{j=1}^{n} x_{ij} = p_i, \quad i = 1, \dots, m, \qquad\qquad \sum_{i=1}^{m} x_{ij} = d_j, \quad j = 1, \dots, n.
+\]
+
+\begin{esercizio}[Distribuzione di energia elettrica]
+Tre stabilimenti $a$, $b$ e $c$ producono rispettivamente $45$, $60$ e $35$ kWh di energia elettrica. L'energia deve servire cinque città $A, B, C, D, E$, con un fabbisogno di $40$, $20$, $30$, $20$ e $30$ kWh. I costi di trasporto per kWh sono riportati nella tabella:
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+ & $A$ & $B$ & $C$ & $D$ & $E$ \\
+\midrule
+$a$ & 7 & 5 & 6 & 9 & 8 \\
+$b$ & 10 & 8 & 11 & 6 & 7 \\
+$c$ & 12 & 9 & 14 & 5 & 13 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Formulare il problema di distribuzione dell'energia di costo minimo.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+L'offerta totale è $45 + 60 + 35 = 140$ kWh, e coincide con la domanda totale $40 + 20 + 30 + 20 + 30 = 140$ kWh: il problema è già in forma bilanciata. Indichiamo con $x_{ij}$ i kWh trasportati dallo stabilimento $i \in \{1, 2, 3\}$ (cioè $a, b, c$) alla città $j \in \{1, \dots, 5\}$ (cioè $A, \dots, E$). La funzione obiettivo è il costo totale:
+\[
+\min\, (7x_{11} + 5x_{12} + 6x_{13} + 9x_{14} + 8x_{15} + 10x_{21} + \dots + 5x_{34} + 13x_{35}).
+\]
+Ogni stabilimento deve distribuire tutta l'energia prodotta, da cui i vincoli di riga:
+\[
+\begin{aligned}
+x_{11} + x_{12} + x_{13} + x_{14} + x_{15} &= 45 \\
+x_{21} + x_{22} + x_{23} + x_{24} + x_{25} &= 60 \\
+x_{31} + x_{32} + x_{33} + x_{34} + x_{35} &= 35
+\end{aligned}
+\]
+mentre ogni città deve ricevere esattamente il suo fabbisogno, da cui i vincoli di colonna:
+\[
+\sum_{i=1}^{3} x_{i1} = 40, \quad
+\sum_{i=1}^{3} x_{i2} = 20, \quad
+\sum_{i=1}^{3} x_{i3} = 30, \quad
+\sum_{i=1}^{3} x_{i4} = 20, \quad
+\sum_{i=1}^{3} x_{i5} = 30
+\]
+con $x_{ij} \ge 0$ per ogni $i, j$.
+
+Il problema ha $15$ variabili, quindi va risolto con il simplesso o con un solver numerico. Il costo minimo è $1020$, ottenuto ad esempio con la distribuzione:
+\begin{center}
+\begin{tabular}{lccccc}
+\toprule
+ & $A$ & $B$ & $C$ & $D$ & $E$ \\
+\midrule
+$a$ & 10 & 5 & 30 & 0 & 0 \\
+$b$ & 30 & 0 & 0 & 0 & 30 \\
+$c$ & 0 & 15 & 0 & 20 & 0 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Le variabili positive sono $7 = m + n - 1$, e non $m + n = 8$. In forma bilanciata uno dei vincoli è infatti ridondante: la somma dei vincoli di riga coincide con la somma dei vincoli di colonna, quindi la matrice dei vincoli ha rango $m + n - 1$ (si veda l'osservazione sulle dimensioni del sistema nel capitolo~\ref{ch:geoalg}).
+
+\section{Forma standard e vertici}\label{sec:es-forma-standard}
+Ricordiamo che un problema in forma standard ha la forma
+\[
+\min c^T x, \quad A x = b, \quad x \ge 0, \qquad A \in \mathbb{R}^{m \times n},\ b \in \mathbb{R}^m,\ m < n
+\]
+con termini noti non negativi ($b_i \ge 0$ per ogni $i$). Le trasformazioni per ottenerla sono riportate dopo la definizione~\ref{def:standard}.
+
+\begin{esercizio}
+Portare in forma standard il problema
+\[
+\begin{aligned}
+&\min\, (12x_1 + x_2 + 5x_3) \\
+&x_2 - 2x_3 \ge 7 \\
+&2x_1 + x_3 \le 10 \\
+&3x_1 - x_2 - 2x_3 = 3 \\
+&x_1,\, x_3 \ge 0.
+\end{aligned}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Il problema è già di minimo. La variabile $x_2$ non ha vincoli di segno, quindi è libera e la scriviamo come $x_2 = x_2' - x_2''$, con $x_2', x_2'' \ge 0$. Al primo vincolo sottraiamo una variabile di surplus $x_4$ e al secondo aggiungiamo una variabile di scarto $x_5$, mentre il terzo è già di uguaglianza. La forma standard è:
+\[
+\begin{aligned}
+&\min\, (12x_1 + x_2' - x_2'' + 5x_3) \\
+&x_2' - x_2'' - 2x_3 - x_4 = 7 \\
+&2x_1 + x_3 + x_5 = 10 \\
+&3x_1 - (x_2' - x_2'') - 2x_3 = 3 \\
+&x_1,\, x_2',\, x_2'',\, x_3,\, x_4,\, x_5 \ge 0.
+\end{aligned}
+\]
+
+\begin{esercizio}
+Portare in forma standard il problema
+\[
+\begin{aligned}
+&\max\, (-x_1 - 2x_2) \\
+&2x_1 + x_2 - x_3 \ge 6 \\
+&x_1 - 2x_2 + x_3 = 4 \\
+&x_2 + x_3 \le 5 \\
+&x_1,\, x_2,\, x_3 \ge 0.
+\end{aligned}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Il problema è di massimo, quindi lo scriviamo come $-\min(x_1 + 2x_2)$. Sottraiamo una variabile di surplus $x_4$ al primo vincolo e aggiungiamo una variabile di scarto $x_5$ al terzo:
+\[
+\begin{aligned}
+&-\min\, (x_1 + 2x_2) \\
+&2x_1 + x_2 - x_3 - x_4 = 6 \\
+&x_1 - 2x_2 + x_3 = 4 \\
+&x_2 + x_3 + x_5 = 5 \\
+&x_i \ge 0, \quad i = 1, \dots, 5.
+\end{aligned}
+\]
+
+\begin{esercizio}
+Dato il poliedro
+\[
+P:\ \begin{cases}
+-2x_1 + x_2 \le 4 \\
+-\frac14 x_1 + x_2 \ge -1 \\
+x_1 + 2x_2 \le 11 \\
+x_1,\, x_2 \ge 0
+\end{cases}
+\]
+stabilire se il punto $B = (1, 0)^T$ è un vertice. Ripetere la verifica sostituendo il terzo vincolo con $x_1 + 2x_2 \le 1$.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Scriviamo i vincoli nella forma $A x \ge b$, moltiplicando per $-1$ quelli di tipo $\le$:
+\[
+A = \begin{pmatrix} 2 & -1 \\ -\frac14 & 1 \\ -1 & -2 \\ 1 & 0 \\ 0 & 1 \end{pmatrix}, \qquad
+b = \begin{pmatrix} -4 \\ -1 \\ -11 \\ 0 \\ 0 \end{pmatrix}.
+\]
+Il punto $B$ è ammissibile, perché $-2 \le 4$, $-\frac14 \ge -1$, $1 \le 11$ e le sue componenti sono non negative. Per essere un vertice servono $n = 2$ vincoli attivi con righe linearmente indipendenti (teorema~\ref{teo:vertici}). In questo caso però è attivo solo il quinto vincolo ($x_2 = 0$), quindi $B$ \textbf{non} è un vertice: si trova sull'asse $x_1$, all'interno di un lato del poliedro.
+
+Con il terzo vincolo $x_1 + 2x_2 \le 1$ il punto resta ammissibile, e il terzo vincolo diventa attivo, perché $1 + 0 = 1$. I vincoli attivi sono ora il terzo e il quinto, e le righe corrispondenti sono linearmente indipendenti:
+\[
+\det \begin{pmatrix} -1 & -2 \\ 0 & 1 \end{pmatrix} = -1 \neq 0.
+\]
+Quindi in questo caso $B$ è un \textbf{vertice}.
+
+\begin{esercizio}
+Determinare i vertici del poliedro
+\[
+P:\ \begin{cases}
+x_1 + 2x_2 + x_3 - x_4 = 1 \\
+x_2 + x_3 = 1 \\
+x_i \ge 0, \quad i = 1, \dots, 4.
+\end{cases}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Il poliedro è in forma standard, con $n = 4$ variabili e $m = 2$ vincoli. Per il teorema~\ref{teo:vertici-base} i vertici sono le soluzioni ammissibili di base, che si trovano così:
+\begin{enumerate}
+    \item Si annullano $n - m = 2$ variabili (le variabili fuori base).
+    \item Si ricavano le $m = 2$ variabili rimanenti dal sistema dei vincoli.
+    \item Se le componenti sono tutte $\ge 0$, il punto è un vertice.
+\end{enumerate}
+Le scelte possibili sono al più $\binom{4}{2} = \frac{4!}{2!\,2!} = 6$, e le esaminiamo tutte:
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+Variabili annullate & Punto & Ammissibile & Vertice \\
+\midrule
+$x_1, x_2$ & $(0, 0, 1, 0)$ & Sì & Sì \\
+$x_1, x_3$ & $(0, 1, 0, 1)$ & Sì & Sì \\
+$x_1, x_4$ & $(0, 0, 1, 0)$ & Sì & Sì \\
+$x_2, x_3$ & nessuna soluzione & No & No \\
+$x_2, x_4$ & $(0, 0, 1, 0)$ & Sì & Sì \\
+$x_3, x_4$ & $(-1, 1, 0, 0)$ & No & No \\
+\bottomrule
+\end{tabular}
+\end{center}
+Annullando $x_2$ e $x_3$, il secondo vincolo diventa $0 = 1$, e il sistema non ha soluzione: le colonne di $x_1$ e $x_4$ sono linearmente dipendenti e non formano una base. Annullando $x_3$ e $x_4$ si ricava invece $x_2 = 1$ e $x_1 = 1 - 2 = -1$, che non è ammissibile.
+
+Il poliedro ha quindi due vertici: $(0, 1, 0, 1)$ e $(0, 0, 1, 0)$. Il secondo si ottiene da tre basi diverse, ed è una soluzione degenere: in ciascuna di queste basi una variabile di base vale zero.
+
+\section{Metodo del simplesso}\label{sec:es-simplesso}
+Per questi esercizi seguiamo i passi della sezione~\ref{sec:algoritmo}. Come variabile entrante scegliamo quella con il costo ridotto minimo (regola di Dantzig), e risolviamo i pareggi scegliendo l'indice minimo.
+
+\begin{esercizio}[Corsi in palestra]
+Una palestra organizza tre tipi di corso: HIIT, yoga e allenamento di forza. Un'ora di corso rende rispettivamente $500$, $200$ e $350$ euro. In una giornata si possono svolgere al massimo $8$ ore di corsi, di cui al massimo $5$ di HIIT e al massimo $3$ di forza. Determinare con il metodo del simplesso quante ore dedicare a ciascun corso per massimizzare il guadagno.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Indichiamo con $x_1$, $x_2$ e $x_3$ le ore di HIIT, yoga e forza. Il problema e la sua forma standard sono:
+\[
+\begin{aligned}
+&\max\, (500x_1 + 200x_2 + 350x_3) \\
+&x_1 + x_2 + x_3 \le 8 \\
+&x_1 \le 5 \\
+&x_3 \le 3 \\
+&x_1,\, x_2,\, x_3 \ge 0
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{aligned}
+&\min\, (-500x_1 - 200x_2 - 350x_3) \\
+&x_1 + x_2 + x_3 + x_4 = 8 \\
+&x_1 + x_5 = 5 \\
+&x_3 + x_6 = 3 \\
+&x_i \ge 0, \quad i = 1, \dots, 6.
+\end{aligned}
+\]
+Le variabili di scarto $x_4$, $x_5$ e $x_6$ formano una base, e la tabella iniziale è:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $b$ \\
+\hline
+$x_4$ & 1 & 1 & 1 & 1 & 0 & 0 & 8 \\
+$x_5$ & $\boxed{1}$ & 0 & 0 & 0 & 1 & 0 & 5 \\
+$x_6$ & 0 & 0 & 1 & 0 & 0 & 1 & 3 \\
+\hline
+ & $-500$ & $-200$ & $-350$ & 0 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Entra $x_1$, che ha il costo ridotto minimo. Il rapporto minimo è $\min\{8/1,\ 5/1\} = 5$, quindi esce $x_5$. Con le operazioni $R_1 \to R_1 - R_2$ e $R_4 \to R_4 + 500R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $b$ \\
+\hline
+$x_4$ & 0 & 1 & $\boxed{1}$ & 1 & $-1$ & 0 & 3 \\
+$x_1$ & 1 & 0 & 0 & 0 & 1 & 0 & 5 \\
+$x_6$ & 0 & 0 & 1 & 0 & 0 & 1 & 3 \\
+\hline
+ & 0 & $-200$ & $-350$ & 0 & 500 & 0 & 2500 \\
+\end{tabular}
+\end{center}
+Entra $x_3$. I rapporti delle righe di $x_4$ e di $x_6$ valgono entrambi $3$, e per la regola dell'indice minimo esce $x_4$. Con le operazioni $R_3 \to R_3 - R_1$ e $R_4 \to R_4 + 350R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $b$ \\
+\hline
+$x_3$ & 0 & 1 & 1 & 1 & $-1$ & 0 & 3 \\
+$x_1$ & 1 & 0 & 0 & 0 & 1 & 0 & 5 \\
+$x_6$ & 0 & $-1$ & 0 & $-1$ & 1 & 1 & 0 \\
+\hline
+ & 0 & 150 & 0 & 350 & 150 & 0 & 3550 \\
+\end{tabular}
+\end{center}
+Tutti i costi ridotti sono non negativi, quindi la soluzione di base $(5, 0, 3, 0, 0, 0)$ è ottima. Conviene fare $5$ ore di HIIT e $3$ ore di forza, con un guadagno di $3550$ euro. La soluzione è degenere, perché $x_6$ è in base con valore nullo (c'era un pareggio nel criterio del rapporto), ed è l'unica ottima, perché i costi ridotti delle variabili fuori base sono strettamente positivi.
+
+\begin{esercizio}[Menu del ristorante]
+Un ristorante prepara quattro piatti: lasagna, pizza, riso e tiramisù, con un profitto per porzione di $9$, $7$, $5$ e $8$ euro. Indicando con $x_1, \dots, x_4$ le porzioni dei quattro piatti, le risorse della cucina impongono i vincoli
+\[
+\begin{aligned}
+6x_1 + 4x_2 + 3x_3 + 5x_4 &\le 120 \\
+2x_1 + x_2 + x_3 + x_4 &\le 30 \\
+x_1 + x_2 + x_3 + x_4 &\le 40
+\end{aligned}
+\]
+con $x_i \ge 0$. Determinare con il metodo del simplesso le porzioni che massimizzano il profitto.
+\end{esercizio}
+
+\paragraph{Soluzione.}
+La forma standard si ottiene cambiando segno alla funzione obiettivo e aggiungendo una variabile di scarto per ogni vincolo:
+\[
+\begin{aligned}
+&\min\, (-9x_1 - 7x_2 - 5x_3 - 8x_4) \\
+&6x_1 + 4x_2 + 3x_3 + 5x_4 + x_5 = 120 \\
+&2x_1 + x_2 + x_3 + x_4 + x_6 = 30 \\
+&x_1 + x_2 + x_3 + x_4 + x_7 = 40 \\
+&x_i \ge 0, \quad i = 1, \dots, 7.
+\end{aligned}
+\]
+La tabella iniziale, con base $\{x_5, x_6, x_7\}$, è:
+\begin{center}
+\begin{tabular}{c|ccccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $b$ \\
+\hline
+$x_5$ & 6 & 4 & 3 & 5 & 1 & 0 & 0 & 120 \\
+$x_6$ & $\boxed{2}$ & 1 & 1 & 1 & 0 & 1 & 0 & 30 \\
+$x_7$ & 1 & 1 & 1 & 1 & 0 & 0 & 1 & 40 \\
+\hline
+ & $-9$ & $-7$ & $-5$ & $-8$ & 0 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Entra $x_1$, con costo ridotto $-9$. I rapporti sono $120/6 = 20$, $30/2 = 15$ e $40/1 = 40$, quindi esce $x_6$ e il pivot vale $2$. Con le operazioni
+\[
+R_2 \to \frac{R_2}{2}, \qquad R_1 \to R_1 - 6R_2, \qquad R_3 \to R_3 - R_2, \qquad R_4 \to R_4 + 9R_2
+\]
+si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $b$ \\
+\hline
+$x_5$ & 0 & 1 & 0 & $\boxed{2}$ & 1 & $-3$ & 0 & 30 \\
+$x_1$ & 1 & $\frac12$ & $\frac12$ & $\frac12$ & 0 & $\frac12$ & 0 & 15 \\
+$x_7$ & 0 & $\frac12$ & $\frac12$ & $\frac12$ & 0 & $-\frac12$ & 1 & 25 \\
+\hline
+ & 0 & $-\frac52$ & $-\frac12$ & $-\frac72$ & 0 & $\frac92$ & 0 & 135 \\
+\end{tabular}
+\end{center}
+Entra $x_4$, con costo ridotto $-\frac72$. I rapporti sono $30/2 = 15$, $15/\frac12 = 30$ e $25/\frac12 = 50$, quindi esce $x_5$. Con le operazioni
+\[
+R_1 \to \frac{R_1}{2}, \qquad R_2 \to R_2 - \frac12 R_1, \qquad R_3 \to R_3 - \frac12 R_1, \qquad R_4 \to R_4 + \frac72 R_1
+\]
+si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $b$ \\
+\hline
+$x_4$ & 0 & $\frac12$ & 0 & 1 & $\frac12$ & $-\frac32$ & 0 & 15 \\
+$x_1$ & 1 & $\boxed{\tfrac14}$ & $\frac12$ & 0 & $-\frac14$ & $\frac54$ & 0 & $\frac{15}{2}$ \\
+$x_7$ & 0 & $\frac14$ & $\frac12$ & 0 & $-\frac14$ & $\frac14$ & 1 & $\frac{35}{2}$ \\
+\hline
+ & 0 & $-\frac34$ & $-\frac12$ & 0 & $\frac74$ & $-\frac34$ & 0 & $\frac{375}{2}$ \\
+\end{tabular}
+\end{center}
+Il costo ridotto minimo, $-\frac34$, è condiviso da $x_2$ e $x_6$: per la regola dell'indice minimo entra $x_2$. I rapporti sono $15/\frac12 = 30$, $\frac{15}{2}/\frac14 = 30$ e $\frac{35}{2}/\frac14 = 70$. C'è un pareggio tra le righe di $x_4$ e di $x_1$, quindi esce $x_1$, che ha indice minore, e il pivot vale $\frac14$. Con le operazioni
+\[
+R_2 \to 4R_2, \qquad R_1 \to R_1 - \frac12 R_2, \qquad R_3 \to R_3 - \frac14 R_2, \qquad R_4 \to R_4 + \frac34 R_2
+\]
+si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $x_6$ & $x_7$ & $b$ \\
+\hline
+$x_4$ & $-2$ & 0 & $-1$ & 1 & 1 & $-4$ & 0 & 0 \\
+$x_2$ & 4 & 1 & 2 & 0 & $-1$ & 5 & 0 & 30 \\
+$x_7$ & $-1$ & 0 & 0 & 0 & 0 & $-1$ & 1 & 10 \\
+\hline
+ & 3 & 0 & 1 & 0 & 1 & 3 & 0 & 210 \\
+\end{tabular}
+\end{center}
+Tutti i costi ridotti sono non negativi, quindi la soluzione di base $(0, 30, 0, 0, 0, 0, 10)$ è ottima: conviene preparare $30$ pizze, con un profitto massimo di $210$ euro. Anche in questo caso il pareggio nel rapporto ha prodotto una soluzione degenere ($x_4$ è in base con valore nullo), e la soluzione è unica perché i costi ridotti delle variabili fuori base sono strettamente positivi.
+
 \section*{Riferimenti}
 Il materiale visto in questa appendice comprende:
 \begin{itemize}
-    \item Materiale visto a lezione (esercitazione del 5 ottobre 2026).
+    \item Materiale visto a lezione (esercitazioni del 5, 12 e 20 ottobre 2026).
+    \item Dispensa del corso \emph{Introduzione all'ottimizzazione}, sezione 4.3 (modelli di trasporto).
 \end{itemize}

@@ -1,0 +1,234 @@
+\chapter{Dualità}\label{ch:dualita}
+La teoria della \textbf{dualità} associa a ogni problema di PL, detto \textbf{primale}, un altro problema di PL, detto \textbf{duale}. Il duale si costruisce con gli stessi dati del primale (la matrice $A$ e i vettori $b$ e $c$), ma ha variabili diverse e un obiettivo opposto: a un primale di minimo corrisponde un duale di massimo, e viceversa. Il concetto di dualità è stato introdotto da Von Neumann nel 1947, mentre il teorema della dualità è stato dimostrato in modo rigoroso nel 1951 da Gale, Kuhn e Tucker.
+
+Si potrebbe pensare che affiancare un secondo problema al primo serva solo a complicare le cose. In realtà lo studio del duale permette di:
+\begin{itemize}
+    \item \textbf{Mettere in luce proprietà del primale}: ad esempio il duale dà un valore economico alle risorse del problema di partenza (sezione~\ref{sec:duale-economico}).
+    \item \textbf{Risolvere un problema più facile}: a volte il duale è più semplice da risolvere del primale, e risolvendo l'uno si ottengono informazioni sull'altro.
+    \item \textbf{Costruire un'altra versione del simplesso}: il \textbf{simplesso duale}, utile ad esempio quando la soluzione di base ha componenti negative.
+\end{itemize}
+
+\section{Il problema duale}
+\begin{definizione}[Problema duale]\label{def:duale}
+Dato il problema primale
+\[
+\min c^T x, \quad A x \ge b, \quad x \ge 0 \tag{P}
+\]
+con $A \in \mathbb{R}^{m \times n}$, $b \in \mathbb{R}^m$ e $c \in \mathbb{R}^n$, si dice \textbf{problema duale} il problema
+\[
+\max y^T b, \quad y^T A \le c^T, \quad y \ge 0 \tag{D}
+\]
+dove $y \in \mathbb{R}^m$ è il vettore delle \textbf{variabili duali}. I due problemi formano una coppia di \textbf{problemi duali simmetrici}.
+\end{definizione}
+
+Il vincolo $y^T A \le c^T$ si legge colonna per colonna: la $j$-esima componente di $y^T A$ è il prodotto scalare tra $y$ e la $j$-esima colonna di $A$. Per esteso, il duale è quindi:
+\[
+\begin{aligned}
+&\max \sum_{i=1}^{m} b_i y_i \\
+&\sum_{i=1}^{m} a_{ij} y_i \le c_j, \quad j = 1, \dots, n \\
+&y_i \ge 0, \quad i = 1, \dots, m.
+\end{aligned}
+\]
+Confrontando i due problemi si nota che:
+\begin{itemize}
+    \item \textbf{Variabili e vincoli si scambiano}: il primale ha $n$ variabili e $m$ vincoli, il duale ha $m$ variabili e $n$ vincoli. A ogni vincolo $i$ del primale corrisponde una variabile duale $y_i$, e a ogni variabile $x_j$ del primale corrisponde un vincolo duale.
+    \item \textbf{Costi e termini noti si scambiano}: i coefficienti $c_j$ della funzione obiettivo primale diventano i termini noti del duale, e i termini noti $b_i$ del primale diventano i coefficienti della funzione obiettivo duale.
+    \item \textbf{La matrice si traspone}: il $j$-esimo vincolo duale usa la $j$-esima colonna di $A$, quindi la matrice dei vincoli duali è $A^T$.
+\end{itemize}
+
+\paragraph{Esempio.}
+Consideriamo il problema primale
+\[
+\begin{aligned}
+&\min\, (2x_1 + 3x_2) \\
+&x_1 + x_2 \ge 4 \\
+&x_1 + 3x_2 \ge 6 \\
+&2x_1 + x_2 \ge 5 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\qquad
+A = \begin{pmatrix} 1 & 1 \\ 1 & 3 \\ 2 & 1 \end{pmatrix}, \quad
+b = \begin{pmatrix} 4 \\ 6 \\ 5 \end{pmatrix}, \quad
+c = \begin{pmatrix} 2 \\ 3 \end{pmatrix}
+\]
+con $n = 2$ variabili e $m = 3$ vincoli. Il duale ha quindi tre variabili $y_1, y_2, y_3$, una per ogni vincolo, e due vincoli, uno per ogni colonna di $A$:
+\[
+\begin{aligned}
+&\max\, (4y_1 + 6y_2 + 5y_3) \\
+&y_1 + y_2 + 2y_3 \le 2 \\
+&y_1 + 3y_2 + y_3 \le 3 \\
+&y_1,\, y_2,\, y_3 \ge 0.
+\end{aligned}
+\]
+Il primo vincolo duale usa la colonna di $x_1$, ovvero $(1, 1, 2)^T$, e ha come termine noto il costo $c_1 = 2$. Il secondo usa la colonna di $x_2$, ovvero $(1, 3, 1)^T$, con termine noto $c_2 = 3$.
+
+\begin{osservazione}[Il duale del duale]
+Il duale del problema duale è il problema primale. Per vederlo, scriviamo (D) come problema di minimo con vincoli di tipo $\ge$:
+\[
+\min\, (-b)^T y, \quad (-A^T)\, y \ge -c, \quad y \ge 0.
+\]
+Applicando la definizione, il suo duale è $\max\, (-c)^T x$ con $x^T(-A^T) \le -b^T$ e $x \ge 0$, ovvero $\min c^T x$ con $A x \ge b$ e $x \ge 0$: è proprio (P). Primale e duale sono quindi uno il duale dell'altro, e non importa quale dei due chiamiamo primale.
+\end{osservazione}
+
+\section{Il duale della forma standard}
+Se il primale è in forma standard, i vincoli sono di uguaglianza:
+\[
+\min c^T x, \quad A x = b, \quad x \ge 0. \tag{P}
+\]
+In questo caso il duale è
+\[
+\max y^T b, \quad y^T A \le c^T \tag{D}
+\]
+dove le variabili duali $y$ non hanno vincoli di segno, ovvero sono \textbf{libere}. Questa coppia si dice di \textbf{problemi duali asimmetrici}.
+
+Il motivo è che un vincolo di uguaglianza equivale a due disuguaglianze: $Ax = b$ significa $Ax \ge b$ e $-Ax \ge -b$. Il primale è quindi nella forma simmetrica, con matrice $\begin{pmatrix} A \\ -A \end{pmatrix}$ e termini noti $\begin{pmatrix} b \\ -b \end{pmatrix}$. Applicando la definizione con due vettori di variabili duali $u, v \ge 0$, uno per ogni gruppo di vincoli, si ottiene:
+\[
+\max\, (u^T b - v^T b), \quad u^T A - v^T A \le c^T, \quad u, v \ge 0.
+\]
+Ponendo $y = u - v$, che può avere componenti di qualsiasi segno, si ritrova proprio (D).
+
+\section{Regole di trasformazione}
+In generale un problema di PL può avere vincoli di tutti i tipi e variabili con segni diversi. Per scriverne il duale non serve portarlo prima nella forma (P): si usano direttamente le regole della tabella~\ref{tab:trasformazioni}. La tabella si legge da sinistra a destra quando il primale è di minimo, e da destra a sinistra quando il primale è di massimo.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Problema di minimo} & \textbf{Problema di massimo} \\
+\midrule
+coefficienti della funzione obiettivo & termini noti \\
+termini noti & coefficienti della funzione obiettivo \\
+coefficienti dell'$i$-esimo vincolo & coefficienti della $i$-esima variabile \\
+\midrule
+$i$-esimo vincolo $\ge$ & $i$-esima variabile $\ge 0$ \\
+$i$-esimo vincolo $\le$ & $i$-esima variabile $\le 0$ \\
+$i$-esimo vincolo $=$ & $i$-esima variabile libera \\
+\midrule
+$j$-esima variabile $\ge 0$ & $j$-esimo vincolo $\le$ \\
+$j$-esima variabile $\le 0$ & $j$-esimo vincolo $\ge$ \\
+$j$-esima variabile libera & $j$-esimo vincolo $=$ \\
+\midrule
+numero di vincoli & numero di variabili \\
+numero di variabili & numero di vincoli \\
+\bottomrule
+\end{tabular}
+\caption{Regole di trasformazione tra un problema di minimo e il suo duale, che è un problema di massimo. Ogni riga mette in corrispondenza un elemento del primo problema con l'elemento corrispondente del secondo.}
+\label{tab:trasformazioni}
+\end{table}
+
+Le regole sono più facili da ricordare se si pensa alla coppia simmetrica (P) e (D). In un problema di minimo la forma \emph{naturale} ha vincoli $\ge$ e variabili $\ge 0$, mentre in un problema di massimo ha vincoli $\le$ e variabili $\ge 0$. Un elemento in forma naturale corrisponde a un elemento in forma naturale, uno \emph{non naturale} (come un vincolo $\le$ in un problema di minimo) corrisponde a uno non naturale, e un'uguaglianza corrisponde a una variabile libera.
+
+\paragraph{Esempio.}
+Scriviamo il duale del problema
+\[
+\begin{aligned}
+&\min\, (3x_1 - x_2 + 2x_3) \\
+&x_1 + x_2 - x_3 \ge 2 \\
+&2x_1 - x_2 \le 5 \\
+&x_1 + 3x_3 = 4 \\
+&x_1 \ge 0, \quad x_2 \le 0, \quad x_3 \text{ libera}
+\end{aligned}
+\qquad
+A = \begin{pmatrix} 1 & 1 & -1 \\ 2 & -1 & 0 \\ 1 & 0 & 3 \end{pmatrix}.
+\]
+Il primale è di minimo, quindi leggiamo la tabella da sinistra a destra. Le variabili duali sono tre, una per vincolo, e il loro segno dipende dal tipo di vincolo:
+\begin{itemize}
+    \item Il primo vincolo è $\ge$, quindi $y_1 \ge 0$.
+    \item Il secondo vincolo è $\le$, quindi $y_2 \le 0$.
+    \item Il terzo vincolo è di uguaglianza, quindi $y_3$ è libera.
+\end{itemize}
+I vincoli duali sono tre, uno per ogni variabile (ovvero per ogni colonna di $A$), e il loro tipo dipende dal segno della variabile:
+\begin{itemize}
+    \item $x_1 \ge 0$, quindi il primo vincolo è $\le$: $\ y_1 + 2y_2 + y_3 \le 3$.
+    \item $x_2 \le 0$, quindi il secondo vincolo è $\ge$: $\ y_1 - y_2 \ge -1$.
+    \item $x_3$ è libera, quindi il terzo vincolo è di uguaglianza: $\ -y_1 + 3y_3 = 2$.
+\end{itemize}
+Il duale è quindi:
+\[
+\begin{aligned}
+&\max\, (2y_1 + 5y_2 + 4y_3) \\
+&y_1 + 2y_2 + y_3 \le 3 \\
+&y_1 - y_2 \ge -1 \\
+&{-y_1} + 3y_3 = 2 \\
+&y_1 \ge 0, \quad y_2 \le 0, \quad y_3 \text{ libera.}
+\end{aligned}
+\]
+
+\section{Interpretazione economica}\label{sec:duale-economico}
+Le variabili duali hanno spesso un significato concreto. Riprendiamo il problema di pianificazione della produzione del capitolo~\ref{ch:pl}, in cui si vuole massimizzare il profitto realizzando $n$ prodotti con $m$ risorse limitate:
+\[
+\max \sum_{j=1}^{n} c_j x_j, \qquad \sum_{j=1}^{n} a_{ij} x_j \le b_i, \quad i = 1, \dots, m, \qquad x_j \ge 0.
+\]
+Il primale è di massimo, quindi leggiamo la tabella~\ref{tab:trasformazioni} da destra a sinistra: i vincoli $\le$ danno variabili duali $y_i \ge 0$, e le variabili $x_j \ge 0$ danno vincoli duali di tipo $\ge$. Il duale è quindi:
+\[
+\min \sum_{i=1}^{m} b_i y_i, \qquad \sum_{i=1}^{m} a_{ij} y_i \ge c_j, \quad j = 1, \dots, n, \qquad y_i \ge 0.
+\]
+
+Supponiamo ora che qualcuno voglia comprare tutte le nostre risorse, invece di lasciarci produrre, e indichiamo con $y_i$ il prezzo unitario che offre per la risorsa $R_i$. Comprando tutte le risorse spende $\sum_i b_i y_i$, e vuole ovviamente spendere il meno possibile. Per convincerci a vendere, però, deve offrire prezzi convenienti: per ogni prodotto $P_j$, le risorse necessarie a fabbricarne una unità devono essere pagate almeno quanto il profitto $c_j$ che ne ricaveremmo, ovvero $\sum_i a_{ij} y_i \ge c_j$.
+
+Il problema del compratore è proprio il duale. I valori $y_i$ si chiamano \textbf{prezzi ombra} delle risorse, perché misurano il valore implicito di ciascuna risorsa all'interno del problema.
+
+\paragraph{Esempio.}
+Torniamo al problema dei mattoncini lego~\eqref{eq:lego}:
+\[
+\begin{aligned}
+&\max\, (15x_1 + 20x_2) \\
+&2x_1 + 2x_2 \le 8 \\
+&x_1 + 2x_2 \le 6 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{aligned}
+&\min\, (8y_1 + 6y_2) \\
+&2y_1 + y_2 \ge 15 \\
+&2y_1 + 2y_2 \ge 20 \\
+&y_1,\, y_2 \ge 0
+\end{aligned}
+\]
+dove $y_1$ e $y_2$ sono i prezzi offerti per un mattoncino piccolo e per uno grande. Il primo vincolo duale dice che i mattoncini di una sedia (2 piccoli e 1 grande) devono valere almeno quanto la sedia, ovvero 15 euro. Il secondo dice lo stesso per il tavolo (2 piccoli e 2 grandi, 20 euro).
+
+Il duale ha due variabili, quindi possiamo risolverlo graficamente (figura~\ref{fig:duale-lego}). La regione ammissibile non è limitata e ha tre vertici: $(0, 15)$, $(5, 5)$ e $(10, 0)$, dove il vertice $(5, 5)$ è l'intersezione delle rette $2y_1 + y_2 = 15$ e $y_1 + y_2 = 10$. La funzione obiettivo vale rispettivamente $90$, $70$ e $80$, e nelle direzioni in cui la regione si estende cresce. Il minimo è quindi $70$, con $y_1 = y_2 = 5$ euro a mattoncino.
+
+Notiamo che $70$ euro è proprio il profitto massimo del primale, che si ottiene costruendo 2 sedie e 2 tavoli (sezione~\ref{sec:graf}). Non è un caso: il fatto che i valori ottimi del primale e del duale coincidano è il contenuto dei teoremi della dualità, che vedremo più avanti.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.32, >=Stealth]
+  \useasboundingbox (-11,-2.6) rectangle (21,18.6);
+  % regione ammissibile (non limitata)
+  \fill[Accent!12] (0,17) -- (0,15) -- (5,5) -- (10,0) -- (17,0) -- (17,17) -- cycle;
+  % assi
+  \draw[->] (-1,0) -- (18.5,0) node[right] {$y_1$};
+  \draw[->] (0,-1) -- (0,18.5) node[above] {$y_2$};
+  \foreach \t in {5,10,15} {
+    \draw (\t,0.3) -- (\t,-0.3);
+    \draw (0.3,\t) -- (-0.3,\t);
+  }
+  % vincoli
+  \draw[blue!65!black, very thick] (-0.5,16) -- (8,-1)
+    node[pos=0.22, sloped, above, font=\scriptsize] {$2y_1+y_2=15$};
+  \draw[orange!85!black, very thick] (-0.5,10.5) -- (11,-1)
+    node[pos=0.7, sloped, above, font=\scriptsize] {$y_1+y_2=10$};
+  % curva di livello ottima
+  \draw[dashed, red!70!black] (-0.5,12.33) -- (9.5,-1);
+  \node[red!70!black, font=\scriptsize, anchor=east] at (-0.7,12.33) {$8y_1+6y_2=70$};
+  % direzione di decrescita
+  \draw[->, red!70!black, very thick] (14,10) -- (11.6,8.2) node[below left, font=\scriptsize] {$d$};
+  % vertici
+  \node[circle, fill=black, inner sep=1.4pt] at (0,15) {};
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (5,5) {};
+  \node[circle, fill=black, inner sep=1.4pt] at (10,0) {};
+  \node[font=\scriptsize, anchor=east] at (-0.5,15) {$(0,15)$};
+  \node[font=\scriptsize, anchor=north east, red!70!black] at (4.6,4.6) {$(5,5)$};
+  \node[font=\scriptsize, anchor=north] at (10,-0.5) {$(10,0)$};
+\end{tikzpicture}
+\caption{Risoluzione grafica del duale del problema dei mattoncini: la regione ammissibile (zona colorata) non è limitata ed è delimitata dalle rette dei due vincoli e dagli assi, con vertici $(0,15)$, $(5,5)$ e $(10,0)$. Spostando le curve di livello $8y_1+6y_2=k$ nella direzione di decrescita $d=(-8,-6)^T$, l'ultimo punto della regione toccato è il vertice $(5,5)$, sulla curva tratteggiata $8y_1+6y_2=70$.}
+\label{fig:duale-lego}
+\end{figure}
+
+\section*{Riferimenti}
+Il materiale visto in questo capitolo comprende:
+\begin{itemize}
+    \item Materiale visto a lezione (30 ottobre 2026).
+    \item Dispensa del corso \emph{Dualità}, sezioni 1 e 2.1 (definizione, tabella delle trasformazioni e duale del problema di allocazione delle risorse).
+\end{itemize}

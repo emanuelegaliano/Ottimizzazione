@@ -1,0 +1,480 @@
+\chapter{Geometria e algebra della programmazione lineare}\label{ch:geoalg}
+Nel capitolo precedente abbiamo risolto i problemi di PL disegnandoli sul piano, un metodo che funziona soltanto con due (al più tre) variabili. Per affrontare problemi con molte variabili serve invece un modo sistematico di descrivere la regione ammissibile e di individuare, tra i suoi punti, quello ottimo. La geometria mostra che la regione ammissibile di un problema di PL è un poliedro e che l'ottimo va cercato tra i suoi vertici, mentre l'algebra fornisce una forma comune in cui scrivere ogni problema di PL e una caratterizzazione dei vertici che si può calcolare con le matrici.
+
+\section{Regione ammissibile di un problema di PL}
+Un problema di PL si può scrivere nella forma generica
+\[
+\min c^T x, \quad A x \ge b
+\]
+dove $A \in \mathbb{R}^{m \times n}$ è la matrice dei coefficienti dei vincoli e $b \in \mathbb{R}^m$ è il vettore dei termini noti:
+\[
+A = \begin{pmatrix} a_{11} & \cdots & a_{1n} \\ \vdots & a_{ij} & \vdots \\ a_{m1} & \cdots & a_{mn} \end{pmatrix}, \qquad
+b = \begin{pmatrix} b_1 \\ \vdots \\ b_m \end{pmatrix}.
+\]
+Indicando con $a_i^T$ l'$i$-esima riga di $A$, l'$i$-esimo vincolo del problema è $a_i^T x \ge b_i$. Per descrivere la regione ammissibile ci serve distinguere, in un punto, i vincoli che sono verificati con il segno di uguaglianza da quelli che non lo sono.
+
+\begin{definizione}[Vincolo attivo]\label{def:attivo}
+Il vincolo $a_i^T x \ge b_i$ si dice \textbf{attivo} in $\bar{x}$ se $a_i^T \bar{x} = b_i$. L'insieme degli indici dei vincoli attivi in $\bar{x}$ si indica con $I(\bar{x})$, ovvero
+\[
+I(\bar{x}) = \{\, i \in \{1, \dots, m\} : a_i^T \bar{x} = b_i \,\}.
+\]
+\end{definizione}
+
+Un vincolo non è attivo quando è verificato con la disuguaglianza stretta, ovvero $a_i^T \bar{x} > b_i$. Graficamente, un vincolo è attivo in $\bar{x}$ quando $\bar{x}$ si trova sul bordo del semipiano, cioè sulla retta che delimita il vincolo.
+
+L'insieme $I(\bar{x})$ è quindi un sottoinsieme degli indici $\{1, \dots, m\}$ delle righe di $A$: contiene i numeri dei vincoli che in $\bar{x}$ valgono con l'uguaglianza, e dipende dal punto $\bar{x}$ considerato (punti diversi hanno, in generale, vincoli attivi diversi). Se in $\bar{x}$ nessun vincolo è attivo, $I(\bar{x})$ è l'insieme vuoto. Ci servirà per distinguere, tra i punti della regione ammissibile, quelli che si trovano sul bordo, perché in seguito il rango delle righe $a_i^T$ con $i \in I(\bar{x})$ sarà la condizione che caratterizza i vertici.
+
+\paragraph{Esempio.}
+Consideriamo i vincoli
+\[
+\begin{aligned}
+&(1) \quad 2x_1 + x_2 \ge 4 \\
+&(2) \quad x_1 + x_2 \ge 1 \\
+&(3) \quad x_1 \ge 0 \\
+&(4) \quad x_2 \ge 0
+\end{aligned}
+\]
+e il punto $\bar{x} = (2, 0)$. Il primo vincolo vale $2 \cdot 2 + 0 = 4$, quindi è attivo, così come il quarto, perché $x_2 = 0$. Il secondo vale $2 + 0 = 2 > 1$ e il terzo vale $2 > 0$, quindi non sono attivi. Gli indici dei vincoli attivi sono quindi $1$ e $4$, ovvero $I(\bar{x}) = \{1, 4\}$.
+
+\begin{osservazione}[Vincoli attivi sul grafico]
+La figura~\ref{fig:attivi} rappresenta la regione ammissibile dell'esempio precedente e mostra tre punti con vincoli attivi diversi. Il punto $\bar{x} = (2, 0)$ si trova all'intersezione delle rette dei vincoli (1) e (4), quindi $I(\bar{x}) = \{1, 4\}$. Il punto $y = (1, 2)$ sta soltanto sulla retta del vincolo (1), quindi $I(y) = \{1\}$, mentre il punto $z = (3, 3)$ è interno alla regione e non sta su nessuna retta, quindi $I(z) = \emptyset$. Il vincolo (2) non è attivo in nessuno dei tre punti, perché la sua retta non tocca la regione ammissibile. Più ci si avvicina al bordo, più vincoli sono attivi: due in un vertice, uno lungo un lato, nessuno all'interno.
+\end{osservazione}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.8, >=Stealth]
+  \useasboundingbox (-2.4,-1.3) rectangle (7.4,5.6);
+
+  % regione ammissibile
+  \fill[Accent!12] (2,0) -- (6.2,0) -- (6.2,5.2) -- (0,5.2) -- (0,4) -- cycle;
+
+  % assi
+  \draw[->] (-0.3,0) -- (6.6,0) node[right] {$x_1$};
+  \draw[->] (0,-0.3) -- (0,5.5) node[above] {$x_2$};
+  \foreach \x in {1,...,5} \draw (\x,0.06) -- (\x,-0.06) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,4} \draw (0.06,\y) -- (-0.06,\y) node[left,font=\scriptsize] {\y};
+  \node[font=\small, anchor=east] at (-0.15,5.0) {(3) $x_1=0$};
+  \node[font=\small, anchor=north] at (6.15,-0.12) {(4) $x_2=0$};
+
+  % vincoli
+  \draw[blue!65!black, very thick] (-0.15,4.3) -- (2.5,-1.0)
+    node[right, font=\small] {(1) $2x_1+x_2=4$};
+  \draw[orange!85!black, very thick] (-1.2,2.2) -- (2.2,-1.2)
+    node[pos=0.1, below, sloped, font=\small] {(2) $x_1+x_2=1$};
+
+  % normale al vincolo (1)
+  \draw[->, TextGray, very thick] (0.25,3.5) -- (1.05,3.9) node[right, font=\small] {$a_1$};
+
+  % punti: vertice, lato, interno
+  \node[circle, fill=red!70!black, inner sep=2pt] at (2,0) {};
+  \node[red!70!black, font=\small, anchor=south west, align=left] at (2.1,0.12)
+    {$\bar{x}=(2,0)$\\ $I(\bar{x})=\{1,4\}$};
+  \node[circle, fill=black, inner sep=1.5pt] at (1,2) {};
+  \node[font=\small, anchor=west, align=left] at (1.15,2.0) {$y=(1,2)$\\ $I(y)=\{1\}$};
+  \node[circle, fill=black, inner sep=1.5pt] at (3,3) {};
+  \node[font=\small, anchor=west, align=left] at (3.15,3.0) {$z=(3,3)$\\ $I(z)=\emptyset$};
+\end{tikzpicture}
+\caption{Vincoli attivi nell'esempio precedente: la regione ammissibile (zona colorata) è delimitata dalla retta del vincolo (1), in blu, e dagli assi, vincoli (3) e (4), mentre la retta del vincolo (2), in arancione, passa fuori dalla regione senza toccarla. Nel vertice $\bar{x}=(2,0)$ (punto rosso) sono attivi i vincoli (1) e (4), nel punto $y=(1,2)$ del bordo è attivo il solo vincolo (1) e nel punto interno $z=(3,3)$ non è attivo nessun vincolo. Il vettore $a_1=(2,1)^T$ è ortogonale alla retta del vincolo (1) e punta verso il semipiano ammissibile.}
+\label{fig:attivi}
+\end{figure}
+
+\section{Poliedri}
+La regione ammissibile di un problema di PL è definita da equazioni e disequazioni lineari. L'insieme dei punti che le soddisfano ha una struttura precisa, che prende il nome di poliedro.
+
+\begin{definizione}[Poliedro]\label{def:poliedro}
+Un insieme $P \subseteq \mathbb{R}^n$ si dice \textbf{poliedro} se $P$ è l'insieme delle soluzioni di un insieme finito di equazioni e disequazioni lineari.
+\end{definizione}
+
+\begin{osservazione}
+Nella definizione di poliedro compaiono solo disuguaglianze $\ge$ oppure $\le$, mai strette ($>$ oppure $<$). Questo perché è un problema di programmazione lineare: i vincoli sono sempre disuguaglianze non strette, e la regione ammissibile è chiusa. Se un poliedro fosse definito da disuguaglianze strette, non sarebbe chiuso e non avrebbe vertici.
+\end{osservazione}
+
+Per convenzione scriveremo un poliedro nella forma
+\[
+P = \{x \in \mathbb{R}^n : A x \ge b\}, \qquad A \in \mathbb{R}^{m \times n},\ b \in \mathbb{R}^m
+\]
+ma sono poliedri anche gli insiemi descritti da equazioni o da disequazioni di tipo $\le$: basta moltiplicare un vincolo $\le$ per $-1$ per ottenere un vincolo $\ge$, e scrivere un'uguaglianza come coppia di disuguaglianze $\ge$ e $\le$. Di conseguenza, la regione ammissibile di un problema di PL è un poliedro.
+
+I poliedri hanno inoltre una proprietà geometrica fondamentale, che richiede di definire gli insiemi convessi.
+
+\begin{definizione}[Insieme convesso]\label{def:convesso}
+Un insieme $K \subseteq \mathbb{R}^n$ è \textbf{convesso} se, per ogni $x, y \in K$, anche $\lambda x + (1 - \lambda) y \in K$ per ogni $\lambda \in [0, 1]$. In altre parole, se $K$ contiene due punti, contiene anche tutto il segmento che li ha come estremi.
+\end{definizione}
+
+\begin{osservazione}[Poliedri chiusi e convessi]\label{oss:convesso}
+I poliedri sono insiemi chiusi e convessi. Sono chiusi perché definiti da disuguaglianze non strette.
+
+Per mostrare che sono convessi ricordiamo che un punto appartiene a $P = \{x \in \mathbb{R}^n : A x \ge b\}$ se e solo se soddisfa \emph{tutti} i vincoli, ovvero $a_i^T x \ge b_i$ per ogni $i = 1, \dots, m$. Presi allora $x, y \in P$ e $\lambda \in [0, 1]$, per dimostrare che $\lambda x + (1 - \lambda) y$ appartiene a $P$ basta verificare che rispetti ciascun vincolo. Fissato un vincolo $i$ qualsiasi si ha
+\[
+a_i^T \big(\lambda x + (1 - \lambda) y\big) \;=\; \lambda\, a_i^T x + (1 - \lambda)\, a_i^T y \;\ge\; \lambda b_i + (1 - \lambda) b_i \;=\; b_i
+\]
+ Il vincolo $i$ era arbitrario, quindi lo stesso calcolo vale per tutti i vincoli: $\lambda x + (1 - \lambda) y$ li soddisfa tutti e, per definizione di $P$, appartiene a $P$.
+\end{osservazione}
+
+\section{Vertici di un poliedro}
+Dalla risoluzione grafica sappiamo che l'ottimo di un problema di PL si trova in un vertice della regione ammissibile. Per poterlo cercare anche quando non è possibile disegnare il poliedro serve una definizione di vertice che non dipenda dalla figura.
+
+\begin{definizione}[Vertice]\label{def:vertice}
+Un punto $\bar{x} \in P = \{x \in \mathbb{R}^n : A x \ge b\}$ è un \textbf{vertice} di $P$ se non esistono $y, z \in P$ con $y \neq \bar{x}$ e $z \neq \bar{x}$ tali che
+\[
+\bar{x} = \lambda y + (1 - \lambda) z \quad \text{con } \lambda \in [0, 1].
+\]
+Ovvero, $\bar{x}$ è un estremo e non può appartenere a segmenti contenuti in $P$ che hanno estremi diversi da $\bar{x}$.
+\end{definizione}
+
+La definizione è comoda dal punto di vista geometrico, ma non permette di riconoscere un vertice con un calcolo. Il teorema seguente lo traduce in una condizione sui vincoli attivi.
+
+\begin{teorema}[Caratterizzazione dei vertici]\label{teo:vertici}
+Un punto $\bar{x} \in P$ è un vertice se e solo se esistono $n$ righe $a_i^T$ della matrice $A$, con $i \in I(\bar{x})$, che sono linearmente indipendenti. In altre parole, il rango dei vincoli attivi in $\bar{x}$ deve essere pari a $n$.
+\end{teorema}
+
+\begin{osservazione}
+In $\mathbb{R}^2$ un punto è l'intersezione di due rette: un vertice del piano ha quindi due vincoli attivi, e le loro rette non sono parallele.
+\end{osservazione}
+
+Dal teorema seguono alcune conseguenze.
+
+\begin{corollario}\label{cor:vertici}
+Sia $P = \{x \in \mathbb{R}^n : A x \ge b\}$. Allora:
+\begin{enumerate}
+    \item Se la matrice $A$ ha meno di $n$ righe linearmente indipendenti, $P$ non ha vertici. In particolare, se il numero $m$ di righe di $A$ è minore di $n$, $P$ non ha vertici.
+    \item Un vertice è l'unica soluzione del sistema $a_i^T x = b_i$ per ogni $i \in I(\bar{x})$, ovvero un vertice è l'intersezione dei vincoli attivi.
+    \item $P$ ha un numero finito di vertici.
+\end{enumerate}
+\end{corollario}
+
+L'ultimo punto è una \emph{conseguenza} del secondo: ogni vertice è determinato dalla scelta di $n$ vincoli linearmente indipendenti tra gli $m$ disponibili, e le scelte possibili sono in numero finito.
+
+\paragraph{Esempio.}
+Sia $P$ il poliedro
+\[
+P = \left\{ x \in \mathbb{R}^3 : \;
+\begin{aligned}
+&x_1 + 2x_2 + 2x_3 \le 2 \\
+&x_1 + 4x_2 + 2x_3 \le 3 \\
+&x_1, x_2, x_3 \ge 0
+\end{aligned}
+\right\}
+\]
+e stabiliamo se $P_1 = (0, 0, 0)$, $P_2 = (0, 0, \tfrac12)$ e $P_3 = (0, 0, 1)$ sono vertici. Nella forma $A x \ge b$ i vincoli sono
+\[
+A = \begin{pmatrix} -1 & -2 & -2 \\ -1 & -4 & -2 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}, \qquad
+b = \begin{pmatrix} -2 \\ -3 \\ 0 \\ 0 \\ 0 \end{pmatrix}
+\]
+e le cinque righe corrispondono ai vincoli $(1), \dots, (5)$. Per essere un vertice un punto deve soddisfare tre condizioni:
+\begin{enumerate}
+    \item Essere un punto ammissibile.
+    \item Avere almeno $n = 3$ vincoli attivi.
+    \item Avere tre righe dei vincoli attivi linearmente indipendenti.
+\end{enumerate}
+Tutti e tre i punti appartengono a $P$, e per ciascuno verifichiamo le altre condizioni:
+\begin{itemize}
+    \item $P_1$ è ammissibile e ha tre vincoli attivi, il terzo, il quarto e il quinto: le loro righe, $(1,0,0)$, $(0,1,0)$ e $(0,0,1)$, sono linearmente indipendenti, quindi $P_1$ è un \textbf{vertice}.
+    \item $P_2$ è ammissibile ma ha solo due vincoli attivi, il terzo e il quarto, per cui \textbf{non} è un vertice.
+    \item $P_3$ è ammissibile e ha tre vincoli attivi, il primo ($-0 - 0 - 2 = -2$), il terzo e il quarto: le righe
+    \[
+    \begin{pmatrix} -1 & -2 & -2 \\ 1 & 0 & 0 \\ 0 & 1 & 0 \end{pmatrix}
+    \]
+    sono linearmente indipendenti (il determinante vale $-2 \neq 0$), quindi $P_3$ è un \textbf{vertice}.
+\end{itemize}
+
+Resta da capire quando un poliedro ha dei vertici, e dove si trova l'ottimo di un problema di PL.
+
+\begin{teorema}[Esistenza dei vertici]\label{teo:rette}
+Un poliedro ha vertici se e solo se non contiene rette.
+\end{teorema}
+
+\paragraph{Esempio.}
+Consideriamo i due poliedri
+\[
+P_a = \{x \in \mathbb{R}^2 : x_1 + x_2 \ge 2,\ x_1 + x_2 \le 4\}, \qquad
+P_b = \{x \in \mathbb{R}^2 : x_1 + x_2 \ge 4,\ x_1 \ge 0,\ x_2 \ge 0\}
+\]
+rappresentati in figura~\ref{fig:poliedri}. Il poliedro $P_a$ è una striscia compresa tra due rette parallele e contiene delle rette (ad esempio $x_1 + x_2 = 3$): per il teorema \ref{teo:rette} non ha vertici, e infatti la matrice dei vincoli ha una sola riga linearmente indipendente, cioè meno di $n = 2$ come richiesto dal corollario. Il poliedro $P_b$ è invece contenuto nel primo quadrante, che non contiene rette, e ha i due vertici $(4, 0)$ e $(0, 4)$, in ciascuno dei quali sono attivi due vincoli linearmente indipendenti.
+
+\begin{figure}[htbp]
+\centering
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.8, >=Stealth]
+  \useasboundingbox (-1.8,-1.4) rectangle (6.4,6.2);
+  \begin{scope}
+    \clip (-1.5,-1.2) rectangle (5.6,5.6);
+    \fill[Accent!12] (-1.5,3.5) -- (-1.5,5.5) -- (5.5,-1.5) -- (3.5,-1.5) -- cycle;
+    \draw[orange!85!black, very thick] (-1.5,3.5) -- (3.5,-1.5)
+      node[pos=0.55, below, sloped, font=\small] {$x_1+x_2=2$};
+    \draw[blue!65!black, very thick] (-1.5,5.5) -- (5.5,-1.5)
+      node[pos=0.5, above, sloped, font=\small] {$x_1+x_2=4$};
+    \draw[red!70!black, very thick, dashed] (-1.5,4.5) -- (4.5,-1.5)
+      node[pos=0.5, above, sloped, font=\small] {$x_1+x_2=3$};
+  \end{scope}
+  \draw[->] (-1.5,0) -- (5.8,0) node[right] {$x_1$};
+  \draw[->] (0,-1.2) -- (0,5.8) node[above] {$x_2$};
+\end{tikzpicture}
+
+\small (a) $P_a$ contiene rette
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[scale=0.8, >=Stealth]
+  \useasboundingbox (-1.8,-1.4) rectangle (6.4,6.2);
+  \fill[Accent!12] (4,0) -- (5.6,0) -- (5.6,5.6) -- (0,5.6) -- (0,4) -- cycle;
+  \draw[blue!65!black, very thick] (0,4) -- (4,0)
+    node[pos=0.55, below, sloped, font=\small] {$x_1+x_2=4$};
+  \draw[->] (-1.5,0) -- (5.8,0) node[right] {$x_1$};
+  \draw[->] (0,-1.2) -- (0,5.8) node[above] {$x_2$};
+  \node[circle, fill=red!70!black, inner sep=2pt] at (4,0) {};
+  \node[circle, fill=red!70!black, inner sep=2pt] at (0,4) {};
+  \node[red!70!black, font=\small, anchor=north] at (4,-0.25) {$(4,0)$};
+  \node[red!70!black, font=\small, anchor=east] at (-0.15,4) {$(0,4)$};
+\end{tikzpicture}
+
+\small (b) $P_b$ ha due vertici
+\end{minipage}
+\caption{Poliedri con e senza vertici: a sinistra la striscia $P_a$ (zona colorata), compresa tra le rette $x_1+x_2=2$ e $x_1+x_2=4$, contiene rette, come quella tratteggiata in rosso, e non ha vertici; a destra il poliedro $P_b$, contenuto nel primo quadrante e sopra la retta $x_1+x_2=4$, non contiene rette e ha i due vertici $(4,0)$ e $(0,4)$ (punti rossi).}
+\label{fig:poliedri}
+\end{figure}
+
+Possiamo ora enunciare il risultato che giustifica la ricerca dell'ottimo tra i vertici.
+
+\begin{teorema}[Teorema fondamentale della PL]\label{teo:fondamentale}
+Sia $P = \{x \in \mathbb{R}^n : A x \ge b\}$ un poliedro non vuoto e che non contiene rette, e si consideri il problema di PL
+\[
+\min c^T x, \quad A x \ge b.
+\]
+Allora il problema è illimitato inferiormente oppure esiste un ottimo in un vertice di $P$.
+\end{teorema}
+
+La principale conseguenza del teorema è che, per cercare una soluzione ottima, basta cercare tra i vertici del poliedro. Non è però possibile visitarli tutti, perché il loro numero cresce esponenzialmente con il numero di vincoli e di variabili: i metodi risolutivi, come il Simplesso, partono da un vertice e si spostano verso vertici migliori.
+
+\begin{osservazione}[Ottimi globali]\label{oss:globali}
+Tutti i problemi di PL sono convessi: la regione ammissibile è un poliedro, quindi convessa (osservazione~\ref{oss:convesso}), e la funzione obiettivo è lineare, quindi convessa. Di conseguenza gli ottimi di un problema di PL sono globali, come anticipato nel capitolo~\ref{ch:pl}.
+\end{osservazione}
+
+\section{Algebra della PL}
+Il teorema fondamentale ci dice che l'ottimo si trova in un vertice, ma per usarlo serve poter calcolare i vertici per via algebrica. L'obiettivo è quindi trovare una forma unica in cui scrivere tutti i problemi di PL, che permetta di individuare i vertici ottimi con delle operazioni sulle matrici.
+
+\subsection{Forma standard}
+\begin{definizione}[Forma standard]\label{def:standard}
+Un problema di PL è in \textbf{forma standard} se è del tipo
+\[
+\min c^T x, \quad A x = b, \quad x \ge 0
+\]
+ovvero, scrivendo vettori e matrici per esteso,
+\[
+\min\, (c_1 x_1 + \dots + c_n x_n), \qquad
+\begin{pmatrix} a_{11} & \cdots & a_{1n} \\ \vdots & & \vdots \\ a_{m1} & \cdots & a_{mn} \end{pmatrix}
+\begin{pmatrix} x_1 \\ \vdots \\ x_n \end{pmatrix} =
+\begin{pmatrix} b_1 \\ \vdots \\ b_m \end{pmatrix}, \qquad
+\begin{pmatrix} x_1 \\ \vdots \\ x_n \end{pmatrix} \ge 0
+\]
+dove, per convenzione, i termini noti sono non negativi: $b_i \ge 0$ per ogni $i$.
+\end{definizione}
+
+Riassumendo, in forma standard:
+\begin{enumerate}
+    \item Il problema è di \textbf{minimo}.
+    \item I vincoli sono tutti di \textbf{uguaglianza}.
+    \item Le variabili sono \textbf{non negative} ($\ge 0$).
+    \item I termini noti sono \textbf{non negativi} ($\ge 0$).
+\end{enumerate}
+Tutti i problemi di PL possono essere scritti in questa forma, in base al punto di partenza, con le seguenti trasformazioni:
+\begin{description}
+    \item[Problema di massimo.] - Un problema di massimo si trasforma in uno di minimo cambiando segno alla funzione obiettivo: $\max c^T x = -\min(-c^T x)$. Il $-\min$ lo trattiamo come un normale $\min$, perché il punto di ottimo non cambia (cambia solo il segno del valore ottimo).
+    \item[Vincolo $\le$.] - Un vincolo $a_i^T x \le b_i$ diventa un'uguaglianza aggiungendo una variabile $x_{n+1} \ge 0$, detta \textbf{variabile di scarto} (\emph{slack}): $a_i^T x + x_{n+1} = b_i$. Ad esempio $2x_1 - 4x_2 \le 5$ diventa $2x_1 - 4x_2 + x_3 = 5$ con $x_3 \ge 0$. Si aggiunge così una dimensione al problema.
+    \item[Vincolo $\ge$.] - Un vincolo $a_i^T x \ge b_i$ si tratta come il precedente, ma la nuova variabile $x_{n+1} \ge 0$, detta \textbf{variabile di surplus}, si sottrae: $a_i^T x - x_{n+1} = b_i$.
+    \item[Variabile $x_j \le 0$.] - Si cambia variabile ponendo $\bar{x}_j = -x_j \ge 0$.
+    \item[Variabile libera in segno.] - Si introducono due variabili $x_j', x_j'' \ge 0$ e si pone $x_j = x_j' - x_j''$.
+\end{description}
+Se dopo queste trasformazioni un termine noto risulta negativo, basta moltiplicare per $-1$ l'intero vincolo, come nel primo esempio.
+
+\paragraph{Esempio.}
+Portiamo in forma standard il problema
+\[
+\begin{aligned}
+&\min\, (x_1 + 6x_2) \\
+&x_1 - 2x_2 \le -1 \\
+&x_1 + 2x_2 \ge 7 \\
+&2x_1 + x_2 \ge 5 \\
+&x_1,\, x_2 \ge 0.
+\end{aligned}
+\]
+Il problema è già di minimo e le variabili sono già non negative. Aggiungiamo una variabile di scarto $x_3$ nel primo vincolo e due variabili di surplus, $x_4$ e $x_5$, negli altri due, ottenendo $x_1 - 2x_2 + x_3 = -1$ nel primo vincolo. Poiché il termine noto è negativo, moltiplichiamo questa equazione per $-1$, e la forma standard è
+\[
+\begin{aligned}
+&\min\, (x_1 + 6x_2) \\
+&-x_1 + 2x_2 - x_3 = 1 \\
+&x_1 + 2x_2 - x_4 = 7 \\
+&2x_1 + x_2 - x_5 = 5 \\
+&x_1,\, x_2,\, x_3,\, x_4,\, x_5 \ge 0
+\end{aligned}
+\]
+con matrice dei vincoli, di dimensione $3 \times 5$, e termini noti
+\[
+A_{FS} = \begin{pmatrix} -1 & 2 & -1 & 0 & 0 \\ 1 & 2 & 0 & -1 & 0 \\ 2 & 1 & 0 & 0 & -1 \end{pmatrix}, \qquad
+b = \begin{pmatrix} 1 \\ 7 \\ 5 \end{pmatrix}.
+\]
+
+\paragraph{Esempio.}
+Portiamo in forma standard il problema
+\[
+\begin{aligned}
+&\max\, (3x_1 - 3x_2 + 2x_3) \\
+&2x_1 + x_3 \le 1 \\
+&3x_1 + x_2 + x_3 \ge -2 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+in cui $x_3$ è libera in segno. Procediamo con le trasformazioni:
+\begin{itemize}
+    \item Il problema è di massimo: lo scriviamo come $-\min(-3x_1 + 3x_2 - 2x_3)$.
+    \item La variabile $x_3$ è libera, quindi poniamo $x_3 = x_3' - x_3''$ con $x_3', x_3'' \ge 0$, e la funzione obiettivo diventa $-\min\big(-3x_1 + 3x_2 - 2(x_3' - x_3'')\big)$.
+    \item Aggiungiamo una variabile di scarto $x_4$ al primo vincolo e sottraiamo una variabile di surplus $x_5$ al secondo, che diventa $3x_1 + x_2 + x_3' - x_3'' - x_5 = -2$. Il termine noto è negativo, quindi moltiplichiamo per $-1$.
+\end{itemize}
+La forma standard è quindi
+\[
+\begin{aligned}
+&-\min\, \big(-3x_1 + 3x_2 - 2(x_3' - x_3'')\big) \\
+&2x_1 + x_3' - x_3'' + x_4 = 1 \\
+&-3x_1 - x_2 - x_3' + x_3'' + x_5 = 2 \\
+&x_1,\, x_2,\, x_3',\, x_3'',\, x_4,\, x_5 \ge 0.
+\end{aligned}
+\]
+
+\begin{osservazione}[Dimensioni del sistema]
+Quando si ottiene la forma standard $A x = b$, $x \ge 0$, con $A \in \mathbb{R}^{m \times n}$ e $b \in \mathbb{R}^m$, supponiamo che le $m$ righe di $A$ siano linearmente indipendenti (altrimenti ci sarebbe ridondanza dei vincoli, oppure incompatibilità) e risulta $m \le n$. Più precisamente:
+\begin{itemize}
+    \item Se $m = n$, il sistema ha una sola soluzione, quindi c'è un solo punto ammissibile.
+    \item Se $m > n$ ci sono vincoli ridondanti, e le righe non possono essere linearmente indipendenti.
+    \item Se $m < n$ ci sono infinite soluzioni, e ha senso cercare tra esse quella ottima.
+\end{itemize}
+\end{osservazione}
+
+\subsection{Forma standard e vertici}
+La forma standard permette di calcolare i vertici con l'algebra lineare. L'idea è scegliere $m$ colonne di $A$ linearmente indipendenti e usarle per esprimere $m$ variabili in funzione delle altre $n - m$, che si pongono uguali a zero.
+
+\begin{definizione}[Matrice di base]\label{def:base}
+Sia $A \in \mathbb{R}^{m \times n}$ la matrice dei vincoli di un problema in forma standard, con $\mathrm{rango}(A) = m$. Una sottomatrice $B$ di dimensione $m \times m$, ottenuta estraendo da $A$ $m$ colonne linearmente indipendenti, è detta \textbf{matrice di base}, e le sue colonne si dicono \textbf{colonne di base}.
+\end{definizione}
+
+Riordinando le colonne si può partizionare $A = (B, N)$ e $x = (x_B, x_N)$, dove $N$ è la matrice formata dalle colonne fuori base, $x_B$ è il vettore delle $m$ \textbf{variabili di base} e $x_N$ è il vettore delle $n - m$ \textbf{variabili fuori base}. Il sistema dei vincoli diventa $B x_B + N x_N = b$.
+
+\begin{definizione}[Soluzione di base]\label{def:sol-base}
+La soluzione $x = (B^{-1} b,\, 0)$ del sistema $B x_B + N x_N = b$ è detta \textbf{soluzione di base}. Se $B^{-1} b \ge 0$ la soluzione di base si dice \textbf{ammissibile}. Se $B^{-1} b > 0$ si dice \textbf{non degenere}, altrimenti si dice \textbf{degenere}.
+\end{definizione}
+
+A ogni matrice di base corrisponde una sola soluzione di base, mentre una soluzione di base può essere associata a più matrici di base: in questo caso è degenere. Le soluzioni di base sono al più $\binom{n}{m}$, che è il numero di modi in cui si possono scegliere $m$ colonne tra $n$, ma in generale sono meno, perché non tutte le sottomatrici $m \times m$ sono invertibili e non tutte le soluzioni di base sono ammissibili. Il legame con i vertici è dato dal teorema seguente.
+
+\begin{teorema}[Vertici e soluzioni di base]\label{teo:vertici-base}
+Sia $A$ una matrice $m \times n$ di rango $m$, $b \in \mathbb{R}^m$ e $P = \{x \in \mathbb{R}^n : A x = b,\ x \ge 0\}$. Un vettore $x$ è un vertice di $P$ se e solo se è una soluzione ammissibile di base.
+\end{teorema}
+
+La ricerca di un vertice ottimo si riconduce quindi alla ricerca di una soluzione ammissibile di base.
+
+\paragraph{Esempio.}
+Consideriamo il poliedro
+\[
+P = \left\{ x \in \mathbb{R}^2 : \;
+\begin{aligned}
+&x_1 - x_2 \le 2 \\
+&2x_1 + x_2 \le 4 \\
+&3x_1 + 2x_2 \le 6 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\right\}
+\]
+e portiamolo in forma standard aggiungendo una variabile di scarto per ciascun vincolo:
+\[
+\begin{aligned}
+&x_1 - x_2 + x_3 = 2 \\
+&2x_1 + x_2 + x_4 = 4 \\
+&3x_1 + 2x_2 + x_5 = 6 \\
+&x_1,\, x_2,\, x_3,\, x_4,\, x_5 \ge 0
+\end{aligned}
+\]
+con $m = 3$ e $n = 5$. Scegliamo come variabili di base $x_1$, $x_2$ e $x_3$, e scriviamole in funzione di $x_4$ e $x_5$:
+\[
+\begin{aligned}
+&x_1 - x_2 + x_3 = 2 \\
+&2x_1 + x_2 = 4 - x_4 \\
+&3x_1 + 2x_2 = 6 - x_5.
+\end{aligned}
+\]
+Ponendo $x_4 = x_5 = 0$ si ottiene il sistema
+\[
+\begin{aligned}
+&x_1 - x_2 + x_3 = 2 \\
+&2x_1 + x_2 = 4 \\
+&3x_1 + 2x_2 = 6
+\end{aligned}
+\quad \Longrightarrow \quad
+\begin{aligned}
+&x_1 = 2 \\
+&x_2 = 0
+\end{aligned}
+\quad \Longrightarrow \quad x_3 = 0
+\]
+cioè la soluzione di base $P_1 = (2, 0, 0, 0, 0)$. Le sue componenti sono tutte $\ge 0$, quindi è una soluzione ammissibile di base e, per il teorema, è un \textbf{vertice}. Poiché due delle variabili di base, $x_2$ e $x_3$, sono nulle, la soluzione è degenere. Nel piano originale corrisponde al punto $(2, 0)$, dove i tre vincoli e la condizione $x_2 \ge 0$ sono tutti attivi.
+
+\paragraph{Esempio.}
+Consideriamo il poliedro in forma standard
+\[
+\begin{aligned}
+&x_1 + 2x_2 + x_3 = 4 \\
+&2x_1 + x_2 + 5x_3 = 5 \\
+&x_1,\, x_2,\, x_3 \ge 0
+\end{aligned}
+\qquad
+A = \begin{pmatrix} 1 & 2 & 1 \\ 2 & 1 & 5 \end{pmatrix}
+\]
+con $m = 2$ e $n = 3$. Le prime due colonne sono linearmente indipendenti (il determinante vale $1 - 4 = -3 \neq 0$), quindi
+\[
+B = \begin{pmatrix} 1 & 2 \\ 2 & 1 \end{pmatrix}
+\]
+è una matrice di base, con variabili di base $x_1, x_2$ e variabile fuori base $x_3$. Esprimendo $x_1$ e $x_2$ in funzione di $x_3$ si ottiene:
+\[
+\begin{cases}
+x_1 + 2x_2 = 4 - x_3 \\
+2x_1 + x_2 = 5 - 5x_3
+\end{cases}
+\quad\Longrightarrow\quad
+\begin{cases}
+x_1 = 2 - 3x_3 \\
+x_2 = 1 + x_3
+\end{cases}
+\]
+e ponendo $x_3 = 0$ si ricava la soluzione di base $(2, 1, 0)$. Le sue componenti sono non negative, quindi è ammissibile ed è un vertice di $P$.
+
+Se invece scegliamo come variabili di base $x_1$ e $x_3$ (il determinante delle loro colonne vale $5 - 2 = 3 \neq 0$), ponendo $x_2 = 0$ si ottiene il sistema $x_1 + x_3 = 4$, $2x_1 + 5x_3 = 5$, da cui $x_3 = -1$ e $x_1 = 5$. La soluzione di base $(5, 0, -1)$ ha una componente negativa: non è ammissibile, quindi non è un vertice.
+
+Dal teorema~\ref{teo:vertici-base} segue anche un modo veloce per verificare se un punto dato è un vertice, senza dover cercare l'intera base.
+
+\begin{corollario}[Vertici e colonne linearmente indipendenti]\label{cor:colonne}
+Sia $P = \{x \in \mathbb{R}^n : A x = b,\ x \ge 0\}$. Un punto $\bar{x} \in P$ è un vertice se e solo se le colonne di $A$ associate alle componenti positive di $\bar{x}$ sono linearmente indipendenti.
+\end{corollario}
+
+L'idea è che le componenti positive di un vertice devono essere variabili di base. Se le loro colonne sono linearmente indipendenti, si possono completare con altre colonne fino a ottenere una base, e $\bar{x}$ è proprio la soluzione di base associata.
+
+\paragraph{Esempio.}
+Stabiliamo se $\bar{x} = (1, 1, 0, 0)$ è un vertice del poliedro
+\[
+P:\ \begin{cases}
+2x_1 + x_2 - 2x_3 + 3x_4 = 3 \\
+x_1 + x_2 + 2x_3 + 2x_4 = 2 \\
+x_i \ge 0, \quad i = 1, \dots, 4.
+\end{cases}
+\]
+Il punto è ammissibile, perché $2 + 1 = 3$ e $1 + 1 = 2$. Le sue componenti positive sono $x_1$ e $x_2$, e le colonne corrispondenti di $A$ sono linearmente indipendenti:
+\[
+\det \begin{pmatrix} 2 & 1 \\ 1 & 1 \end{pmatrix} = 1 \neq 0.
+\]
+Quindi $\bar{x}$ è un vertice di $P$.
+
+\section*{Riferimenti}
+Il materiale visto in questo capitolo comprende:
+\begin{itemize}
+    \item Materiale visto a lezione (9 e 16 ottobre 2026).
+    \item Dispensa del corso \emph{Geometria della PL}.
+    \item Dispensa del corso \emph{Il metodo del simplesso}, sezioni 1.1 (forma standard) e 1.2 (basi e soluzioni di base).
+\end{itemize}

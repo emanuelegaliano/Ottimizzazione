@@ -23,7 +23,7 @@
 \definecolor{RuleGray}{gray}{0.75}
 \definecolor{ObsColor}{HTML}{9C5A12}  % ocra scuro, per le osservazioni
 \definecolor{FigColor}{HTML}{6B3F73}  % prugna, per le didascalie
-\definecolor{LemmaColor}{HTML}{4E7A3A}  % verde foglia, per lemmi e teoremi
+\definecolor{LemmaColor}{HTML}{4E7A3A}  % verde foglia, per lemmi, teoremi e corollari
 \definecolor{ExColor}{HTML}{4A5560}  % grigio ardesia, per gli esercizi
 
 % =====================================================
@@ -113,7 +113,7 @@
 
 \tcbset{
   boxbase/.style={
-    enhanced, breakable, frame hidden, boxrule=0pt, sharp corners,
+    enhanced, unbreakable, frame hidden, boxrule=0pt, sharp corners,
     left=12pt, right=10pt, top=7pt, bottom=7pt,
     before skip=0.6em, after skip=0.6em,
     attach title to upper={\ },
@@ -143,6 +143,25 @@
   borderline west={2.5pt}{0pt}{LemmaColor},
   attach title to upper={\tcblabelfix\ },
   title={Lemma~\thetcbcounter\ifblank{#1}{}{\ (#1)}.},
+}
+
+% \begin{teorema}[Titolo opzionale] ... \end{teorema}
+% \begin{corollario}[Titolo opzionale] ... \end{corollario}
+%   stesso colore del lemma, numerazione separata per capitolo
+\newtcolorbox[auto counter, number within=chapter]{teorema}[1][]{
+  boxbase,
+  colback=LemmaColor!7, coltitle=LemmaColor,
+  borderline west={2.5pt}{0pt}{LemmaColor},
+  attach title to upper={\tcblabelfix\ },
+  title={Teorema~\thetcbcounter\ifblank{#1}{}{\ (#1)}.},
+}
+
+\newtcolorbox[auto counter, number within=chapter]{corollario}[1][]{
+  boxbase,
+  colback=LemmaColor!7, coltitle=LemmaColor,
+  borderline west={2.5pt}{0pt}{LemmaColor},
+  attach title to upper={\tcblabelfix\ },
+  title={Corollario~\thetcbcounter\ifblank{#1}{}{\ (#1)}.},
 }
 
 % \begin{esercizio}[Titolo opzionale] testo \end{esercizio}
@@ -324,6 +343,9 @@ Versione: \today
 
 \input{chapters/introduzione}
 \input{chapters/programmazione_lineare}
+\input{chapters/geometria_algebra}
+\input{chapters/simplesso}
+\input{chapters/dualita}
 
 % =====================================================
 % APPENDICI
