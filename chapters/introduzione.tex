@@ -67,10 +67,10 @@ ovvero una parabola con vertice $V_0 = (5, 25)$, rappresentata nella figura~\ref
 
 \begin{figure}[htbp]
 \centering
-\begin{subfigure}[t]{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
 \centering
 \begin{tikzpicture}[xscale=0.45, yscale=0.085, >=Stealth]
-  \useasboundingbox (-2,-33) rectangle (14,34);
+  \useasboundingbox (-2,-33) rectangle (14,36.3);
   % parabola speculare (traccia)
   \draw[RuleGray, dashed, domain=-0.6:10.6, samples=60, smooth] plot (\x, {\x*\x-10*\x});
   % assi
@@ -86,12 +86,12 @@ ovvero una parabola con vertice $V_0 = (5, 25)$, rappresentata nella figura~\ref
   \node[circle, fill=Accent, inner sep=1.8pt] at (5,25) {};
   \node[Accent, font=\small, anchor=south west] at (5.3,25.5) {$V_0$: massimo};
 \end{tikzpicture}
-\end{subfigure}
+\end{minipage}
 \hfill
-\begin{subfigure}[t]{0.48\textwidth}
+\begin{minipage}[t]{0.48\textwidth}
 \centering
 \begin{tikzpicture}[xscale=0.45, yscale=0.085, >=Stealth]
-  \useasboundingbox (-2,-33) rectangle (14,34);
+  \useasboundingbox (-2,-33) rectangle (14,36.3);
   % parabola speculare (traccia)
   \draw[RuleGray, dashed, domain=-0.6:10.6, samples=60, smooth] plot (\x, {-\x*\x+10*\x});
   % assi
@@ -107,7 +107,7 @@ ovvero una parabola con vertice $V_0 = (5, 25)$, rappresentata nella figura~\ref
   \node[circle, fill=red!70!black, inner sep=1.8pt] at (5,-25) {};
   \node[red!70!black, font=\small, anchor=north west] at (5.3,-25.5) {$V_1$: minimo};
 \end{tikzpicture}
-\end{subfigure}
+\end{minipage}
 \caption{Una parabola e la sua opposta: a sinistra $f(x) = -x^2+10x$ (in verde petrolio) con il massimo nel vertice $V_0 = (5,25)$, a destra $-f(x) = x^2-10x$ (in rosso) con il minimo nel vertice $V_1 = (5,-25)$. In entrambi i grafici la curva tratteggiata grigia è l'altra parabola: cambiare di segno la funzione equivale a ribaltarla rispetto all'asse $x$, e trasforma il massimo in un minimo di valore opposto.}
 \label{fig:parabole}
 \end{figure}
@@ -160,7 +160,7 @@ ovvero $g_1(x) = x - 3$, con $m = 1$ e $p = 0$ (c'è un solo vincolo, di disugua
 \begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[xscale=0.6, yscale=0.11, >=Stealth]
-  \useasboundingbox (-3.6,-36) rectangle (12.6,17);
+  \useasboundingbox (-3.6,-36) rectangle (12.6,19.1);
   % regione ammissibile x <= 3
   \fill[Accent!10] (-3,-34) rectangle (3,14);
   \node[Accent, font=\small, anchor=south] at (0,-34) {$X=(-\infty,3]$};
@@ -211,9 +211,8 @@ Un problema di ottimizzazione è \textbf{inammissibile} se $X = \emptyset$, ovve
 \begin{esempiofig}
 Consideriamo ancora la funzione $x^2 - 10x$, ma con due vincoli: $x \le 3$ e $x \ge 5$. Un punto ammissibile dovrebbe rispettarli entrambi, ma nessun numero è contemporaneamente minore o uguale a $3$ e maggiore o uguale a $5$: come mostra il grafico a destra, le due zone colorate non hanno punti in comune. Quindi $X = \emptyset$ e il problema è inammissibile. In questo caso non ha senso cercare un minimo, perché non esiste alcuna scelta possibile.
 \tcblower
-\resizebox{\linewidth}{!}{%
-\begin{tikzpicture}[xscale=0.5, yscale=0.09, >=Stealth]
-  \useasboundingbox (-1.8,-30) rectangle (12.6,16);
+\begin{tikzpicture}[xscale=0.455, yscale=0.0819, >=Stealth]
+  \useasboundingbox (-1.8,-30) rectangle (12.6,18.7);
   \fill[Accent!14] (-1,-28) rectangle (3,12);
   \fill[red!14] (5,-28) rectangle (11,12);
   \draw[->] (-1,0) -- (11.8,0) node[right, font=\scriptsize] {$x$};
@@ -225,7 +224,6 @@ Consideriamo ancora la funzione $x^2 - 10x$, ma con due vincoli: $x \le 3$ e $x 
   \node[red!70!black, font=\scriptsize] at (8,8) {$x\ge 5$};
   \node[font=\scriptsize, fill=white, inner sep=1.5pt] at (4,-10) {$X=\emptyset$};
 \end{tikzpicture}
-}
 \end{esempiofig}
 
 \begin{definizione}[Problema illimitato]
@@ -239,9 +237,8 @@ Consideriamo il problema
 \]
 Per qualsiasi $k > 0$ vale $f(x) < -k$ quando $x^2 - 10x - k > 0$, e questa disuguaglianza è verificata da tutti gli $x$ abbastanza grandi in valore assoluto. Ad esempio, per $k = 20$ si ha $f(13) = -169 + 130 = -39 < -20$. La funzione obiettivo scende quindi sotto qualsiasi valore fissato, come si vede dal grafico a destra: il problema è illimitato e non ammette un minimo.
 \tcblower
-\resizebox{\linewidth}{!}{%
-\begin{tikzpicture}[xscale=0.36, yscale=0.06, >=Stealth]
-  \useasboundingbox (-4.2,-52) rectangle (15.5,32);
+\begin{tikzpicture}[xscale=0.3269, yscale=0.0555, >=Stealth]
+  \useasboundingbox (-4.2,-52) rectangle (15.85,37);
   \draw[->] (-4,0) -- (14.8,0) node[right, font=\scriptsize] {$x$};
   \draw[->] (0,-50) -- (0,30) node[above, font=\scriptsize] {$y$};
   \draw[Accent, thick, domain=-3.4:13.4, samples=60, smooth] plot (\x, {-\x*\x+10*\x});
@@ -251,7 +248,6 @@ Per qualsiasi $k > 0$ vale $f(x) < -k$ quando $x^2 - 10x - k > 0$, e questa disu
   \node[circle, fill=red!70!black, inner sep=1.5pt] at (13,-39) {};
   \node[red!70!black, font=\scriptsize, anchor=east] at (12.3,-42) {$f(x)<-k$};
 \end{tikzpicture}
-}
 \end{esempiofig}
 
 \begin{definizione}[Ottimo globale]
@@ -265,9 +261,8 @@ f(x) - f(5) = x^2 - 10x + 25 = (x - 5)^2 \ge 0
 \]
 ovvero $f(x) \ge -25 = f(5)$: nessun punto può avere un valore della funzione obiettivo inferiore a quello di $x^*$, come si vede nel grafico a destra dove la curva non scende mai sotto la retta tratteggiata.
 \tcblower
-\resizebox{\linewidth}{!}{%
-\begin{tikzpicture}[xscale=0.5, yscale=0.09, >=Stealth]
-  \useasboundingbox (-1.8,-33) rectangle (12.6,16);
+\begin{tikzpicture}[xscale=0.455, yscale=0.0819, >=Stealth]
+  \useasboundingbox (-1.8,-33) rectangle (12.6,18.7);
   \draw[->] (-1,0) -- (11.8,0) node[right, font=\scriptsize] {$x$};
   \draw[->] (0,-28) -- (0,14) node[above, font=\scriptsize] {$y$};
   \draw[Accent, thick, domain=-0.9:10.9, samples=50, smooth] plot (\x, {\x*\x-10*\x});
@@ -279,7 +274,6 @@ ovvero $f(x) \ge -25 = f(5)$: nessun punto può avere un valore della funzione o
   \node[red!70!black, font=\scriptsize, anchor=north] at (5,-27) {$x^*=5$};
   \node[TextGray, font=\scriptsize, anchor=north west] at (6.2,-26.5) {$f(x^*)=-25$};
 \end{tikzpicture}
-}
 \end{esempiofig}
 
 \begin{definizione}[Ottimo locale]
@@ -293,9 +287,8 @@ f(x) - f(1) = x^3 - 3x + 2 = (x - 1)^2 (x + 2)
 \]
 e per ogni $x$ nell'intorno $|x - 1| < 1$, ovvero in $(0, 2)$, il fattore $x + 2$ è positivo. Di conseguenza $f(x) > f(1) = -2$ per ogni $x \neq 1$ dell'intorno: $x^* = 1$ è un ottimo locale stretto. Non è però un ottimo globale, perché $f(-3) = -18 < -2$. L'ottimo globale del problema è infatti $x = -3$, estremo della regione ammissibile. Come si vede dal grafico a destra, il minimo locale è il punto più basso solo nei dintorni di $x = 1$, mentre altrove su $X$ la funzione scende ancora di più.
 \tcblower
-\resizebox{\linewidth}{!}{%
-\begin{tikzpicture}[xscale=0.85, yscale=0.14, >=Stealth]
-  \useasboundingbox (-3.6,-22) rectangle (4.3,22);
+\begin{tikzpicture}[xscale=0.8287, yscale=0.1365, >=Stealth]
+  \useasboundingbox (-3.6,-22) rectangle (4.3,23.8);
   \draw[->] (-3.3,0) -- (3.9,0) node[right, font=\scriptsize] {$x$};
   \draw[->] (0,-21) -- (0,21) node[above, font=\scriptsize] {$y$};
   \draw[Accent, thick, domain=-3:3, samples=60, smooth] plot (\x, {\x*\x*\x-3*\x});
@@ -307,7 +300,6 @@ e per ogni $x$ nell'intorno $|x - 1| < 1$, ovvero in $(0, 2)$, il fattore $x + 2
   \node[circle, fill=Accent, inner sep=1.6pt] at (-3,-18) {};
   \node[Accent, font=\scriptsize, anchor=west] at (-2.75,-19) {min globale};
 \end{tikzpicture}
-}
 \end{esempiofig}
 
 Un ottimo locale non stretto è invece un punto che appartiene a una regione confinata di punti con lo stesso valore minimo di $f$. Naturalmente ogni ottimo globale è anche un ottimo locale, ma non è detto il contrario.
