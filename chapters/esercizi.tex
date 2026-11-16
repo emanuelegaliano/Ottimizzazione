@@ -24,7 +24,7 @@ Risolvere graficamente il problema
 \begin{aligned}
 &\min\, (x_1 - x_2) \\
 &x_1 + x_2 \le 4 \\
-&-x_1 + x_2 \le 2 \\
+&{-x_1} + x_2 \le 2 \\
 &x_1,\, x_2 \ge 0
 \end{aligned}
 \]
@@ -84,7 +84,7 @@ Risolvere graficamente il problema
 \begin{aligned}
 &\max\, (4x_1 - 5x_2) \\
 &x_1 + 2x_2 \le -3 \\
-&-x_1 + x_2 \le 1 \\
+&{-x_1} + x_2 \le 1 \\
 &x_2 \ge 0
 \end{aligned}
 \]
@@ -651,12 +651,12 @@ Il poliedro ha quindi due vertici: $(0, 1, 0, 1)$ e $(0, 0, 1, 0)$. Il secondo s
 \section{Metodo del simplesso}\label{sec:es-simplesso}
 Per questi esercizi seguiamo i passi della sezione~\ref{sec:algoritmo}. Come variabile entrante scegliamo quella con il costo ridotto minimo (regola di Dantzig), e risolviamo i pareggi scegliendo l'indice minimo.
 
-\begin{esercizio}[Corsi in palestra]
-Una palestra organizza tre tipi di corso: HIIT, yoga e allenamento di forza. Un'ora di corso rende rispettivamente $500$, $200$ e $350$ euro. In una giornata si possono svolgere al massimo $8$ ore di corsi, di cui al massimo $5$ di HIIT e al massimo $3$ di forza. Determinare con il metodo del simplesso quante ore dedicare a ciascun corso per massimizzare il guadagno.
+\begin{esercizio}[Nike Training App]
+Un'app di allenamento vuole inserire un nuovo programma settimanale di $8$ ore, scegliendo fra tre attività: HIIT, yoga e allenamento di forza. Un'ora di HIIT permette di bruciare $500$ calorie, un'ora di yoga $200$ e un'ora di forza $350$. Per l'elevata intensità delle sessioni si possono fare al massimo $5$ ore settimanali di HIIT, e per mantenere il programma sostenibile al massimo $3$ ore di forza. Determinare con il metodo del simplesso quante ore dedicare a ciascuna attività per massimizzare le calorie bruciate.
 \end{esercizio}
 
 \paragraph{Soluzione.}
-Indichiamo con $x_1$, $x_2$ e $x_3$ le ore di HIIT, yoga e forza. Il problema e la sua forma standard sono:
+Indichiamo con $x_1$, $x_2$ e $x_3$ le ore settimanali di HIIT, yoga e forza. Il tempo complessivo non può superare le $8$ ore, quindi il problema e la sua forma standard sono:
 \[
 \begin{aligned}
 &\max\, (500x_1 + 200x_2 + 350x_3) \\
@@ -710,21 +710,34 @@ $x_6$ & 0 & $-1$ & 0 & $-1$ & 1 & 1 & 0 \\
  & 0 & 150 & 0 & 350 & 150 & 0 & 3550 \\
 \end{tabular}
 \end{center}
-Tutti i costi ridotti sono non negativi, quindi la soluzione di base $(5, 0, 3, 0, 0, 0)$ è ottima. Conviene fare $5$ ore di HIIT e $3$ ore di forza, con un guadagno di $3550$ euro. La soluzione è degenere, perché $x_6$ è in base con valore nullo (c'era un pareggio nel criterio del rapporto), ed è l'unica ottima, perché i costi ridotti delle variabili fuori base sono strettamente positivi.
+Tutti i costi ridotti sono non negativi, quindi la soluzione di base $(5, 0, 3, 0, 0, 0)$ è ottima. Conviene fare $5$ ore di HIIT e $3$ ore di forza, bruciando $3550$ calorie a settimana. La soluzione è degenere, perché $x_6$ è in base con valore nullo (c'era un pareggio nel criterio del rapporto), ed è l'unica ottima, perché i costi ridotti delle variabili fuori base sono strettamente positivi.
 
-\begin{esercizio}[Menu del ristorante]
-Un ristorante prepara quattro piatti: lasagna, pizza, riso e tiramisù, con un profitto per porzione di $9$, $7$, $5$ e $8$ euro. Indicando con $x_1, \dots, x_4$ le porzioni dei quattro piatti, le risorse della cucina impongono i vincoli
-\[
-\begin{aligned}
-6x_1 + 4x_2 + 3x_3 + 5x_4 &\le 120 \\
-2x_1 + x_2 + x_3 + x_4 &\le 30 \\
-x_1 + x_2 + x_3 + x_4 &\le 40
-\end{aligned}
-\]
-con $x_i \ge 0$. Determinare con il metodo del simplesso le porzioni che massimizzano il profitto.
+\begin{esercizio}[Cena tra amici]
+Per una cena tra amici si possono preparare lasagne, pizza rustica, insalata di riso e tiramisù. Ogni porzione contribuisce alla soddisfazione degli ospiti con un punteggio di $9$ (lasagna), $7$ (pizza), $5$ (insalata di riso) e $8$ (tiramisù). Il costo e il tempo di preparazione di una porzione sono:
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+ & Lasagna & Pizza rustica & Insalata di riso & Tiramisù \\
+\midrule
+Costo (euro) & 6 & 4 & 3 & 5 \\
+Tempo (ore) & 2 & 1 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\end{center}
+Si dispone di un budget massimo di $120$ euro, di $30$ ore complessive di preparazione e di spazio per servire al massimo $40$ porzioni. Determinare con il metodo del simplesso le porzioni che massimizzano la soddisfazione complessiva.
 \end{esercizio}
 
 \paragraph{Soluzione.}
+Indichiamo con $x_1, \dots, x_4$ le porzioni di lasagna, pizza, insalata di riso e tiramisù. I tre vincoli riguardano il budget, il tempo e il numero di porzioni:
+\[
+\begin{aligned}
+&\max\, (9x_1 + 7x_2 + 5x_3 + 8x_4) \\
+&6x_1 + 4x_2 + 3x_3 + 5x_4 \le 120 \\
+&2x_1 + x_2 + x_3 + x_4 \le 30 \\
+&x_1 + x_2 + x_3 + x_4 \le 40 \\
+&x_i \ge 0, \quad i = 1, \dots, 4.
+\end{aligned}
+\]
 La forma standard si ottiene cambiando segno alla funzione obiettivo e aggiungendo una variabile di scarto per ogni vincolo:
 \[
 \begin{aligned}
@@ -795,11 +808,618 @@ $x_7$ & $-1$ & 0 & 0 & 0 & 0 & $-1$ & 1 & 10 \\
  & 3 & 0 & 1 & 0 & 1 & 3 & 0 & 210 \\
 \end{tabular}
 \end{center}
-Tutti i costi ridotti sono non negativi, quindi la soluzione di base $(0, 30, 0, 0, 0, 0, 10)$ è ottima: conviene preparare $30$ pizze, con un profitto massimo di $210$ euro. Anche in questo caso il pareggio nel rapporto ha prodotto una soluzione degenere ($x_4$ è in base con valore nullo), e la soluzione è unica perché i costi ridotti delle variabili fuori base sono strettamente positivi.
+Tutti i costi ridotti sono non negativi, quindi la soluzione di base $(0, 30, 0, 0, 0, 0, 10)$ è ottima: conviene preparare $30$ pizze, con una soddisfazione complessiva di $210$. Anche in questo caso il pareggio nel rapporto ha prodotto una soluzione degenere ($x_4$ è in base con valore nullo), e la soluzione è unica perché i costi ridotti delle variabili fuori base sono strettamente positivi.
+
+\begin{esercizio}[Soluzioni ottime multiple]
+Risolvere con il metodo del simplesso il problema
+\[
+\begin{aligned}
+&\min\, (4x_1 - 10x_2) \\
+&{-2x_1} + x_2 \le 1 \\
+&{-2x_1} + 5x_2 \le 8 \\
+&x_1,\, x_2 \ge 0.
+\end{aligned}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Aggiungendo le variabili di scarto $x_3$ e $x_4$ si ottiene subito una base, e la tabella iniziale è:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_3$ & $-2$ & $\boxed{1}$ & 1 & 0 & 1 \\
+$x_4$ & $-2$ & 5 & 0 & 1 & 8 \\
+\hline
+ & 4 & $-10$ & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Entra $x_2$, con costo ridotto $-10$. I rapporti sono $1/1 = 1$ e $8/5$, quindi esce $x_3$. Con le operazioni $R_2 \to R_2 - 5R_1$ e $R_3 \to R_3 + 10R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_2$ & $-2$ & 1 & 1 & 0 & 1 \\
+$x_4$ & $\boxed{8}$ & 0 & $-5$ & 1 & 3 \\
+\hline
+ & $-16$ & 0 & 10 & 0 & 10 \\
+\end{tabular}
+\end{center}
+Ora entra $x_1$, e l'unico elemento positivo della sua colonna è nella riga di $x_4$, che quindi esce. Con le operazioni $R_2 \to R_2/8$, $R_1 \to R_1 + 2R_2$ e $R_3 \to R_3 + 16R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_2$ & 0 & 1 & $-\frac14$ & $\frac14$ & $\frac74$ \\
+$x_1$ & 1 & 0 & $-\frac58$ & $\frac18$ & $\frac38$ \\
+\hline
+ & 0 & 0 & 0 & 2 & 16 \\
+\end{tabular}
+\end{center}
+I costi ridotti sono non negativi, quindi la soluzione $x^* = (\frac38, \frac74)$ è ottima, con valore $-16$. Il costo ridotto della variabile fuori base $x_3$, però, è nullo, quindi la condizione di unicità (teorema~\ref{teo:unicita}) non è verificata e il problema può avere altre soluzioni ottime.
+
+Facciamo entrare $x_3$, ponendo $x_3 = t \ge 0$. Gli elementi della sua colonna sono tutti negativi, quindi le variabili di base
+\[
+x_2 = \frac74 + \frac14 t, \qquad x_1 = \frac38 + \frac58 t
+\]
+crescono senza mai annullarsi, mentre la funzione obiettivo resta uguale a $-16$, perché il costo ridotto di $x_3$ è nullo. Il problema ha quindi \textbf{infinite soluzioni ottime}: tutti i punti della semiretta che parte da $(\frac38, \frac74)$ con direzione $(5, 2)$. Non si tratta di un problema illimitato, perché il test di illimitatezza richiede un costo ridotto negativo, mentre qui la funzione obiettivo resta costante.
+
+Graficamente, la funzione obiettivo $4x_1 - 10x_2 = -2(-2x_1 + 5x_2)$ è un multiplo del primo membro del secondo vincolo, quindi le curve di livello sono parallele alla sua retta. L'ottimo è raggiunto su tutta la parte di questa retta che delimita la regione ammissibile (figura~\ref{fig:es-multiple}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=1.25, >=Stealth]
+  \useasboundingbox (-1.5,-0.6) rectangle (7.0,4.1);
+  % regione ammissibile (non limitata)
+  \fill[Accent!12] (0,0) -- (0,1) -- (0.375,1.75) -- (4.6,3.44) -- (4.6,0) -- cycle;
+  % assi
+  \draw[->] (-0.3,0) -- (5.0,0) node[right] {$x_1$};
+  \draw[->] (0,-0.3) -- (0,3.9) node[above] {$x_2$};
+  \foreach \x in {1,...,4} \draw (\x,0.05) -- (\x,-0.05) node[below,font=\scriptsize] {\x};
+  \foreach \y in {1,...,3} \draw (0.05,\y) -- (-0.05,\y) node[left,font=\scriptsize] {\y};
+  % vincoli
+  \draw[blue!65!black, very thick] (-0.4,0.2) -- (1.4,3.8)
+    node[above, font=\small] {$-2x_1+x_2=1$};
+  \draw[orange!85!black, very thick] (-1,1.2) -- (4.6,3.44)
+    node[right, font=\small] {$-2x_1+5x_2=8$};
+  % semiretta delle soluzioni ottime
+  \draw[red!70!black, line width=2pt] (0.375,1.75) -- (4.6,3.44);
+  \node[circle, fill=red!70!black, inner sep=1.6pt] at (0.375,1.75) {};
+  \node[font=\small, red!70!black, anchor=north west] at (0.45,1.68) {$x^*=(\tfrac38,\tfrac74)$};
+  % direzione di decrescita
+  \draw[->, red!70!black, very thick] (3.3,0.9) -- (3.05,1.52) node[left, font=\small] {$d$};
+\end{tikzpicture}
+\caption{Esercizio con soluzioni ottime multiple: la regione ammissibile (zona colorata) non è limitata. Le curve di livello di $4x_1-10x_2$ sono parallele alla retta arancione, e spostandole nella direzione di decrescita $d=(-4,10)^T$ l'ultima che tocca la regione coincide con questa retta. Tutti i punti della semiretta rossa, che parte da $x^*=(\frac38,\frac74)$, sono soluzioni ottime con valore $-16$.}
+\label{fig:es-multiple}
+\end{figure}
+
+\section{Metodo delle due fasi}\label{sec:es-due-fasi}
+Per questo esercizio seguiamo i passi della sezione~\ref{sec:due-fasi}.
+
+\begin{esercizio}
+Risolvere con il metodo delle due fasi il problema
+\[
+\begin{aligned}
+&\max\, (x_1 + 2x_2 + x_3) \\
+&x_1 + 2x_2 - x_3 = 4 \\
+&{-x_1} + x_2 + x_3 = 8 \\
+&x_1 + 5x_2 - x_3 = 16 \\
+&x_1,\, x_2,\, x_3 \ge 0.
+\end{aligned}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+Il problema è di massimo, quindi lo scriviamo come $-\min(-x_1 - 2x_2 - x_3)$. I vincoli sono già di uguaglianza e i termini noti sono positivi, ma nessuna colonna della matrice
+\[
+A = \begin{pmatrix} 1 & 2 & -1 \\ -1 & 1 & 1 \\ 1 & 5 & -1 \end{pmatrix}
+\]
+è una colonna dell'identità. Aggiungiamo quindi tre variabili artificiali, e la tabella iniziale della fase 1 è:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $y_1$ & $y_2$ & $y_3$ & $b$ \\
+\hline
+$y_1$ & 1 & $\boxed{2}$ & $-1$ & 1 & 0 & 0 & 4 \\
+$y_2$ & $-1$ & 1 & 1 & 0 & 1 & 0 & 8 \\
+$y_3$ & 1 & 5 & $-1$ & 0 & 0 & 1 & 16 \\
+\hline
+ & $-1$ & $-8$ & 1 & 0 & 0 & 0 & $-28$ \\
+\end{tabular}
+\end{center}
+Entra $x_2$, con il costo ridotto minimo $-8$. I rapporti sono $4/2 = 2$, $8/1 = 8$ e $16/5$, quindi esce $y_1$. Con le operazioni $R_1 \to R_1/2$, $R_2 \to R_2 - R_1$, $R_3 \to R_3 - 5R_1$ e $R_4 \to R_4 + 8R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $y_1$ & $y_2$ & $y_3$ & $b$ \\
+\hline
+$x_2$ & $\frac12$ & 1 & $-\frac12$ & $\frac12$ & 0 & 0 & 2 \\
+$y_2$ & $-\frac32$ & 0 & $\boxed{\tfrac32}$ & $-\frac12$ & 1 & 0 & 6 \\
+$y_3$ & $-\frac32$ & 0 & $\frac32$ & $-\frac52$ & 0 & 1 & 6 \\
+\hline
+ & 3 & 0 & $-3$ & 4 & 0 & 0 & $-12$ \\
+\end{tabular}
+\end{center}
+Entra $x_3$. I rapporti delle righe di $y_2$ e di $y_3$ valgono entrambi $4$, quindi esce $y_2$, che ha indice minore. Con le operazioni $R_2 \to \frac23 R_2$, $R_1 \to R_1 + \frac12 R_2$, $R_3 \to R_3 - \frac32 R_2$ e $R_4 \to R_4 + 3R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $y_1$ & $y_2$ & $y_3$ & $b$ \\
+\hline
+$x_2$ & 0 & 1 & 0 & $\frac13$ & $\frac13$ & 0 & 4 \\
+$x_3$ & $-1$ & 0 & 1 & $-\frac13$ & $\frac23$ & 0 & 4 \\
+$y_3$ & 0 & 0 & 0 & $-2$ & $-1$ & 1 & 0 \\
+\hline
+ & 0 & 0 & 0 & 3 & 2 & 0 & 0 \\
+\end{tabular}
+\end{center}
+I costi ridotti sono non negativi e il valore ottimo è nullo, quindi il problema di partenza è ammissibile. La variabile artificiale $y_3$, però, è rimasta in base con valore nullo, e la sua riga ha tutti zeri nelle colonne di $x_1$, $x_2$ e $x_3$: il terzo vincolo è ridondante. Infatti è uguale al doppio del primo più il secondo:
+\[
+2\,(1, 2, -1 \mid 4) + (-1, 1, 1 \mid 8) = (1, 5, -1 \mid 16).
+\]
+Eliminiamo la riga di $y_3$ e le colonne delle variabili artificiali. La soluzione ammissibile di base trovata è $(0, 4, 4)$.
+
+Nella fase 2 ripristiniamo la funzione obiettivo $-x_1 - 2x_2 - x_3$, con $c_B = (c_2, c_3) = (-2, -1)$. Le variabili $x_2$ e $x_3$ sono in base, mentre per $x_1$ si ha
+\[
+\bar{c}_1 = -1 - (-2, -1) \begin{pmatrix} 0 \\ -1 \end{pmatrix} = -1 - 1 = -2
+\]
+e l'elemento in basso a destra vale $-(-2 \cdot 4 - 1 \cdot 4) = 12$:
+\begin{center}
+\begin{tabular}{c|ccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $b$ \\
+\hline
+$x_2$ & 0 & 1 & 0 & 4 \\
+$x_3$ & $-1$ & 0 & 1 & 4 \\
+\hline
+ & $-2$ & 0 & 0 & 12 \\
+\end{tabular}
+\end{center}
+Il costo ridotto di $x_1$ è negativo e gli elementi della sua colonna sono tutti $\le 0$: per il test di illimitatezza il problema di minimo è illimitato inferiormente, ovvero il problema di partenza è \textbf{illimitato superiormente}. In effetti, ponendo $x_1 = t$, si ha $x_2 = 4$ e $x_3 = 4 + t$, che rispettano tutti i vincoli per ogni $t \ge 0$, mentre la funzione obiettivo vale $t + 8 + (4 + t) = 12 + 2t$.
+
+\section{Dualità}\label{sec:es-dualita}
+Gli esercizi di questa sezione utilizzano i risultati del capitolo~\ref{ch:dualita}.
+
+\begin{esercizio}
+Dato il problema
+\[
+\begin{aligned}
+&\max\, (3x_1 + 2x_2) \\
+&x_1 + x_2 \le 4 \\
+&x_1 + 3x_2 \le 6 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+\begin{enumerate}[label=\alph*)]
+    \item scrivere il duale,
+    \item scrivere il primale in forma standard,
+    \item scrivere il duale del problema del punto b),
+    \item confrontare i duali dei punti a) e c).
+\end{enumerate}
+\end{esercizio}
+
+\paragraph{Soluzione.}
+\textbf{a)} Il primale è di massimo con vincoli $\le$, quindi leggiamo la tabella delle trasformazioni da destra a sinistra: le variabili duali sono $\ge 0$ e i vincoli duali sono di tipo $\ge$:
+\[
+\begin{aligned}
+&\min\, (4y_1 + 6y_2) \\
+&y_1 + y_2 \ge 3 \\
+&y_1 + 3y_2 \ge 2 \\
+&y_1,\, y_2 \ge 0.
+\end{aligned}
+\]
+In questo caso la matrice $A = \begin{pmatrix} 1 & 1 \\ 1 & 3 \end{pmatrix}$ è simmetrica, quindi $A^T = A$.
+
+\textbf{b)} Cambiando segno alla funzione obiettivo e aggiungendo le variabili di scarto $x_3$ e $x_4$ si ottiene:
+\[
+\begin{aligned}
+&\min\, (-3x_1 - 2x_2) \\
+&x_1 + x_2 + x_3 = 4 \\
+&x_1 + 3x_2 + x_4 = 6 \\
+&x_i \ge 0, \quad i = 1, \dots, 4
+\end{aligned}
+\qquad
+A_{FS} = \begin{pmatrix} 1 & 1 & 1 & 0 \\ 1 & 3 & 0 & 1 \end{pmatrix}.
+\]
+
+\textbf{c)} Il primale del punto b) è in forma standard, quindi il suo duale ha variabili libere (sezione~\ref{sec:duale-standard}) e un vincolo per ogni colonna di $A_{FS}$:
+\[
+\begin{aligned}
+&\max\, (4y_1 + 6y_2) \\
+&y_1 + y_2 \le -3 \\
+&y_1 + 3y_2 \le -2 \\
+&y_1 \le 0 \\
+&y_2 \le 0.
+\end{aligned}
+\]
+Gli ultimi due vincoli vengono dalle colonne delle variabili di scarto, che hanno costo nullo: le variabili duali sono libere, ma questi vincoli le costringono a essere non positive.
+
+\textbf{d)} Ponendo $w = -y$ nel duale del punto c) si ottiene
+\[
+\max\, (-4w_1 - 6w_2) = -\min\, (4w_1 + 6w_2), \quad w_1 + w_2 \ge 3, \quad w_1 + 3w_2 \ge 2, \quad w_1,\, w_2 \ge 0
+\]
+ovvero proprio il duale del punto a), a meno del segno. I due duali sono quindi equivalenti: le variabili duali del punto c) sono le opposte di quelle del punto a), e anche i valori ottimi sono opposti, perché il primale del punto b) è il problema di partenza con la funzione obiettivo cambiata di segno.
+
+Come verifica, il primale ha ottimo in $(4, 0)$ con valore $12$, il duale del punto a) in $(3, 0)$ con valore $12$, e quello del punto c) in $(-3, 0)$ con valore $-12$.
+
+\begin{esercizio}
+Dato il problema
+\[
+\begin{aligned}
+&\max\, (3x_1 + 4x_2 + 2x_3) \\
+&x_1 + 2x_2 + x_3 \le 8 \\
+&2x_1 + x_2 + x_3 \le 10 \\
+&x_1,\, x_2,\, x_3 \ge 0
+\end{aligned}
+\]
+\begin{enumerate}[label=\alph*)]
+    \item trovare il duale,
+    \item risolvere il duale graficamente,
+    \item trovare la soluzione ottima primale con le condizioni di complementarietà.
+\end{enumerate}
+\end{esercizio}
+
+\paragraph{Soluzione.}
+\textbf{a)} Il primale ha tre variabili e due vincoli, quindi il duale ha due variabili e tre vincoli. Leggendo la tabella delle trasformazioni da destra a sinistra si ottiene:
+\[
+\begin{aligned}
+&\min\, (8y_1 + 10y_2) \\
+&y_1 + 2y_2 \ge 3 \\
+&2y_1 + y_2 \ge 4 \\
+&y_1 + y_2 \ge 2 \\
+&y_1,\, y_2 \ge 0
+\end{aligned}
+\qquad
+A = \begin{pmatrix} 1 & 2 & 1 \\ 2 & 1 & 1 \end{pmatrix}, \quad
+A^T = \begin{pmatrix} 1 & 2 \\ 2 & 1 \\ 1 & 1 \end{pmatrix}.
+\]
+
+\textbf{b)} Tracciamo le rette dei vincoli:
+\begin{itemize}
+    \item $y_1 + 2y_2 = 3$ passa per $(0, \frac32)$ e $(3, 0)$.
+    \item $2y_1 + y_2 = 4$ passa per $(0, 4)$ e $(2, 0)$.
+    \item $y_1 + y_2 = 2$ passa per $(0, 2)$ e $(2, 0)$.
+\end{itemize}
+La regione ammissibile (figura~\ref{fig:es-duale-grafico}) non è limitata e ha tre vertici: $(0, 4)$, $(\frac53, \frac23)$ e $(3, 0)$, dove il secondo è l'intersezione delle prime due rette. Il terzo vincolo non è mai attivo, perché in tutti i punti della regione si ha $y_1 + y_2 \ge \frac73 > 2$. La funzione obiettivo vale $40$, $20$ e $24$ nei tre vertici, e cresce nelle direzioni in cui la regione si estende: il minimo è $20$, nel punto $\bar{y} = (\frac53, \frac23)$.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.9, >=Stealth]
+  \useasboundingbox (-2.8,-1.0) rectangle (7.2,5.7);
+  % regione ammissibile (non limitata)
+  \fill[Accent!12] (0,5.3) -- (0,4) -- (1.667,0.667) -- (3,0) -- (6.4,0) -- (6.4,5.3) -- cycle;
+  % assi
+  \draw[->] (-0.3,0) -- (6.8,0) node[right] {$y_1$};
+  \draw[->] (0,-0.3) -- (0,5.6) node[above] {$y_2$};
+  \foreach \t in {1,...,6} \draw (\t,0.06) -- (\t,-0.06);
+  \foreach \t in {1,...,5} \draw (0.06,\t) -- (-0.06,\t);
+  % vincoli
+  \draw[blue!65!black, very thick] (-0.4,1.7) -- (3.6,-0.3);
+  \node[blue!65!black, font=\small, anchor=east] at (-0.45,1.7) {$y_1+2y_2=3$};
+  \draw[orange!85!black, very thick] (-0.3,4.6) -- (2.3,-0.6);
+  \node[orange!85!black, font=\small, anchor=east] at (-0.35,4.6) {$2y_1+y_2=4$};
+  \draw[green!45!black, thick] (-0.3,2.3) -- (2.3,-0.3);
+  \node[green!45!black, font=\small, anchor=east] at (-0.35,2.3) {$y_1+y_2=2$};
+  % curva di livello ottima
+  \draw[dashed, red!70!black] (-0.3,2.24) -- (3.25,-0.6);
+  \node[red!70!black, font=\small, anchor=west] at (3.3,-0.6) {$8y_1+10y_2=20$};
+  % direzione di decrescita
+  \draw[->, red!70!black, very thick] (4.5,3.8) -- (3.88,3.02) node[below left, font=\small] {$d$};
+  % vertici
+  \node[circle, fill=black, inner sep=1.4pt] at (0,4) {};
+  \node[circle, fill=red!70!black, inner sep=1.8pt] at (1.667,0.667) {};
+  \node[circle, fill=black, inner sep=1.4pt] at (3,0) {};
+  \node[font=\small, anchor=south west] at (0.08,4.05) {$(0,4)$};
+  \node[font=\small, anchor=west, red!70!black] at (1.85,0.85) {$\bar{y}=(\frac53,\frac23)$};
+  \node[font=\small, anchor=south west] at (3.05,0.05) {$(3,0)$};
+\end{tikzpicture}
+\caption{Risoluzione grafica del duale dell'esercizio: la regione ammissibile (zona colorata) non è limitata e ha vertici $(0,4)$, $\bar{y}=(\frac53,\frac23)$ e $(3,0)$. La retta verde $y_1+y_2=2$ non tocca mai la regione, quindi il terzo vincolo non è mai attivo. Spostando le curve di livello $8y_1+10y_2=k$ nella direzione di decrescita $d=(-8,-10)^T$, l'ultimo punto toccato è $\bar{y}$, sulla curva tratteggiata $8y_1+10y_2=20$.}
+\label{fig:es-duale-grafico}
+\end{figure}
+
+\textbf{c)} Le condizioni di complementarietà hanno la stessa forma anche per una coppia di massimo e di minimo, e sono:
+\[
+\begin{aligned}
+y_1\,(8 - x_1 - 2x_2 - x_3) &= 0 \\
+y_2\,(10 - 2x_1 - x_2 - x_3) &= 0
+\end{aligned}
+\qquad\qquad
+\begin{aligned}
+x_1\,(y_1 + 2y_2 - 3) &= 0 \\
+x_2\,(2y_1 + y_2 - 4) &= 0 \\
+x_3\,(y_1 + y_2 - 2) &= 0.
+\end{aligned}
+\]
+Sostituiamo $\bar{y} = (\frac53, \frac23)$. Entrambe le variabili duali sono positive, quindi i due vincoli primali sono attivi. I primi due vincoli duali sono attivi in $\bar{y}$, perché $\frac53 + \frac43 = 3$ e $\frac{10}{3} + \frac23 = 4$, quindi le condizioni su $x_1$ e $x_2$ sono soddisfatte. Il terzo invece vale $\frac53 + \frac23 - 2 = \frac13 \neq 0$, quindi $x_3 = 0$. Resta il sistema
+\[
+\begin{cases}
+x_1 + 2x_2 = 8 \\
+2x_1 + x_2 = 10
+\end{cases}
+\quad\Longrightarrow\quad x_1 = 4, \quad x_2 = 2.
+\]
+La soluzione ottima primale è quindi $x^* = (4, 2, 0)$, con valore $3 \cdot 4 + 4 \cdot 2 = 20$, uguale all'ottimo del duale.
+
+\begin{esercizio}
+Dato il problema
+\[
+\begin{aligned}
+&\min\, (13x_1 + 10x_2 + 6x_3) \\
+&5x_1 + x_2 + 3x_3 = 8 \\
+&3x_1 + x_2 = 3 \\
+&x_1,\, x_2,\, x_3 \ge 0
+\end{aligned}
+\]
+\begin{enumerate}[label=\alph*)]
+    \item risolverlo con il metodo delle due fasi,
+    \item calcolare la soluzione ottima duale, sia con le condizioni di complementarietà sia dalla tabella finale.
+\end{enumerate}
+\end{esercizio}
+
+\paragraph{Soluzione.}
+\textbf{a)} Nessuna colonna di $A$ è una colonna dell'identità, quindi aggiungiamo due variabili artificiali, che in questo esercizio indichiamo con $t_1$ e $t_2$ per non confonderle con le variabili duali:
+\[
+\min\, (t_1 + t_2), \qquad 5x_1 + x_2 + 3x_3 + t_1 = 8, \qquad 3x_1 + x_2 + t_2 = 3.
+\]
+Nella tabella iniziale entra $x_1$, con costo ridotto $-8$. I rapporti sono $8/5$ e $3/3 = 1$, quindi esce $t_2$:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $t_1$ & $t_2$ & $b$ \\
+\hline
+$t_1$ & 5 & 1 & 3 & 1 & 0 & 8 \\
+$t_2$ & $\boxed{3}$ & 1 & 0 & 0 & 1 & 3 \\
+\hline
+ & $-8$ & $-2$ & $-3$ & 0 & 0 & $-11$ \\
+\end{tabular}
+\end{center}
+Con le operazioni $R_2 \to R_2/3$, $R_1 \to R_1 - 5R_2$ e $R_3 \to R_3 + 8R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $t_1$ & $t_2$ & $b$ \\
+\hline
+$t_1$ & 0 & $-\frac23$ & $\boxed{3}$ & 1 & $-\frac53$ & 3 \\
+$x_1$ & 1 & $\frac13$ & 0 & 0 & $\frac13$ & 1 \\
+\hline
+ & 0 & $\frac23$ & $-3$ & 0 & $\frac83$ & $-3$ \\
+\end{tabular}
+\end{center}
+Entra $x_3$, e l'unico elemento positivo della sua colonna è nella riga di $t_1$, che quindi esce. Con le operazioni $R_1 \to R_1/3$ e $R_3 \to R_3 + 3R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $t_1$ & $t_2$ & $b$ \\
+\hline
+$x_3$ & 0 & $-\frac29$ & 1 & $\frac13$ & $-\frac59$ & 1 \\
+$x_1$ & 1 & $\frac13$ & 0 & 0 & $\frac13$ & 1 \\
+\hline
+ & 0 & 0 & 0 & 1 & 1 & 0 \\
+\end{tabular}
+\end{center}
+La fase 1 termina con valore ottimo nullo e con le variabili artificiali fuori base, quindi $(1, 0, 1)$ è una soluzione ammissibile di base. Nella fase 2 ripristiniamo la funzione obiettivo, con $c_B = (c_3, c_1) = (6, 13)$:
+\[
+\bar{c}_2 = 10 - (6, 13) \begin{pmatrix} -2/9 \\ 1/3 \end{pmatrix} = 10 - 3 = 7
+\]
+mentre l'elemento in basso a destra vale $-(6 \cdot 1 + 13 \cdot 1) = -19$. Il costo ridotto di $x_2$ è positivo, quindi la soluzione $x^* = (1, 0, 1)$ è ottima, con valore $19$, senza bisogno di altre iterazioni.
+
+\textbf{b)} Il primale è in forma standard, quindi il duale ha variabili libere:
+\[
+\begin{aligned}
+&\max\, (8y_1 + 3y_2) \\
+&5y_1 + 3y_2 \le 13 \\
+&y_1 + y_2 \le 10 \\
+&3y_1 \le 6 \\
+&y_1,\, y_2 \text{ libere.}
+\end{aligned}
+\]
+Con le condizioni di complementarietà, resta solo la condizione $(\bar{y}^T A - c^T)x^* = 0$, perché i vincoli primali sono di uguaglianza. Poiché $x_1 = 1 > 0$ e $x_3 = 1 > 0$, il primo e il terzo vincolo duale sono attivi:
+\[
+\begin{cases}
+5y_1 + 3y_2 = 13 \\
+3y_1 = 6
+\end{cases}
+\quad\Longrightarrow\quad y_1 = 2, \quad y_2 = 1.
+\]
+Dalla tabella, invece, $B^{-1}$ si legge nelle colonne di $t_1$ e $t_2$, che nella tabella iniziale formavano l'identità. La fase 2 non ha fatto nessuna iterazione, quindi la base finale è la stessa dell'ultima tabella della fase 1\footnote{Se nella fase 2 servono altre iterazioni, conviene non cancellare le colonne delle variabili artificiali (senza però farle entrare in base) e continuare ad aggiornarle: in questo modo contengono sempre $B^{-1}$.}:
+\[
+\bar{y}^T = c_B^T B^{-1} = (6, 13) \begin{pmatrix} \frac13 & -\frac59 \\ 0 & \frac13 \end{pmatrix} = \left(2,\ -\frac{10}{3} + \frac{13}{3}\right) = (2, 1).
+\]
+I due metodi danno la stessa soluzione $\bar{y} = (2, 1)$, con valore $8 \cdot 2 + 3 \cdot 1 = 19$, uguale all'ottimo del primale.
+
+\begin{esercizio}
+Dato il problema
+\[
+\begin{aligned}
+&\min\, (-2x_1 - x_2) \\
+&2x_1 \le 2 \\
+&4x_2 \le 1 \\
+&4x_1 - 3x_2 \le 4 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+\begin{enumerate}[label=\alph*)]
+    \item risolverlo con il metodo del simplesso,
+    \item calcolare la soluzione duale dalla tabella finale.
+\end{enumerate}
+\end{esercizio}
+
+\paragraph{Soluzione.}
+\textbf{a)} Aggiungiamo le variabili di scarto $x_3$, $x_4$ e $x_5$. Entra $x_1$, e i rapporti delle righe di $x_3$ e di $x_5$ valgono entrambi $1$: esce $x_3$, che ha indice minore.
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_3$ & $\boxed{2}$ & 0 & 1 & 0 & 0 & 2 \\
+$x_4$ & 0 & 4 & 0 & 1 & 0 & 1 \\
+$x_5$ & 4 & $-3$ & 0 & 0 & 1 & 4 \\
+\hline
+ & $-2$ & $-1$ & 0 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Con le operazioni $R_1 \to R_1/2$, $R_3 \to R_3 - 4R_1$ e $R_4 \to R_4 + 2R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_1$ & 1 & 0 & $\frac12$ & 0 & 0 & 1 \\
+$x_4$ & 0 & $\boxed{4}$ & 0 & 1 & 0 & 1 \\
+$x_5$ & 0 & $-3$ & $-2$ & 0 & 1 & 0 \\
+\hline
+ & 0 & $-1$ & 1 & 0 & 0 & 2 \\
+\end{tabular}
+\end{center}
+Ora entra $x_2$, e l'unico elemento positivo della sua colonna è nella riga di $x_4$, che quindi esce. Con le operazioni $R_2 \to R_2/4$, $R_3 \to R_3 + 3R_2$ e $R_4 \to R_4 + R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_1$ & 1 & 0 & $\frac12$ & 0 & 0 & 1 \\
+$x_2$ & 0 & 1 & 0 & $\frac14$ & 0 & $\frac14$ \\
+$x_5$ & 0 & 0 & $-2$ & $\frac34$ & 1 & $\frac34$ \\
+\hline
+ & 0 & 0 & 1 & $\frac14$ & 0 & $\frac94$ \\
+\end{tabular}
+\end{center}
+I costi ridotti sono non negativi: la soluzione ottima è $x^* = (1, \frac14)$, con valore $-\frac94$.
+
+\textbf{b)} I vincoli sono tutti di tipo $\le$, quindi la soluzione duale è l'opposto dei costi ridotti delle variabili di scarto: $\bar{y} = -(1, \frac14, 0) = (-1, -\frac14, 0)$. Si ottiene lo stesso risultato con $\bar{y}^T = c_B^T B^{-1}$, dove $c_B = (c_1, c_2, c_5) = (-2, -1, 0)$ e $B^{-1}$ si legge nelle colonne di $x_3$, $x_4$ e $x_5$:
+\[
+\bar{y}^T = (-2, -1, 0) \begin{pmatrix} \frac12 & 0 & 0 \\ 0 & \frac14 & 0 \\ -2 & \frac34 & 1 \end{pmatrix} = \left(-1,\ -\frac14,\ 0\right).
+\]
+Il duale è $\max\, (2y_1 + y_2 + 4y_3)$ con $2y_1 + 4y_3 \le -2$, $4y_2 - 3y_3 \le -1$ e $y \le 0$: $\bar{y}$ è ammissibile e vale $-2 - \frac14 = -\frac94$, come il primale.
+
+\section{Simplesso duale}\label{sec:es-simplesso-duale}
+Per questi esercizi seguiamo i passi della sezione~\ref{sec:simplesso-duale}.
+
+\begin{esercizio}
+Risolvere con il simplesso duale il problema
+\[
+\begin{aligned}
+&\min\, (3x_1 + 2x_2) \\
+&2x_1 - x_2 \ge 1 \\
+&x_1 + x_2 \le 2 \\
+&x_1,\, x_2 \ge 0.
+\end{aligned}
+\]
+\end{esercizio}
+
+\paragraph{Soluzione.}
+In forma standard i vincoli sono $2x_1 - x_2 - x_3 = 1$ e $x_1 + x_2 + x_4 = 2$. La colonna della variabile di surplus $x_3$ ha il segno meno, quindi moltiplichiamo il primo vincolo per $-1$, ottenendo $-2x_1 + x_2 + x_3 = -1$. Le colonne di $x_3$ e $x_4$ formano ora una base, con soluzione $(0, 0, -1, 2)$ non ammissibile, ma con costi ridotti non negativi:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_3$ & $\boxed{-2}$ & 1 & 1 & 0 & $-1$ \\
+$x_4$ & 1 & 1 & 0 & 1 & 2 \\
+\hline
+ & 3 & 2 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Esce $x_3$, l'unica variabile con termine noto negativo. Nella sua riga l'unico elemento negativo è quello di $x_1$, che quindi entra, con pivot $-2$. Con le operazioni $R_1 \to -\frac12 R_1$, $R_2 \to R_2 - R_1$ e $R_3 \to R_3 - 3R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_1$ & 1 & $-\frac12$ & $-\frac12$ & 0 & $\frac12$ \\
+$x_4$ & 0 & $\frac32$ & $\frac12$ & 1 & $\frac32$ \\
+\hline
+ & 0 & $\frac72$ & $\frac32$ & 0 & $-\frac32$ \\
+\end{tabular}
+\end{center}
+I termini noti sono non negativi, quindi la soluzione $x^* = (\frac12, 0)$ è ottima, con valore $\frac32$.
+
+\begin{esercizio}
+Dato il problema
+\[
+\begin{aligned}
+&\min\, (x_1 + 2x_2) \\
+&x_1 + 3x_2 \ge 11 \\
+&2x_1 + x_2 \ge 9 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+\begin{enumerate}[label=\alph*)]
+    \item risolverlo con il simplesso duale,
+    \item risolverlo con il metodo delle due fasi,
+    \item calcolare la soluzione ottima duale.
+\end{enumerate}
+\end{esercizio}
+
+\paragraph{Soluzione.}
+\textbf{a)} Sottraiamo le variabili di surplus $x_3$ e $x_4$ e moltiplichiamo entrambi i vincoli per $-1$, ottenendo $-x_1 - 3x_2 + x_3 = -11$ e $-2x_1 - x_2 + x_4 = -9$. Il termine noto più negativo è $-11$, quindi esce $x_3$. I rapporti sono $\frac{1}{|-1|} = 1$ e $\frac{2}{|-3|} = \frac23$, quindi entra $x_2$:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_3$ & $-1$ & $\boxed{-3}$ & 1 & 0 & $-11$ \\
+$x_4$ & $-2$ & $-1$ & 0 & 1 & $-9$ \\
+\hline
+ & 1 & 2 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Con le operazioni $R_1 \to -\frac13 R_1$, $R_2 \to R_2 + R_1$ e $R_3 \to R_3 - 2R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_2$ & $\frac13$ & 1 & $-\frac13$ & 0 & $\frac{11}{3}$ \\
+$x_4$ & $\boxed{-\tfrac53}$ & 0 & $-\frac13$ & 1 & $-\frac{16}{3}$ \\
+\hline
+ & $\frac13$ & 0 & $\frac23$ & 0 & $-\frac{22}{3}$ \\
+\end{tabular}
+\end{center}
+Ora esce $x_4$, con termine noto $-\frac{16}{3}$. I rapporti sono $\frac13 / \frac53 = \frac15$ per $x_1$ e $\frac23 / \frac13 = 2$ per $x_3$, quindi entra $x_1$. Con le operazioni $R_2 \to -\frac35 R_2$, $R_1 \to R_1 - \frac13 R_2$ e $R_3 \to R_3 - \frac13 R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $b$ \\
+\hline
+$x_2$ & 0 & 1 & $-\frac25$ & $\frac15$ & $\frac{13}{5}$ \\
+$x_1$ & 1 & 0 & $\frac15$ & $-\frac35$ & $\frac{16}{5}$ \\
+\hline
+ & 0 & 0 & $\frac35$ & $\frac15$ & $-\frac{42}{5}$ \\
+\end{tabular}
+\end{center}
+I termini noti sono non negativi, quindi la soluzione $x^* = (\frac{16}{5}, \frac{13}{5})$ è ottima, con valore $\frac{42}{5}$.
+
+\textbf{b)} Con il metodo delle due fasi aggiungiamo due variabili artificiali, che indichiamo con $t_1$ e $t_2$, ai vincoli $x_1 + 3x_2 - x_3 = 11$ e $2x_1 + x_2 - x_4 = 9$:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $t_1$ & $t_2$ & $b$ \\
+\hline
+$t_1$ & 1 & $\boxed{3}$ & $-1$ & 0 & 1 & 0 & 11 \\
+$t_2$ & 2 & 1 & 0 & $-1$ & 0 & 1 & 9 \\
+\hline
+ & $-3$ & $-4$ & 1 & 1 & 0 & 0 & $-20$ \\
+\end{tabular}
+\end{center}
+Entra $x_2$, e i rapporti sono $\frac{11}{3}$ e $9$, quindi esce $t_1$. Con le operazioni $R_1 \to R_1/3$, $R_2 \to R_2 - R_1$ e $R_3 \to R_3 + 4R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $t_1$ & $t_2$ & $b$ \\
+\hline
+$x_2$ & $\frac13$ & 1 & $-\frac13$ & 0 & $\frac13$ & 0 & $\frac{11}{3}$ \\
+$t_2$ & $\boxed{\tfrac53}$ & 0 & $\frac13$ & $-1$ & $-\frac13$ & 1 & $\frac{16}{3}$ \\
+\hline
+ & $-\frac53$ & 0 & $-\frac13$ & 1 & $\frac43$ & 0 & $-\frac{16}{3}$ \\
+\end{tabular}
+\end{center}
+Entra $x_1$, e i rapporti sono $11$ e $\frac{16}{5}$, quindi esce $t_2$. Con le operazioni $R_2 \to \frac35 R_2$, $R_1 \to R_1 - \frac13 R_2$ e $R_3 \to R_3 + \frac53 R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|cccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $t_1$ & $t_2$ & $b$ \\
+\hline
+$x_2$ & 0 & 1 & $-\frac25$ & $\frac15$ & $\frac25$ & $-\frac15$ & $\frac{13}{5}$ \\
+$x_1$ & 1 & 0 & $\frac15$ & $-\frac35$ & $-\frac15$ & $\frac35$ & $\frac{16}{5}$ \\
+\hline
+ & 0 & 0 & 0 & 0 & 1 & 1 & 0 \\
+\end{tabular}
+\end{center}
+La fase 1 termina con le variabili artificiali fuori base. Nella fase 2 ripristiniamo la funzione obiettivo, con $c_B = (c_2, c_1) = (2, 1)$, e ricalcoliamo i costi ridotti:
+\[
+\bar{c}_3 = 0 - (2, 1) \begin{pmatrix} -2/5 \\ 1/5 \end{pmatrix} = \frac35, \qquad
+\bar{c}_4 = 0 - (2, 1) \begin{pmatrix} 1/5 \\ -3/5 \end{pmatrix} = \frac15.
+\]
+Sono entrambi positivi, quindi la soluzione di base $(\frac{16}{5}, \frac{13}{5})$ è già ottima, e si ritrova la stessa tabella finale del punto a). In questo caso entrambi i metodi richiedono due iterazioni, ma il simplesso duale lavora su una tabella più piccola, senza variabili artificiali, e non deve ricalcolare i costi ridotti a metà strada.
+
+\textbf{c)} I vincoli sono tutti di tipo $\ge$, quindi la soluzione ottima duale è il vettore dei costi ridotti delle variabili di surplus nella tabella finale: $\bar{y} = (\frac35, \frac15)$. Il duale è $\max\, (11y_1 + 9y_2)$ con $y_1 + 2y_2 \le 1$, $3y_1 + y_2 \le 2$ e $y \ge 0$: $\bar{y}$ è ammissibile, con entrambi i vincoli attivi, e vale $\frac{33}{5} + \frac95 = \frac{42}{5}$, come il primale.
 
 \section*{Riferimenti}
 Il materiale visto in questa appendice comprende:
 \begin{itemize}
-    \item Materiale visto a lezione (esercitazioni del 5, 12 e 20 ottobre 2026).
+    \item Materiale visto a lezione (esercitazioni del 5, 12 e 26 ottobre e del 9 novembre 2026, esercizi delle lezioni del 6, 13 e 16 novembre 2026).
     \item Dispensa del corso \emph{Introduzione all'ottimizzazione}, sezione 4.3 (modelli di trasporto).
 \end{itemize}

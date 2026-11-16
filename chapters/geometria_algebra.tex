@@ -345,7 +345,7 @@ La forma standard è quindi
 \begin{osservazione}[Dimensioni del sistema]
 Quando si ottiene la forma standard $A x = b$, $x \ge 0$, con $A \in \mathbb{R}^{m \times n}$ e $b \in \mathbb{R}^m$, supponiamo che le $m$ righe di $A$ siano linearmente indipendenti (altrimenti ci sarebbe ridondanza dei vincoli, oppure incompatibilità) e risulta $m \le n$. Più precisamente:
 \begin{itemize}
-    \item Se $m = n$, il sistema ha una sola soluzione, quindi c'è un solo punto ammissibile.
+    \item Se $m = n$, il sistema ha una sola soluzione, $x = A^{-1}b$, quindi c'è al più un punto ammissibile (se $A^{-1}b \ge 0$).
     \item Se $m > n$ ci sono vincoli ridondanti, e le righe non possono essere linearmente indipendenti.
     \item Se $m < n$ ci sono infinite soluzioni, e ha senso cercare tra esse quella ottima.
 \end{itemize}

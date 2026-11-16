@@ -30,8 +30,8 @@ Il passaggio da un problema reale alla sua soluzione segue, in generale, cinque 
 \begin{enumerate}
     \item \textbf{Formulazione del problema}: si individuano gli obiettivi, si determinano le restrizioni e si raccolgono i dati.
     \item \textbf{Costruzione del modello}: si cerca un compromesso tra precisione e trattabilità matematica, individuando le variabili, la funzione obiettivo e i vincoli.
-    \item \textbf{Analisi del modello}: si individuano i metodi numerici adatti e si costruisce l'algoritmo risolutivo.
-    \item \textbf{Soluzione numerica}: si esegue l'algoritmo e si calcola la soluzione.
+    \item \textbf{Analisi del modello}: si deducono le proprietà del modello, come l'esistenza e l'unicità della soluzione, le condizioni di ottimalità e la stabilità delle soluzioni.
+    \item \textbf{Soluzione numerica}: si costruisce l'algoritmo risolutivo e si calcola la soluzione.
     \item \textbf{Validazione del modello}: si verifica la soluzione ottenuta (collaudo) e, se necessario, si migliora il modello.
 \end{enumerate}
 
@@ -144,7 +144,7 @@ ovvero il problema si scrive come
 &h_j(x) = 0, \quad j = 1, \dots, p
 \end{aligned}
 \]
-dove $g_i : \mathbb{R}^n \to \mathbb{R}$ sono i $m$ vincoli di disuguaglianza e $h_j : \mathbb{R}^n \to \mathbb{R}$ sono i $p$ vincoli di uguaglianza. Un punto è quindi ammissibile solo se li rispetta tutti\footnote{Da notare che la $i$ e la $j$ indicano rispettivamente il numero di vincoli di disuguaglianza e di uguaglianza.} contemporaneamente.
+dove $g_i : \mathbb{R}^n \to \mathbb{R}$ sono i $m$ vincoli di disuguaglianza e $h_j : \mathbb{R}^n \to \mathbb{R}$ sono i $p$ vincoli di uguaglianza. Un punto è quindi ammissibile solo se li rispetta tutti\footnote{Da notare che $i$ e $j$ sono gli indici dei vincoli di disuguaglianza e di uguaglianza, mentre il loro numero è rispettivamente $m$ e $p$.} contemporaneamente.
 \end{definizione}
 
 \paragraph{Esempio.}
@@ -335,7 +335,6 @@ Risolvere un problema di ottimizzazione significa quindi, in pratica:
 \section*{Riferimenti}
 Il materiale visto in questo capitolo comprende:
 \begin{itemize}
-    \item Materiale visto a lezione (2 ottobre 2026).
+    \item Materiale visto a lezione (2 ottobre 2026), compreso il problema di Dantzig.
     \item Dispensa del corso \emph{Introduzione all'ottimizzazione}, capitoli 1--3.
-    \item Slide del corso \emph{Introduzione alla Ricerca Operativa} (esempio di Dantzig).
 \end{itemize}

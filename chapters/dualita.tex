@@ -5,7 +5,7 @@ Si potrebbe pensare che affiancare un secondo problema al primo serva solo a com
 \begin{itemize}
     \item \textbf{Mettere in luce proprietà del primale}: ad esempio il duale dà un valore economico alle risorse del problema di partenza (sezione~\ref{sec:duale-economico}).
     \item \textbf{Risolvere un problema più facile}: a volte il duale è più semplice da risolvere del primale, e risolvendo l'uno si ottengono informazioni sull'altro.
-    \item \textbf{Costruire un'altra versione del simplesso}: il \textbf{simplesso duale}, utile ad esempio quando la soluzione di base ha componenti negative.
+    \item \textbf{Costruire un'altra versione del simplesso}: il \textbf{simplesso duale}, utile ad esempio quando la soluzione di base ha componenti negative (sezione~\ref{sec:simplesso-duale}).
 \end{itemize}
 
 \section{Il problema duale}
@@ -40,27 +40,29 @@ Confrontando i due problemi si nota che:
 Consideriamo il problema primale
 \[
 \begin{aligned}
-&\min\, (2x_1 + 3x_2) \\
-&x_1 + x_2 \ge 4 \\
-&x_1 + 3x_2 \ge 6 \\
-&2x_1 + x_2 \ge 5 \\
-&x_1,\, x_2 \ge 0
+&\min\, (2x_1 + x_2) \\
+&2x_1 + 3x_2 + x_3 \ge 4 \\
+&x_1 + 5x_2 + 4x_3 \ge 8 \\
+&x_1,\, x_2,\, x_3 \ge 0
 \end{aligned}
 \qquad
-A = \begin{pmatrix} 1 & 1 \\ 1 & 3 \\ 2 & 1 \end{pmatrix}, \quad
-b = \begin{pmatrix} 4 \\ 6 \\ 5 \end{pmatrix}, \quad
-c = \begin{pmatrix} 2 \\ 3 \end{pmatrix}
+A = \begin{pmatrix} 2 & 3 & 1 \\ 1 & 5 & 4 \end{pmatrix}, \quad
+b = \begin{pmatrix} 4 \\ 8 \end{pmatrix}, \quad
+c = \begin{pmatrix} 2 \\ 1 \\ 0 \end{pmatrix}
 \]
-con $n = 2$ variabili e $m = 3$ vincoli. Il duale ha quindi tre variabili $y_1, y_2, y_3$, una per ogni vincolo, e due vincoli, uno per ogni colonna di $A$:
+con $n = 3$ variabili e $m = 2$ vincoli. La variabile $x_3$ non compare nella funzione obiettivo, quindi il suo costo è $c_3 = 0$. Il duale ha due variabili $y_1, y_2$, una per ogni vincolo, e tre vincoli, uno per ogni colonna di $A$:
 \[
 \begin{aligned}
-&\max\, (4y_1 + 6y_2 + 5y_3) \\
-&y_1 + y_2 + 2y_3 \le 2 \\
-&y_1 + 3y_2 + y_3 \le 3 \\
-&y_1,\, y_2,\, y_3 \ge 0.
+&\max\, (4y_1 + 8y_2) \\
+&2y_1 + y_2 \le 2 \\
+&3y_1 + 5y_2 \le 1 \\
+&y_1 + 4y_2 \le 0 \\
+&y_1,\, y_2 \ge 0
 \end{aligned}
+\qquad
+A^T = \begin{pmatrix} 2 & 1 \\ 3 & 5 \\ 1 & 4 \end{pmatrix}.
 \]
-Il primo vincolo duale usa la colonna di $x_1$, ovvero $(1, 1, 2)^T$, e ha come termine noto il costo $c_1 = 2$. Il secondo usa la colonna di $x_2$, ovvero $(1, 3, 1)^T$, con termine noto $c_2 = 3$.
+Il primo vincolo duale usa la colonna di $x_1$, ovvero $(2, 1)^T$, e ha come termine noto il costo $c_1 = 2$. Allo stesso modo il secondo usa la colonna di $x_2$, con termine noto $c_2 = 1$, e il terzo quella di $x_3$, con termine noto $c_3 = 0$.
 
 \begin{osservazione}[Il duale del duale]
 Il duale del problema duale è il problema primale. Per vederlo, scriviamo (D) come problema di minimo con vincoli di tipo $\ge$:
@@ -70,7 +72,7 @@ Il duale del problema duale è il problema primale. Per vederlo, scriviamo (D) c
 Applicando la definizione, il suo duale è $\max\, (-c)^T x$ con $x^T(-A^T) \le -b^T$ e $x \ge 0$, ovvero $\min c^T x$ con $A x \ge b$ e $x \ge 0$: è proprio (P). Primale e duale sono quindi uno il duale dell'altro, e non importa quale dei due chiamiamo primale.
 \end{osservazione}
 
-\section{Il duale della forma standard}
+\section{Il duale della forma standard}\label{sec:duale-standard}
 Se il primale è in forma standard, i vincoli sono di uguaglianza:
 \[
 \min c^T x, \quad A x = b, \quad x \ge 0. \tag{P}
@@ -87,7 +89,7 @@ Il motivo è che un vincolo di uguaglianza equivale a due disuguaglianze: $Ax = 
 \]
 Ponendo $y = u - v$, che può avere componenti di qualsiasi segno, si ritrova proprio (D).
 
-\section{Regole di trasformazione}
+\section{Regole di trasformazione}\label{sec:regole-duale}
 In generale un problema di PL può avere vincoli di tutti i tipi e variabili con segni diversi. Per scriverne il duale non serve portarlo prima nella forma (P): si usano direttamente le regole della tabella~\ref{tab:trasformazioni}. La tabella si legge da sinistra a destra quando il primale è di minimo, e da destra a sinistra quando il primale è di massimo.
 
 \begin{table}[htbp]
@@ -118,18 +120,71 @@ numero di variabili & numero di vincoli \\
 
 Le regole sono più facili da ricordare se si pensa alla coppia simmetrica (P) e (D). In un problema di minimo la forma \emph{naturale} ha vincoli $\ge$ e variabili $\ge 0$, mentre in un problema di massimo ha vincoli $\le$ e variabili $\ge 0$. Un elemento in forma naturale corrisponde a un elemento in forma naturale, uno \emph{non naturale} (come un vincolo $\le$ in un problema di minimo) corrisponde a uno non naturale, e un'uguaglianza corrisponde a una variabile libera.
 
+In pratica, il tipo di ogni vincolo primale determina il segno della variabile duale corrispondente, mentre il segno di ogni variabile primale determina il tipo del vincolo duale corrispondente.
+
+\paragraph{Esempio.}
+Scriviamo il duale del problema di massimo
+\[
+\begin{aligned}
+&\max\, (24x_1 + 14x_2) \\
+&3x_1 + 2x_2 \le 12 \\
+&4x_1 + x_2 \le 10 \\
+&2x_1 + x_2 \le 7 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\qquad
+A = \begin{pmatrix} 3 & 2 \\ 4 & 1 \\ 2 & 1 \end{pmatrix}.
+\]
+Il primale è di massimo, quindi leggiamo la tabella da destra a sinistra. I tre vincoli sono di tipo $\le$, quindi le tre variabili duali sono $\ge 0$. Le due variabili primali sono $\ge 0$, quindi i due vincoli duali sono di tipo $\ge$:
+\[
+\begin{aligned}
+&\min\, (12y_1 + 10y_2 + 7y_3) \\
+&3y_1 + 4y_2 + 2y_3 \ge 24 \\
+&2y_1 + y_2 + y_3 \ge 14 \\
+&y_1,\, y_2,\, y_3 \ge 0
+\end{aligned}
+\qquad
+A^T = \begin{pmatrix} 3 & 4 & 2 \\ 2 & 1 & 1 \end{pmatrix}.
+\]
+Ritroveremo questo problema nella sezione~\ref{sec:post-ottimale}, con i termini noti moltiplicati per $100$.
+
 \paragraph{Esempio.}
 Scriviamo il duale del problema
 \[
 \begin{aligned}
-&\min\, (3x_1 - x_2 + 2x_3) \\
-&x_1 + x_2 - x_3 \ge 2 \\
-&2x_1 - x_2 \le 5 \\
-&x_1 + 3x_3 = 4 \\
-&x_1 \ge 0, \quad x_2 \le 0, \quad x_3 \text{ libera}
+&\min\, (2x_1 + 3x_2 + 4x_3 + x_4) \\
+&x_1 - 5x_3 + 2x_4 \ge 7 \\
+&2x_1 + 4x_2 - 6x_3 \ge 9 \\
+&x_1,\, x_2,\, x_3,\, x_4 \text{ libere}
 \end{aligned}
 \qquad
-A = \begin{pmatrix} 1 & 1 & -1 \\ 2 & -1 & 0 \\ 1 & 0 & 3 \end{pmatrix}.
+A = \begin{pmatrix} 1 & 0 & -5 & 2 \\ 2 & 4 & -6 & 0 \end{pmatrix}.
+\]
+I due vincoli sono di tipo $\ge$, quindi $y_1, y_2 \ge 0$. Le variabili primali invece sono tutte libere, quindi i quattro vincoli duali sono di uguaglianza:
+\[
+\begin{aligned}
+&\max\, (7y_1 + 9y_2) \\
+&y_1 + 2y_2 = 2 \\
+&4y_2 = 3 \\
+&{-5y_1} - 6y_2 = 4 \\
+&2y_1 = 1 \\
+&y_1,\, y_2 \ge 0.
+\end{aligned}
+\]
+Torneremo su questo duale nella sezione~\ref{sec:teoremi-dualita}.
+
+\paragraph{Esempio.}
+Scriviamo il duale del problema
+\[
+\begin{aligned}
+&\min\, (2x_1 + 3x_2 + x_3) \\
+&3x_1 + x_2 + 5x_3 \ge 7 \\
+&x_1 + x_2 - 6x_3 \le 9 \\
+&4x_1 - x_2 - 2x_3 = 8 \\
+&x_1,\, x_2,\, x_3 \ge 0
+\end{aligned}
+\qquad
+A = \begin{pmatrix} 3 & 1 & 5 \\ 1 & 1 & -6 \\ 4 & -1 & -2 \end{pmatrix}.
 \]
 Il primale è di minimo, quindi leggiamo la tabella da sinistra a destra. Le variabili duali sono tre, una per vincolo, e il loro segno dipende dal tipo di vincolo:
 \begin{itemize}
@@ -137,19 +192,13 @@ Il primale è di minimo, quindi leggiamo la tabella da sinistra a destra. Le var
     \item Il secondo vincolo è $\le$, quindi $y_2 \le 0$.
     \item Il terzo vincolo è di uguaglianza, quindi $y_3$ è libera.
 \end{itemize}
-I vincoli duali sono tre, uno per ogni variabile (ovvero per ogni colonna di $A$), e il loro tipo dipende dal segno della variabile:
-\begin{itemize}
-    \item $x_1 \ge 0$, quindi il primo vincolo è $\le$: $\ y_1 + 2y_2 + y_3 \le 3$.
-    \item $x_2 \le 0$, quindi il secondo vincolo è $\ge$: $\ y_1 - y_2 \ge -1$.
-    \item $x_3$ è libera, quindi il terzo vincolo è di uguaglianza: $\ -y_1 + 3y_3 = 2$.
-\end{itemize}
-Il duale è quindi:
+Le variabili primali sono invece tutte $\ge 0$, quindi i tre vincoli duali, uno per ogni colonna di $A$, sono di tipo $\le$:
 \[
 \begin{aligned}
-&\max\, (2y_1 + 5y_2 + 4y_3) \\
-&y_1 + 2y_2 + y_3 \le 3 \\
-&y_1 - y_2 \ge -1 \\
-&{-y_1} + 3y_3 = 2 \\
+&\max\, (7y_1 + 9y_2 + 8y_3) \\
+&3y_1 + y_2 + 4y_3 \le 2 \\
+&y_1 + y_2 - y_3 \le 3 \\
+&5y_1 - 6y_2 - 2y_3 \le 1 \\
 &y_1 \ge 0, \quad y_2 \le 0, \quad y_3 \text{ libera.}
 \end{aligned}
 \]
@@ -164,9 +213,9 @@ Il primale è di massimo, quindi leggiamo la tabella~\ref{tab:trasformazioni} da
 \min \sum_{i=1}^{m} b_i y_i, \qquad \sum_{i=1}^{m} a_{ij} y_i \ge c_j, \quad j = 1, \dots, n, \qquad y_i \ge 0.
 \]
 
-Supponiamo ora che qualcuno voglia comprare tutte le nostre risorse, invece di lasciarci produrre, e indichiamo con $y_i$ il prezzo unitario che offre per la risorsa $R_i$. Comprando tutte le risorse spende $\sum_i b_i y_i$, e vuole ovviamente spendere il meno possibile. Per convincerci a vendere, però, deve offrire prezzi convenienti: per ogni prodotto $P_j$, le risorse necessarie a fabbricarne una unità devono essere pagate almeno quanto il profitto $c_j$ che ne ricaveremmo, ovvero $\sum_i a_{ij} y_i \ge c_j$.
+Supponiamo ora che, in un mercato parallelo, qualcuno voglia comprare tutte le nostre risorse invece di lasciarci produrre, e indichiamo con $y_i$ il prezzo unitario che offre per la risorsa $R_i$. Comprando tutte le risorse spende $\sum_i b_i y_i$, e per essere competitivo vuole spendere il meno possibile. Per convincerci a vendere, però, deve offrire prezzi convenienti: per ogni prodotto $P_j$, le risorse necessarie a fabbricarne una unità devono essere pagate almeno quanto il profitto $c_j$ che ne ricaveremmo, ovvero $\sum_i a_{ij} y_i \ge c_j$.
 
-Il problema del compratore è proprio il duale. I valori $y_i$ si chiamano \textbf{prezzi ombra} delle risorse, perché misurano il valore implicito di ciascuna risorsa all'interno del problema.
+Il problema del compratore è proprio il duale. Anche il duale è quindi un problema di natura economica, e il mercato parallelo si dice \textbf{mercato ombra}. I valori $y_i$ si chiamano \textbf{prezzi ombra} delle risorse, perché misurano il valore implicito di ciascuna risorsa all'interno del problema.
 
 \paragraph{Esempio.}
 Torniamo al problema dei mattoncini lego~\eqref{eq:lego}:
@@ -189,7 +238,7 @@ dove $y_1$ e $y_2$ sono i prezzi offerti per un mattoncino piccolo e per uno gra
 
 Il duale ha due variabili, quindi possiamo risolverlo graficamente (figura~\ref{fig:duale-lego}). La regione ammissibile non è limitata e ha tre vertici: $(0, 15)$, $(5, 5)$ e $(10, 0)$, dove il vertice $(5, 5)$ è l'intersezione delle rette $2y_1 + y_2 = 15$ e $y_1 + y_2 = 10$. La funzione obiettivo vale rispettivamente $90$, $70$ e $80$, e nelle direzioni in cui la regione si estende cresce. Il minimo è quindi $70$, con $y_1 = y_2 = 5$ euro a mattoncino.
 
-Notiamo che $70$ euro è proprio il profitto massimo del primale, che si ottiene costruendo 2 sedie e 2 tavoli (sezione~\ref{sec:graf}). Non è un caso: il fatto che i valori ottimi del primale e del duale coincidano è il contenuto dei teoremi della dualità, che vedremo più avanti.
+Notiamo che $70$ euro è proprio il profitto massimo del primale, che si ottiene costruendo 2 sedie e 2 tavoli (sezione~\ref{sec:graf}). Non è un caso: il fatto che i valori ottimi del primale e del duale coincidano è il contenuto del teorema della dualità forte, che vediamo nella prossima sezione.
 
 \begin{figure}[htbp]
 \centering
@@ -226,9 +275,467 @@ Notiamo che $70$ euro è proprio il profitto massimo del primale, che si ottiene
 \label{fig:duale-lego}
 \end{figure}
 
+\section{Teoremi della dualità}\label{sec:teoremi-dualita}
+In questa sezione consideriamo la coppia di problemi duali simmetrici
+\[
+\min c^T x, \quad A x \ge b, \quad x \ge 0 \tag{P}
+\]
+\[
+\max y^T b, \quad y^T A \le c^T, \quad y \ge 0. \tag{D}
+\]
+Il primo risultato confronta i valori delle due funzioni obiettivo in punti ammissibili qualsiasi.
+
+\begin{teorema}[Dualità debole]\label{teo:dualita-debole}
+Se $\bar{x}$ è un punto ammissibile per il primale e $\bar{y}$ è un punto ammissibile per il duale, allora
+\[
+\bar{y}^T b \le c^T \bar{x}.
+\]
+\end{teorema}
+
+\paragraph{Dimostrazione.}
+Poiché $\bar{x}$ è ammissibile si ha $A \bar{x} \ge b$, e poiché $\bar{y} \ge 0$ possiamo moltiplicare la disuguaglianza per $\bar{y}^T$ senza cambiarne il verso: $\bar{y}^T b \le \bar{y}^T A \bar{x}$. Allo stesso modo $\bar{y}$ è ammissibile, quindi $\bar{y}^T A \le c^T$, e poiché $\bar{x} \ge 0$ si ha $\bar{y}^T A \bar{x} \le c^T \bar{x}$. Mettendo insieme le due disuguaglianze:
+\begin{equation}\label{eq:catena-debole}
+\bar{y}^T b \le \bar{y}^T A \bar{x} \le c^T \bar{x}
+\end{equation}
+che è la tesi. \hfill $\square$
+
+\vspace{0.5em}
+In pratica, il duale in un suo punto ammissibile non supera mai il valore del primale in un suo punto ammissibile. Ne seguono alcune conseguenze:
+\begin{itemize}
+    \item Il valore della funzione obiettivo primale in un qualsiasi punto ammissibile è un \textbf{upper bound} (limite superiore) per il valore ottimo del duale.
+    \item Il valore della funzione obiettivo duale in un qualsiasi punto ammissibile è un \textbf{lower bound} (limite inferiore) per il valore ottimo del primale.
+    \item Se primale e duale sono entrambi ammissibili, i loro valori ottimi sono finiti, e l'ottimo del primale è maggiore o uguale dell'ottimo del duale.
+\end{itemize}
+
+\begin{corollario}[Condizione di ottimalità]\label{cor:ottimalita-duale}
+Se $\bar{x}$ è ammissibile per il primale, $\bar{y}$ è ammissibile per il duale e $c^T \bar{x} = \bar{y}^T b$, allora $\bar{x}$ è una soluzione ottima del primale e $\bar{y}$ è una soluzione ottima del duale.
+\end{corollario}
+
+Il motivo è che, per la dualità debole, nessun punto ammissibile del primale può avere un valore minore di $\bar{y}^T b$, e $\bar{x}$ raggiunge proprio questo valore. Lo stesso ragionamento vale per $\bar{y}$. Il corollario dà quindi un modo per certificare che una soluzione è ottima: basta trovare una soluzione duale ammissibile con lo stesso valore.
+
+\begin{corollario}\label{cor:illimitato-inammissibile}
+Se il primale è illimitato inferiormente, allora il duale è inammissibile. Allo stesso modo, se il duale è illimitato superiormente, allora il primale è inammissibile.
+\end{corollario}
+
+Infatti, se il duale avesse un punto ammissibile $\bar{y}$, il valore $\bar{y}^T b$ sarebbe un lower bound per il primale, che quindi non potrebbe essere illimitato inferiormente.
+
+La dualità debole dice che l'ottimo del duale non supera quello del primale. Il teorema della dualità forte dice che, in realtà, i due valori coincidono.
+
+\begin{teorema}[Dualità forte]\label{teo:dualita-forte}
+Se uno dei due problemi, primale o duale, ammette una soluzione ottima finita, anche l'altro ammette una soluzione ottima finita, e i valori ottimi delle due funzioni obiettivo coincidono. Se invece uno dei due problemi è illimitato, l'altro non ammette soluzioni ammissibili\footnote{In questa forma, sia la dualità debole sia la dualità forte valgono per i problemi di PL.}.
+\end{teorema}
+
+Mettendo insieme i due teoremi si ottengono tutte le combinazioni possibili tra primale e duale, riassunte nella tabella~\ref{tab:primale-duale}. Ad esempio, un primale con ottimo finito non può avere un duale illimitato o inammissibile, mentre primale e duale possono essere entrambi inammissibili.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lccc}
+\toprule
+ & \multicolumn{3}{c}{\textbf{Duale}} \\
+\cmidrule(lr){2-4}
+\textbf{Primale} & ha ottimo finito & è illimitato & è inammissibile \\
+\midrule
+ha ottimo finito & sì & no & no \\
+è illimitato & no & no & sì \\
+è inammissibile & no & sì & sì \\
+\bottomrule
+\end{tabular}
+\caption{Relazioni tra primale e duale: ogni casella dice se il primale (riga) e il duale (colonna) possono trovarsi contemporaneamente nei casi indicati.}
+\label{tab:primale-duale}
+\end{table}
+
+\paragraph{Esempio.}
+Torniamo al duale del problema con variabili libere della sezione~\ref{sec:regole-duale}. Le ultime due equazioni danno $y_1 = \frac12$ e $y_2 = \frac34$, che soddisfano anche la prima, perché $\frac12 + \frac32 = 2$. Con questi valori, però, la terza equazione vale $-\frac52 - \frac92 = -7 \neq 4$: il duale non ha soluzioni ammissibili. Il primale invece è ammissibile, ad esempio con $x = (7, 0, 0, 0)$. Guardando la tabella~\ref{tab:primale-duale}, un duale inammissibile è compatibile solo con un primale illimitato o inammissibile: il primale è quindi illimitato inferiormente, senza bisogno di risolverlo.
+
+Per un primale in forma standard, la soluzione ottima duale si può costruire direttamente a partire dalla soluzione ottima di base del primale, come dice il teorema seguente.
+
+\begin{teorema}[Soluzione ottima duale]\label{teo:sol-duale}
+Sia dato il primale in forma standard $\min c^T x$, $Ax = b$, $x \ge 0$, e sia $\bar{x} = (B^{-1}b, 0)$ una sua soluzione ottima di base, con costi ridotti non negativi. Allora
+\[
+\bar{y}^T = c_B^T B^{-1}
+\]
+è una soluzione ottima del duale $\max y^T b$, $y^T A \le c^T$.
+\end{teorema}
+
+\paragraph{Dimostrazione.}
+Verifichiamo prima che $\bar{y}$ sia ammissibile per il duale, ovvero che $\bar{y}^T A \le c^T$. Partizionando $A = (B, N)$, il vincolo si divide in due parti. Per le colonne di base si ha
+\[
+\bar{y}^T B = c_B^T B^{-1} B = c_B^T
+\]
+quindi il vincolo è soddisfatto con l'uguaglianza. Per le colonne fuori base si ha invece
+\[
+\bar{y}^T N = c_B^T B^{-1} N \le c_N^T
+\]
+perché $c_N^T - c_B^T B^{-1} N \ge 0$ è proprio la condizione sui costi ridotti. Inoltre
+\[
+\bar{y}^T b = c_B^T B^{-1} b = c^T \bar{x}
+\]
+quindi primale e duale hanno lo stesso valore, e per il corollario~\ref{cor:ottimalita-duale}\footnote{Il corollario vale anche per la coppia asimmetrica, perché la dualità debole si dimostra allo stesso modo: se $A\bar{x} = b$, $\bar{x} \ge 0$ e $\bar{y}^T A \le c^T$, allora $\bar{y}^T b = \bar{y}^T A \bar{x} \le c^T \bar{x}$.} $\bar{y}$ è ottima. \hfill $\square$
+
+\begin{osservazione}[Ammissibilità duale e ottimalità primale]
+La dimostrazione mostra che $\bar{y}^T = c_B^T B^{-1}$ è ammissibile per il duale se e solo se i costi ridotti della base $B$ sono non negativi. In altre parole, la condizione di ammissibilità della soluzione duale coincide con la condizione di ottimalità primale (teorema~\ref{teo:ottimalita}). È l'idea su cui si basa il simplesso duale.
+\end{osservazione}
+
+\section{Condizioni di complementarietà}\label{sec:complementarieta}
+La dualità forte dice che all'ottimo i valori di primale e duale coincidono. Le \textbf{condizioni di complementarietà}, dette anche degli \textbf{scarti complementari}, traducono questa uguaglianza in condizioni sui singoli vincoli.
+
+\begin{teorema}[Scarti complementari]\label{teo:complementarieta}
+Siano $\bar{x}$ ammissibile per (P) e $\bar{y}$ ammissibile per (D). Allora $\bar{x}$ e $\bar{y}$ sono soluzioni ottime dei rispettivi problemi se e solo se
+\[
+\bar{y}^T (A\bar{x} - b) = 0 \qquad \text{e} \qquad (\bar{y}^T A - c^T)\, \bar{x} = 0.
+\]
+\end{teorema}
+
+Il motivo segue dalla catena di disuguaglianze~\eqref{eq:catena-debole}. La prima disuguaglianza è un'uguaglianza solo se $\bar{y}^T(A\bar{x} - b) = 0$, mentre la seconda lo è solo se $(\bar{y}^T A - c^T)\bar{x} = 0$. I due punti sono ottimi se e solo se $\bar{y}^T b = c^T \bar{x}$ (per la dualità forte e il corollario~\ref{cor:ottimalita-duale}), ovvero se e solo se valgono entrambe le uguaglianze.
+
+Le due condizioni si possono scrivere componente per componente. Il vettore $A\bar{x} - b$ ha componenti $\ge 0$, perché $\bar{x}$ è ammissibile, e anche $\bar{y} \ge 0$: la somma $\bar{y}^T(A\bar{x} - b)$ è quindi nulla solo se ogni suo termine è nullo. Lo stesso vale per la seconda condizione, in cui $\bar{y}^T A - c^T \le 0$ e $\bar{x} \ge 0$. Si ottengono così $m + n$ condizioni:
+\[
+\bar{y}_i \,(a_i^T \bar{x} - b_i) = 0, \quad i = 1, \dots, m \qquad\qquad \bar{x}_j \,(\bar{y}^T A_j - c_j) = 0, \quad j = 1, \dots, n
+\]
+dove $a_i^T$ è la $i$-esima riga di $A$ e $A_j$ è la sua $j$-esima colonna.
+
+In pratica, per ogni vincolo almeno uno dei due fattori deve essere nullo: se $\bar{y}_i > 0$ il vincolo $i$ è attivo, e se il vincolo $i$ non è attivo allora $\bar{y}_i = 0$. Lo stesso vale per ogni variabile primale e il vincolo duale corrispondente.
+
+Pensando ai prezzi ombra della sezione~\ref{sec:duale-economico}, la condizione ha una lettura molto banale. Se il prezzo ombra di una risorsa è positivo, la risorsa è tutta utilizzata (il vincolo è saturo). Se invece una parte della risorsa avanza, il suo prezzo ombra è nullo: averne di più non serve.
+
+\begin{osservazione}[Casi particolari]
+Se il primale è in forma standard, i vincoli $Ax = b$ sono di uguaglianza e la prima condizione è sempre verificata. Le condizioni di complementarietà si riducono quindi a $(\bar{y}^T A - c^T)\bar{x} = 0$. Al contrario, se il primale ha vincoli $Ax \ge b$ e variabili libere, il duale ha vincoli di uguaglianza $y^T A = c^T$, e resta solo la condizione $\bar{y}^T(A\bar{x} - b) = 0$.
+\end{osservazione}
+
+\paragraph{Esempio.}
+Consideriamo il problema
+\[
+\begin{aligned}
+&\min\, (6x_1 + 4x_2) \\
+&x_1 + 2x_2 \ge 1 \\
+&2x_1 + x_2 \ge -1 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\]
+di cui sappiamo che la soluzione ottima è $\bar{x} = (0, \frac12)$, e calcoliamo la soluzione ottima duale. Per prima cosa costruiamo il duale:
+\[
+\begin{aligned}
+&\max\, (y_1 - y_2) \\
+&y_1 + 2y_2 \le 6 \\
+&2y_1 + y_2 \le 4 \\
+&y_1,\, y_2 \ge 0.
+\end{aligned}
+\]
+Le condizioni di complementarietà sono quattro, due per i vincoli primali e due per le variabili primali:
+\[
+\begin{aligned}
+y_1\,(x_1 + 2x_2 - 1) &= 0 \\
+y_2\,(2x_1 + x_2 + 1) &= 0
+\end{aligned}
+\qquad\qquad
+\begin{aligned}
+x_1\,(y_1 + 2y_2 - 6) &= 0 \\
+x_2\,(2y_1 + y_2 - 4) &= 0.
+\end{aligned}
+\]
+Sostituiamo $\bar{x} = (0, \frac12)$. Il primo vincolo primale è attivo, quindi la prima condizione è soddisfatta qualunque sia $y_1$. Il secondo vale invece $\frac12 + 1 = \frac32 > 0$, quindi deve essere $y_2 = 0$. Poiché $x_1 = 0$, la terza condizione è sempre soddisfatta, mentre $x_2 = \frac12 > 0$ impone $2y_1 + y_2 = 4$, da cui $y_1 = 2$. La soluzione ottima duale è quindi $\bar{y} = (2, 0)$. Come verifica, i due valori ottimi coincidono: $6 \cdot 0 + 4 \cdot \frac12 = 2 = 2 - 0$.
+
+\paragraph{Esempio.}
+Torniamo al problema dei mattoncini e al suo duale. Il primale è di massimo, ma le condizioni hanno la stessa forma: ogni variabile duale moltiplica lo scarto del vincolo primale corrispondente, e ogni variabile primale moltiplica lo scarto del vincolo duale corrispondente.
+
+La soluzione ottima primale è $x^* = (2, 2)$, quindi entrambe le variabili sono positive e i due vincoli duali devono essere attivi:
+\[
+\begin{cases}
+2y_1 + y_2 = 15 \\
+2y_1 + 2y_2 = 20
+\end{cases}
+\quad\Longrightarrow\quad y_1 = y_2 = 5.
+\]
+Ritroviamo così, senza disegnare nulla, la soluzione trovata graficamente. Le condizioni sui vincoli primali, invece, non danno informazioni: nella soluzione ottima si usano tutti i mattoncini, quindi entrambi i vincoli sono attivi e le condizioni sono soddisfatte qualunque siano $y_1$ e $y_2$.
+
+\section{Calcolo della soluzione duale dalla tabella}\label{sec:duale-tabella}
+Il teorema~\ref{teo:sol-duale} dà anche un metodo operativo per calcolare la soluzione ottima duale a partire dalla tabella finale del simplesso applicato al primale:
+\[
+\bar{y}^T = c_B^T B^{-1}
+\]
+dove $c_B$ è il vettore dei costi delle variabili in base nella tabella finale, ordinati come le righe della tabella.
+
+Per trovare $B^{-1}$ non serve invertire nessuna matrice. Le operazioni del simplesso trasformano infatti i vincoli della tabella iniziale moltiplicandoli per $B^{-1}$, quindi le colonne che nella tabella iniziale formavano la matrice identità diventano $B^{-1} I = B^{-1}$. In pratica, $B^{-1}$ si legge nella tabella finale, nelle colonne delle variabili che erano in base alla prima iterazione.
+
+Se la base iniziale è formata da variabili di scarto si può fare ancora più in fretta. Il costo ridotto della variabile di scarto dell'$i$-esimo vincolo, che ha costo nullo e colonna $e_i$, vale infatti $0 - \bar{y}^T e_i = -\bar{y}_i$. Quindi, se il primale ha solo vincoli di tipo $\le$:
+\[
+\bar{y}_i = -\bar{c}_{\text{scarto } i}
+\]
+ovvero la soluzione duale è l'opposto del vettore dei costi ridotti delle variabili di scarto nella tabella finale.
+
+\paragraph{Esempio.}
+Consideriamo il problema
+\[
+\begin{aligned}
+&\min\, (-2x_1 - x_2) \\
+&x_1 + 2x_2 \le 2 \\
+&2x_1 + 3x_2 \le 4 \\
+&x_1 + 3x_2 \le 3 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{aligned}
+&\max\, (2y_1 + 4y_2 + 3y_3) \\
+&y_1 + 2y_2 + y_3 \le -2 \\
+&2y_1 + 3y_2 + 3y_3 \le -1 \\
+&y_1,\, y_2,\, y_3 \le 0
+\end{aligned}
+\]
+dove il duale ha variabili $\le 0$ perché i vincoli del primale di minimo sono di tipo $\le$. Risolviamo il primale con il simplesso, aggiungendo le variabili di scarto $x_3$, $x_4$ e $x_5$. Entra $x_1$, e i rapporti delle righe di $x_3$ e di $x_4$ valgono entrambi $2$: per la regola dell'indice minimo esce $x_3$. Con le operazioni $R_2 \to R_2 - 2R_1$, $R_3 \to R_3 - R_1$ e $R_4 \to R_4 + 2R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_3$ & $\boxed{1}$ & 2 & 1 & 0 & 0 & 2 \\
+$x_4$ & 2 & 3 & 0 & 1 & 0 & 4 \\
+$x_5$ & 1 & 3 & 0 & 0 & 1 & 3 \\
+\hline
+ & $-2$ & $-1$ & 0 & 0 & 0 & 0 \\
+\end{tabular}
+\qquad$\Longrightarrow$\qquad
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_1$ & 1 & 2 & 1 & 0 & 0 & 2 \\
+$x_4$ & 0 & $-1$ & $-2$ & 1 & 0 & 0 \\
+$x_5$ & 0 & 1 & $-1$ & 0 & 1 & 1 \\
+\hline
+ & 0 & 3 & 2 & 0 & 0 & 4 \\
+\end{tabular}
+\end{center}
+I costi ridotti sono tutti non negativi: la soluzione ottima è $x^* = (2, 0)$, con valore $-4$. Nella tabella finale $B^{-1}$ si legge nelle colonne di $x_3$, $x_4$ e $x_5$, e la base è $(x_1, x_4, x_5)$, con $c_B = (-2, 0, 0)$:
+\[
+\bar{y}^T = c_B^T B^{-1} = (-2, 0, 0) \begin{pmatrix} 1 & 0 & 0 \\ -2 & 1 & 0 \\ -1 & 0 & 1 \end{pmatrix} = (-2, 0, 0).
+\]
+Allo stesso risultato si arriva prendendo l'opposto dei costi ridotti delle variabili di scarto, che sono $(2, 0, 0)$. Il punto $\bar{y}$ è ammissibile per il duale e ha valore $2 \cdot (-2) = -4$, uguale all'ottimo del primale\footnote{La soluzione primale è degenere, perché $x_4$ è in base con valore nullo. In questo caso il duale può avere più soluzioni ottime: anche $y = (0, -1, 0)$ è ammissibile e ha valore $-4$. Il simplesso ne trova una, che dipende dalla base finale.}.
+
+\section{Analisi post-ottimale}\label{sec:post-ottimale}
+Una volta risolto un problema, ci si può chiedere come cambia la soluzione ottima se cambiano i dati, ad esempio se aumenta la disponibilità di una risorsa. Le variabili duali rispondono proprio a questa domanda nel caso dei termini noti.
+
+\paragraph{Esempio.}
+Un'azienda produce due prodotti, deluxe e standard, utilizzando due ingredienti $I_1$ e $I_2$ e una lavorazione su macchina. Le quantità necessarie per una unità di prodotto e i prezzi di vendita sono riportati nella tabella:
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & Deluxe & Standard & Disponibilità settimanale \\
+\midrule
+$I_1$ (kg) & 3 & 2 & 1200 \\
+$I_2$ (kg) & 4 & 1 & 1000 \\
+Macchina (ore) & 2 & 1 & 700 \\
+Prezzo (euro) & 24 & 14 & \\
+\bottomrule
+\end{tabular}
+\end{center}
+Indicando con $x_1$ e $x_2$ le quantità prodotte di deluxe e standard, il problema e il suo duale sono:
+\[
+\begin{aligned}
+&\max\, (24x_1 + 14x_2) \\
+&3x_1 + 2x_2 \le 1200 \\
+&4x_1 + x_2 \le 1000 \\
+&2x_1 + x_2 \le 700 \\
+&x_1,\, x_2 \ge 0
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{aligned}
+&\min\, (1200y_1 + 1000y_2 + 700y_3) \\
+&3y_1 + 4y_2 + 2y_3 \ge 24 \\
+&2y_1 + y_2 + y_3 \ge 14 \\
+&y_1,\, y_2,\, y_3 \ge 0
+\end{aligned}
+\]
+ovvero lo stesso problema del primo esempio della sezione~\ref{sec:regole-duale}, con i termini noti moltiplicati per $100$. La soluzione ottima primale è $x^* = (160, 360)$, con un profitto di $8880$ euro.
+
+Calcoliamo la soluzione duale con le condizioni di complementarietà. I primi due vincoli sono attivi in $x^*$, mentre il terzo vale $2 \cdot 160 + 360 = 680 < 700$: avanzano 20 ore di lavorazione, quindi $y_3 = 0$. Inoltre $x_1$ e $x_2$ sono positivi, quindi i due vincoli duali sono attivi:
+\[
+\begin{cases}
+3y_1 + 4y_2 = 24 \\
+2y_1 + y_2 = 14
+\end{cases}
+\quad\Longrightarrow\quad y_1 = 6.4, \quad y_2 = 1.2.
+\]
+Il duale vale $1200 \cdot 6.4 + 1000 \cdot 1.2 = 8880$, come il primale: per il corollario~\ref{cor:ottimalita-duale} le due soluzioni sono ottime.
+
+Supponiamo ora che l'azienda voglia aumentare la disponibilità di $I_1$ o di $I_2$ per produrre e guadagnare di più. Di quanto aumenta il profitto se la disponibilità di $I_1$ passa da 1200 a 1201 kg a settimana? La regione ammissibile del duale non dipende dai termini noti del primale: questi compaiono solo nella funzione obiettivo duale, che diventa $1201y_1 + 1000y_2 + 700y_3$. Se la soluzione duale ottima resta la stessa, il valore ottimo aumenta quindi di $y_1^* = 6.4$ euro.
+
+Allo stesso modo un kg in più di $I_2$ vale $1.2$ euro, mentre un'ora di macchina in più non vale niente, perché ne avanzano già 20.
+
+In altre parole, la variabile duale $y_i^*$ esprime di quanto varia il valore ottimo del primale se si incrementa di una unità la risorsa $i$-esima\footnote{Nell'esempio questo vale finché la disponibilità di $I_1$ resta tra 750 e 1250 kg. Oltre questi valori la base ottima cambia e bisogna risolvere di nuovo il problema.}.
+
+Vediamo il caso generale. Consideriamo il primale in forma standard con base ottima $B$, e perturbiamo i termini noti, che passano da $b$ a $b + \Delta b$. I costi ridotti $c_N^T - c_B^T B^{-1} N$ non dipendono da $b$, quindi restano non negativi e la soluzione duale $\bar{y}^T = c_B^T B^{-1}$ resta ammissibile. La nuova soluzione di base primale è invece $(B^{-1}(b + \Delta b), 0)$, e si presentano due casi:
+\begin{itemize}
+    \item \textbf{Base ancora ammissibile}: se $B^{-1}(b + \Delta b) \ge 0$, la soluzione di base primale è ancora ammissibile, quindi la base $B$ resta ottima. La soluzione duale non cambia, e il valore ottimo varia di
+    \[
+    c_B^T B^{-1}(b + \Delta b) - c_B^T B^{-1} b = \bar{y}^T \Delta b.
+    \]
+    In particolare, se si perturba solo il termine noto $b_r$, il valore ottimo varia di $\bar{y}_r \Delta b_r$.
+    \item \textbf{Base non più ammissibile}: se $B^{-1}(b + \Delta b)$ ha componenti negative, la soluzione di base primale non è più ammissibile, ma quella duale sì. Si può allora ripartire dalla base $B$ con il simplesso duale (sezione~\ref{sec:simplesso-duale}).
+\end{itemize}
+Se $\bar{y}_r$ è grande, piccole variazioni di $b_r$ producono grandi variazioni del valore ottimo. Se invece $\bar{y}_r$ è piccolo, il valore ottimo è poco sensibile al termine noto $b_r$.
+
+\section{Il simplesso duale}\label{sec:simplesso-duale}
+Il \textbf{simplesso duale} è una variante del simplesso visto nel capitolo~\ref{ch:simplesso}, che d'ora in poi chiamiamo \textbf{simplesso primale}. Serve a risolvere problemi in cui si ha a disposizione una base che supera il test di ottimalità, ma che non è ammissibile.
+
+\paragraph{Esempio.}
+Consideriamo il problema
+\[
+\begin{aligned}
+&\min\, (3x_1 + x_2 + x_3) \\
+&2x_1 + x_2 \ge 5 \\
+&2x_1 + x_2 + 3x_3 \ge 2 \\
+&x_1,\, x_2,\, x_3 \ge 0
+\end{aligned}
+\qquad\Longrightarrow\qquad
+\begin{aligned}
+&2x_1 + x_2 - x_4 = 5 \\
+&2x_1 + x_2 + 3x_3 - x_5 = 2 \\
+&x_i \ge 0, \quad i = 1, \dots, 5.
+\end{aligned}
+\]
+Le variabili di surplus hanno colonne con il segno meno, quindi il sistema non è in forma canonica. Si potrebbe pensare di usare il metodo delle due fasi, e l'idea non sarebbe sbagliata, ma richiede un problema artificiale con due variabili in più. Proviamo invece a moltiplicare entrambi i vincoli per $-1$:
+\[
+-2x_1 - x_2 + x_4 = -5, \qquad -2x_1 - x_2 - 3x_3 + x_5 = -2.
+\]
+Ora le colonne di $x_4$ e $x_5$ formano la matrice identità, e la tabella è:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_4$ & $-2$ & $\boxed{-1}$ & 0 & 1 & 0 & $-5$ \\
+$x_5$ & $-2$ & $-1$ & $-3$ & 0 & 1 & $-2$ \\
+\hline
+ & 3 & 1 & 1 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+La soluzione di base $(0, 0, 0, -5, -2)$ non è ammissibile, perché i termini noti sono negativi. I costi ridotti però sono tutti non negativi, quindi il test di ottimalità è superato. È la situazione opposta a quella del simplesso primale, che parte da una base ammissibile e cerca di raggiungere l'ottimalità.
+
+Il nome deriva dall'osservazione della sezione~\ref{sec:teoremi-dualita}: una base con costi ridotti non negativi dà una soluzione duale $\bar{y}^T = c_B^T B^{-1}$ ammissibile. Il simplesso duale genera quindi una sequenza di basi con soluzione duale ammissibile e soluzione primale non ammissibile, finché non trova una base ammissibile anche per il primale. A quel punto la base supera entrambi i test ed è ottima. Il metodo si basa sull'ammissibilità duale, ed è per questo che si chiama simplesso duale.
+
+Geometricamente, il simplesso primale si sposta tra vertici della regione ammissibile. Il simplesso duale invece parte da un punto che non appartiene alla regione ammissibile (nell'esempio l'origine, che non soddisfa i vincoli) e si avvicina al vertice ottimo attraverso soluzioni di base non ammissibili.
+
+\subsection{Criteri del simplesso duale}
+Consideriamo una tabella in forma canonica con costi ridotti $\bar{c}_j \ge 0$ per ogni $j$. Le regole del simplesso duale sono le seguenti:
+\begin{itemize}
+    \item \textbf{Criterio di ottimalità}: se tutti i termini noti sono non negativi, $\beta_i \ge 0$ per ogni $i$, la base $B$ è ottima. La soluzione ottima primale è $\bar{x} = (B^{-1}b, 0)$ e quella duale è $\bar{y}^T = c_B^T B^{-1}$.
+    \item \textbf{Criterio di inammissibilità}: se esiste una riga $r$ con $\beta_r < 0$ e tutti gli elementi $\alpha_{rj} \ge 0$, il primale non ha soluzioni ammissibili (e il duale è illimitato). La riga $r$ si legge infatti $x_r + \sum_j \alpha_{rj} x_j = \beta_r$: con $x \ge 0$ il primo membro è non negativo, e non può essere uguale a $\beta_r < 0$.
+    \item \textbf{Criterio di uscita}: esce dalla base la variabile $x_r$ con il termine noto più negativo, ovvero $\beta_r = \min\{\beta_i : \beta_i < 0\}$. In caso di pareggio si sceglie quella con indice minore.
+    \item \textbf{Criterio di entrata}: entra in base la variabile $x_s$ che realizza il rapporto minimo tra i costi ridotti e i valori assoluti degli elementi negativi della riga $r$:
+    \[
+    \frac{\bar{c}_s}{|\alpha_{rs}|} = \min_j \left\{ \frac{\bar{c}_j}{|\alpha_{rj}|} : \alpha_{rj} < 0 \right\}.
+    \]
+\end{itemize}
+Il pivot è l'elemento $\alpha_{rs}$, che è negativo, e le operazioni sulle righe sono le stesse del simplesso primale. Dopo il pivot il termine noto della riga $r$ diventa $\beta_r / \alpha_{rs} > 0$.
+
+Il criterio di entrata serve a mantenere i costi ridotti non negativi, ovvero l'ammissibilità duale. Dopo il pivot i nuovi costi ridotti valgono:
+\[
+\bar{c}'_j = \bar{c}_j - \alpha_{rj} \frac{\bar{c}_s}{\alpha_{rs}}.
+\]
+Poiché $\alpha_{rs} < 0$, se $\alpha_{rj} \ge 0$ il costo ridotto non diminuisce. Se invece $\alpha_{rj} < 0$, la condizione $\bar{c}'_j \ge 0$ equivale a $\frac{\bar{c}_j}{|\alpha_{rj}|} \ge \frac{\bar{c}_s}{|\alpha_{rs}|}$, ed è garantita proprio dalla scelta del rapporto minimo.
+
+Mettendo insieme i criteri, i passi dell'algoritmo sono:
+\begin{enumerate}
+    \item Si parte da una base con costi ridotti non negativi, ovvero con soluzione duale $\bar{y}^T = c_B^T B^{-1}$ ammissibile.
+    \item Se tutti i termini noti sono $\ge 0$, la soluzione corrente è ottima e l'algoritmo termina. Altrimenti si sceglie la riga $r$ della variabile uscente con il criterio di uscita.
+    \item Se tutti gli elementi della riga $r$ sono $\ge 0$, il primale è inammissibile e l'algoritmo termina. Altrimenti si sceglie la variabile entrante $x_s$ con il criterio di entrata.
+    \item Si esegue il pivot sull'elemento $\alpha_{rs}$ e si torna al passo 2.
+\end{enumerate}
+
+\paragraph{Esempio.}
+Torniamo al nostro esempio. Il termine noto più negativo è $-5$, quindi esce $x_4$. Nella sua riga gli elementi negativi sono quelli di $x_1$ e di $x_2$, e i rapporti sono:
+\[
+\min \left\{ \frac{3}{|-2|},\ \frac{1}{|-1|} \right\} = \min \left\{ \frac32,\ 1 \right\} = 1
+\]
+quindi entra $x_2$, e il pivot vale $-1$. Con le operazioni $R_1 \to -R_1$, $R_2 \to R_2 + R_1$ e $R_3 \to R_3 - R_1$, dove $R_1$ indica la riga del pivot già aggiornata, si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_2$ & 2 & 1 & 0 & $-1$ & 0 & 5 \\
+$x_5$ & 0 & 0 & $-3$ & $-1$ & 1 & 3 \\
+\hline
+ & 1 & 0 & 1 & 1 & 0 & $-5$ \\
+\end{tabular}
+\end{center}
+I termini noti sono ora non negativi, e i costi ridotti sono rimasti non negativi: la soluzione $x^* = (0, 5, 0)$ è ottima, con valore $5$, ed è bastata una sola iterazione.
+
+\paragraph{Esempio.}
+Risolviamo con il simplesso duale il problema
+\[
+\begin{aligned}
+&\min\, (12x_1 + 11x_2 + 16x_3) \\
+&{-3x_1} + x_2 + x_3 \ge 3 \\
+&4x_1 + x_2 + 2x_3 \ge 4 \\
+&x_1,\, x_2,\, x_3 \ge 0.
+\end{aligned}
+\]
+Sottraiamo le variabili di surplus $x_4$ e $x_5$ e moltiplichiamo entrambi i vincoli per $-1$, ottenendo $3x_1 - x_2 - x_3 + x_4 = -3$ e $-4x_1 - x_2 - 2x_3 + x_5 = -4$. Il termine noto più negativo è $-4$, quindi esce $x_5$. I rapporti sono $\frac{12}{4} = 3$, $\frac{11}{1} = 11$ e $\frac{16}{2} = 8$, quindi entra $x_1$:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_4$ & 3 & $-1$ & $-1$ & 1 & 0 & $-3$ \\
+$x_5$ & $\boxed{-4}$ & $-1$ & $-2$ & 0 & 1 & $-4$ \\
+\hline
+ & 12 & 11 & 16 & 0 & 0 & 0 \\
+\end{tabular}
+\end{center}
+Con le operazioni $R_2 \to -\frac14 R_2$, $R_1 \to R_1 - 3R_2$ e $R_3 \to R_3 - 12R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_4$ & 0 & $-\frac74$ & $\boxed{-\tfrac52}$ & 1 & $\frac34$ & $-6$ \\
+$x_1$ & 1 & $\frac14$ & $\frac12$ & 0 & $-\frac14$ & 1 \\
+\hline
+ & 0 & 8 & 10 & 0 & 3 & $-12$ \\
+\end{tabular}
+\end{center}
+Ora esce $x_4$, con termine noto $-6$. I rapporti sono $8 / \frac74 = \frac{32}{7}$ e $10 / \frac52 = 4$, quindi entra $x_3$. Con le operazioni $R_1 \to -\frac25 R_1$, $R_2 \to R_2 - \frac12 R_1$ e $R_3 \to R_3 - 10R_1$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_3$ & 0 & $\frac{7}{10}$ & 1 & $-\frac25$ & $-\frac{3}{10}$ & $\frac{12}{5}$ \\
+$x_1$ & 1 & $\boxed{-\tfrac{1}{10}}$ & 0 & $\frac15$ & $-\frac{1}{10}$ & $-\frac15$ \\
+\hline
+ & 0 & 1 & 0 & 4 & 6 & $-36$ \\
+\end{tabular}
+\end{center}
+Resta negativo il termine noto di $x_1$, che quindi esce. I rapporti sono $1 / \frac{1}{10} = 10$ per $x_2$ e $6 / \frac{1}{10} = 60$ per $x_5$, quindi entra $x_2$. Con le operazioni $R_2 \to -10R_2$, $R_1 \to R_1 - \frac{7}{10} R_2$ e $R_3 \to R_3 - R_2$ si ottiene:
+\begin{center}
+\begin{tabular}{c|ccccc|c}
+ & $x_1$ & $x_2$ & $x_3$ & $x_4$ & $x_5$ & $b$ \\
+\hline
+$x_3$ & 7 & 0 & 1 & 1 & $-1$ & 1 \\
+$x_2$ & $-10$ & 1 & 0 & $-2$ & 1 & 2 \\
+\hline
+ & 10 & 0 & 0 & 6 & 5 & $-38$ \\
+\end{tabular}
+\end{center}
+I termini noti sono non negativi, quindi la soluzione $x^* = (0, 2, 1)$ è ottima, con valore $38$. Notiamo che il valore $z_0$ (l'opposto dell'elemento in basso a destra) è passato da $0$ a $12$, $36$ e infine $38$: nel simplesso duale cresce a ogni iterazione, perché è il valore del duale, che stiamo massimizzando.
+
+Il duale del problema è:
+\[
+\begin{aligned}
+&\max\, (3y_1 + 4y_2) \\
+&{-3y_1} + 4y_2 \le 12 \\
+&y_1 + y_2 \le 11 \\
+&y_1 + 2y_2 \le 16 \\
+&y_1,\, y_2 \ge 0.
+\end{aligned}
+\]
+Per un problema con soli vincoli di tipo $\ge$, la soluzione ottima duale è il vettore dei costi ridotti delle variabili di surplus nella tabella finale\footnote{Moltiplicando le righe per $-1$, le colonne delle variabili di surplus diventano colonne dell'identità, e il loro costo ridotto vale $-\bar{y}'_i$, dove $\bar{y}'$ è la soluzione duale del sistema moltiplicato per $-1$. Le variabili duali del problema di partenza sono $\bar{y} = -\bar{y}'$, quindi coincidono con i costi ridotti.}, ovvero $\bar{y} = (6, 5)$. Infatti $\bar{y}$ è ammissibile e il suo valore è $3 \cdot 6 + 4 \cdot 5 = 38$, come quello del primale. Ricordando la sezione~\ref{sec:duale-tabella}, per un problema con soli vincoli di tipo $\le$ la soluzione duale è invece l'opposto dei costi ridotti delle variabili di scarto.
+
+\begin{osservazione}[Simplesso duale o metodo delle due fasi?]
+Consideriamo un problema di minimo con vincoli di tipo $\le$ e $\ge$, di cui almeno uno $\ge$. Moltiplicando per $-1$ i vincoli $\ge$, le variabili di scarto e di surplus formano una base, e i costi ridotti iniziali coincidono con i coefficienti della funzione obiettivo:
+\begin{itemize}
+    \item Se i coefficienti della funzione obiettivo sono tutti non negativi, la base iniziale supera il test di ottimalità e si può usare il simplesso duale (oppure il metodo delle due fasi).
+    \item Se qualche coefficiente è negativo, la base iniziale non supera il test di ottimalità, quindi il simplesso duale non si può applicare direttamente e si usa il metodo delle due fasi.
+\end{itemize}
+\end{osservazione}
+
 \section*{Riferimenti}
 Il materiale visto in questo capitolo comprende:
 \begin{itemize}
-    \item Materiale visto a lezione (30 ottobre 2026).
-    \item Dispensa del corso \emph{Dualità}, sezioni 1 e 2.1 (definizione, tabella delle trasformazioni e duale del problema di allocazione delle risorse).
+    \item Materiale visto a lezione (30 ottobre, 6, 13 e 16 novembre 2026).
+    \item Dispensa del corso \emph{Dualità}, sezioni 1--7 (definizione, tabella delle trasformazioni, interpretazione economica, teoremi fondamentali, calcolo della soluzione duale, condizioni di complementarietà, simplesso duale e analisi post-ottimale).
 \end{itemize}

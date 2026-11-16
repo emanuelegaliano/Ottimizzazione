@@ -629,11 +629,11 @@ Dato un problema in forma standard con vincoli $Ax = b$, $x \ge 0$ e $b \ge 0$, 
 \[
 \begin{aligned}
 &\min \sum_{i=1}^{m} y_i \\
-&Ax + y = b \\
+&Ax + Iy = b \\
 &x \ge 0, \quad y \ge 0
 \end{aligned}
 \]
-dove $y = (y_1, \dots, y_m)^T$ è il vettore delle variabili artificiali.
+dove $y = (y_1, \dots, y_m)^T$ è il vettore delle variabili artificiali e $I$ è la matrice identità $m \times m$.
 \end{definizione}
 
 Le variabili artificiali misurano quanto un punto si allontana dal rispettare i vincoli di partenza. Sia $(x^*, y^*)$ una soluzione ottima del problema artificiale. Se $y^* = 0$, allora $Ax^* = b$ e $x^* \ge 0$, quindi $x^*$ è una soluzione ammissibile di base del problema di partenza.
